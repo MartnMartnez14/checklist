@@ -2,6 +2,8 @@
 
 PWA de listas y notas tipo tablero, **offline-first**. Funciona instalada en PC y celular, y guarda todo en el propio dispositivo (nada se sube a un servidor).
 
+**App:** https://martnmartnez14.github.io/checklist/
+
 ## Funcionalidades
 
 - Listas con elementos, tachado de completados y borrado.

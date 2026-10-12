@@ -8,10 +8,54 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#1a73e8">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<script>
+(function () {
+  var KEY = "checklist-theme";
+  var stored = null;
+  try { stored = localStorage.getItem(KEY); } catch (e) {}
+  var dark = stored ? stored === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  var t = dark ? "dark" : "light";
+  var el = document.documentElement;
+  el.dataset.theme = t; el.style.colorScheme = t;
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", dark ? "#0e1116" : "#ffffff");
+})();
+</script>
 <style>
   :root {
+    color-scheme: light;
     --bg: #f1f3f4; --card: #ffffff; --text: #202124; --muted: #5f6368;
     --accent: #1a73e8; --line: #e0e0e0; --danger: #d93025;
+    --hover: color-mix(in srgb, var(--accent) 12%, transparent);
+    --surface: rgba(255,255,255,.82);
+    --bg-glow: rgba(26,115,232,.10);
+    --scrim: rgba(255,255,255,.82);
+    --scrim-input: rgba(255,255,255,.60);
+    --on-image: #202124;
+    --edge-manual: #5f6368; --edge-manual-hover: #202124;
+    --edge-tag: #9334e6; --edge-tag-hover: #6f1fb0;
+    --tag-s: 62%; --tag-l: 38%; --ring-a: .55;
+    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-pill: 999px;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06);
+    --shadow-2: 0 4px 10px rgba(0,0,0,.10), 0 12px 28px rgba(0,0,0,.10);
+    --shadow-pop: 0 8px 30px rgba(0,0,0,.18);
+    --t-fast: 120ms ease; --t-med: 180ms ease;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg:#0e1116; --card:#1a1f27; --text:#e8eaed; --muted:#9aa0a6; --accent:#8ab4f8; --line:#2c323b; --danger:#f28b82;
+    --hover: color-mix(in srgb, var(--accent) 18%, transparent);
+    --surface: rgba(20,24,31,.72);
+    --bg-glow: rgba(138,180,248,.08);
+    --scrim: rgba(12,15,20,.72);
+    --scrim-input: rgba(0,0,0,.35);
+    --on-image: #f1f3f4;
+    --edge-manual:#9aa0a6; --edge-manual-hover:#e8eaed;
+    --edge-tag:#c58af9; --edge-tag-hover:#d7adfb;
+    --tag-s:70%; --tag-l:70%; --ring-a:.70;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.4), 0 2px 10px rgba(0,0,0,.35);
+    --shadow-2: 0 6px 16px rgba(0,0,0,.45), 0 16px 40px rgba(0,0,0,.4);
+    --shadow-pop: 0 10px 34px rgba(0,0,0,.55);
   }
   * { box-sizing: border-box; }
   body {
@@ -19,43 +63,63 @@
     background: var(--bg); color: var(--text);
   }
   header {
-    background: var(--card); border-bottom: 1px solid var(--line);
-    padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 20;
+    background: var(--surface); backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    border-bottom: 1px solid var(--line);
+    padding: 14px clamp(16px,3vw,32px); display: flex; align-items: center; justify-content: space-between;
     flex-wrap: wrap; gap: 8px;
   }
-  header h1 { font-size: 20px; font-weight: 500; margin: 0; }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    header { background: var(--card); }
+  }
+  header h1 { font-size: 18px; font-weight: 650; letter-spacing: -.01em; margin: 0; }
   .btn {
     border: 1px solid var(--line); background: var(--card); color: var(--accent);
-    border-radius: 18px; padding: 8px 16px; font: inherit; cursor: pointer;
+    border-radius: var(--radius-pill); padding: 8px 16px; font: inherit; font-weight: 550; cursor: pointer;
+    transition: background var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
   }
-  .btn:hover { background: #e8f0fe; }
+  .btn:hover { background: var(--hover); }
+  .btn:active { transform: translateY(1px); }
   .btn:disabled { opacity: .5; cursor: default; }
+  .theme-toggle{display:inline-flex;align-items:center;justify-content:center;padding:8px;border-radius:var(--radius-pill);}
+  .theme-toggle .i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+  :root[data-theme="light"] .i-moon{display:none;}
+  :root[data-theme="dark"] .i-sun{display:none;}
   .btn:focus-visible, .icon-btn:focus-visible, input:focus-visible,
   .swatch:focus-visible, .toggle:focus-visible, .clear:focus-visible {
     outline: 2px solid var(--accent); outline-offset: 2px;
   }
-  .board { position: relative; }
+  .board {
+    position: relative;
+    background-image: radial-gradient(1200px 600px at 50% -10%, var(--bg-glow), transparent 70%);
+    background-repeat: no-repeat;
+  }
   main {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px; padding: 24px; align-items: start;
+    gap: 18px; padding: clamp(16px,3vw,32px); align-items: start;
   }
-  .empty { color: var(--muted); grid-column: 1 / -1; text-align: center; margin-top: 48px; }
+  .empty { color: var(--muted); grid-column: 1 / -1; text-align: center; margin: 72px auto; max-width: 420px; line-height: 1.5; }
+  .empty strong { display: block; color: var(--text); font-size: 17px; margin-bottom: 6px; }
   .note {
     position: relative; z-index: 2;
     background-color: var(--card);
     background-image: linear-gradient(var(--tint, transparent), var(--tint, transparent));
-    border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-1);
+    transition: box-shadow var(--t-med);
     padding: 12px 16px 8px;
     --accent: #1a73e8;
   }
+  .note:hover { box-shadow: var(--shadow-2); }
   .note.pop-open { z-index: 5; }
   .note.has-bg {
-    --scrim: rgba(255,255,255,.82);
     background-image: linear-gradient(var(--scrim), var(--scrim)), var(--bg-img, none);
     background-size: cover; background-position: center;
   }
-  .note.has-bg .add-input { background: rgba(255,255,255,.6); border-radius: 6px; }
-  .note.has-bg .add-input::placeholder { color: #3c4043; }
+  .note.has-bg .add-input { background: var(--scrim-input); border-radius: var(--radius-sm); }
+  .note.has-bg .add-input::placeholder { color: var(--on-image); }
+  .note.has-bg .note-title,
+  .note.has-bg .item-text { color: var(--on-image); }
   .note-head { display: flex; align-items: center; gap: 4px; }
   .note-title {
     flex: 1; min-width: 0; border: none; background: transparent; font: inherit;
@@ -67,6 +131,10 @@
     color: var(--muted); padding: 2px 4px 6px; outline: none;
   }
   .note-tags:focus { border-bottom: 1px solid var(--accent); }
+  .tag-chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 4px 6px;}
+  .tag-chip{--chip:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l));font-size:11px;line-height:1;font-weight:600;padding:4px 8px;border-radius:var(--radius-pill);color:var(--chip);background:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.12);border:1px solid hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.40);}
+  :root[data-theme="dark"] .tag-chip{background:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.18);}
+  .note:not(:focus-within) .note-tags:not(:placeholder-shown){position:absolute;opacity:0;pointer-events:none;}
   .item { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
   .item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; margin: 0; }
   .item-text {
@@ -85,8 +153,8 @@
     border: none; background: none; cursor: pointer; color: var(--muted); font-size: 16px;
     width: 32px; height: 32px; border-radius: 50%; flex: none; opacity: .5;
   }
-  .icon-btn:hover { background: #f1f3f4; color: var(--danger); opacity: 1; }
-  .note-design:hover { background: #f1f3f4; color: var(--accent); opacity: 1; }
+  .icon-btn:hover { background: var(--hover); color: var(--danger); opacity: 1; }
+  .note-design:hover { background: var(--hover); color: var(--accent); opacity: 1; }
   .item:hover .icon-btn, .item:focus-within .icon-btn, .note:hover .note-head .icon-btn { opacity: 1; }
   .done-bar {
     display: flex; align-items: center; justify-content: space-between;
@@ -104,19 +172,35 @@
     position: absolute; inset: 0; width: 100%; height: 100%;
     overflow: visible; pointer-events: none; z-index: 1;
   }
-  .edge-line { stroke: #5f6368; stroke-width: 2; fill: none; }
-  .edge-tag .edge-line { stroke: #9334e6; stroke-dasharray: 6 4; }
-  .edge-hit { stroke: transparent; stroke-width: 18; fill: none; pointer-events: stroke; cursor: pointer; }
+  .edge-line{stroke:var(--edge-manual);stroke-width:2;fill:none;stroke-linecap:round;transition:stroke var(--t-fast),stroke-width var(--t-fast);}
+  .edge-tag .edge-line{stroke:var(--edge-tag);stroke-dasharray:7 5;}
+  .edge-anchor{fill:var(--edge-manual);stroke:var(--card);stroke-width:1.5;}
+  .edge-tag .edge-anchor{fill:var(--edge-tag);}
+  .edge-hit{stroke:transparent;stroke-width:28;fill:none;pointer-events:stroke;cursor:pointer;touch-action:manipulation;}
+  .edge:hover .edge-line,.edge.selected .edge-line{stroke-width:3;}
+  .edge-manual:hover .edge-line{stroke:var(--edge-manual-hover);}
+  .edge-tag:hover .edge-line{stroke:var(--edge-tag-hover);}
+  @media (pointer:coarse){.edge-hit{stroke-width:34;}}
+  @media (prefers-reduced-motion:no-preference){
+    .edge-new.edge-manual .edge-line{stroke-dasharray:1;stroke-dashoffset:1;animation:edge-draw .45s ease-out forwards;}
+    .edge-new.edge-tag .edge-line{animation:edge-fade .3s ease-out both;}
+    .edge-new .edge-anchor{animation:edge-fade .3s ease-out both;}
+    @keyframes edge-draw{to{stroke-dashoffset:0;}}
+    @keyframes edge-fade{from{opacity:0;}to{opacity:1;}}
+  }
   main.connecting .note { cursor: crosshair; }
+  .note.tag-linked{--tag-ring:hsl(var(--tag-h) var(--tag-s) var(--tag-l) / var(--ring-a));box-shadow:0 0 0 2px var(--tag-ring),var(--shadow-1);}
+  .note.tag-linked:hover{box-shadow:0 0 0 2px var(--tag-ring),var(--shadow-2);}
+  main.connecting .note.tag-linked,.note.is-origin,.note.is-target{box-shadow:var(--shadow-1);}
   .note.is-origin { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .note.is-target { outline: 2px dashed #9334e6; outline-offset: 2px; cursor: crosshair; }
+  .note.is-target { outline: 2px dashed var(--edge-tag); outline-offset: 2px; cursor: crosshair; }
   .note.is-target:hover { outline-style: solid; }
 
   /* --- Popover de estilo --- */
   .pop {
     position: absolute; top: 44px; right: 8px; z-index: 10;
-    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(0,0,0,.2); padding: 12px; width: 244px;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md);
+    box-shadow: var(--shadow-pop); padding: 12px; width: 244px;
   }
   .pop-title { font-size: 11px; color: var(--muted); margin: 10px 0 6px; text-transform: uppercase; letter-spacing: .05em; }
   .pop-title:first-child { margin-top: 0; }
@@ -130,13 +214,13 @@
     background-image: linear-gradient(to top right,
       transparent 45%, var(--muted) 45%, var(--muted) 55%, transparent 55%);
   }
-  .swatch.selected { border-color: var(--text); box-shadow: 0 0 0 2px #fff inset; }
+  .swatch.selected { border-color: var(--text); box-shadow: 0 0 0 2px var(--card) inset; }
   .opacity-slider { width: 100%; accent-color: var(--accent); }
   .pop-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
   .pop-btn { padding: 6px 10px; font-size: 13px; }
   .bg-thumb {
     width: 38px; height: 38px; border-radius: 6px; background-size: cover; background-position: center;
-    background-color: #eee; border: 1px solid var(--line); flex: none;
+    background-color: var(--line); border: 1px solid var(--line); flex: none;
   }
   .pop-links { max-height: 140px; overflow: auto; }
   .link-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
@@ -161,6 +245,10 @@
 <header>
   <h1>Checklist</h1>
   <div class="actions">
+    <button class="btn theme-toggle" id="theme-toggle" type="button" aria-label="Activar modo oscuro" aria-pressed="false">
+      <svg class="i i-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
+      <svg class="i i-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>
+    </button>
     <button class="btn btn-secondary" id="export">Exportar</button>
     <label class="btn btn-secondary" for="import-file">Importar</label>
     <input type="file" id="import-file" accept="application/json" hidden>
@@ -204,6 +292,23 @@
     if (Array.isArray(v)) v = v.join(",");
     if (typeof v !== "string") return [];
     return [...new Set(v.split(",").map(t => t.trim().toLowerCase()).filter(Boolean))];
+  }
+
+  // Hash determinista (FNV-1a) de un tag -> matiz 0..360.
+  function tagHue(tag) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < tag.length; i++) { h ^= tag.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return (h * 137.508) % 360;
+  }
+
+  let tagCounts = new Map();
+  function computeTagCounts() {
+    tagCounts = new Map();
+    notes.forEach(n => (n.tags || []).forEach(t => tagCounts.set(t, (tagCounts.get(t) || 0) + 1)));
+  }
+  // Primer tag de la nota compartido por >= 2 notas (para auto-conexión).
+  function sharedTag(note) {
+    return (note.tags || []).find(t => (tagCounts.get(t) || 0) >= 2) || null;
   }
 
   // Normaliza una nota al modelo actual sin perder datos.
@@ -262,6 +367,25 @@
   function announce(msg) {
     const s = document.getElementById("sr-status");
     if (s) s.textContent = msg;
+  }
+
+  // ---------- Tema (claro / oscuro) ----------
+  const THEME_KEY = "checklist-theme";
+  function applyTheme(t, persist) {
+    const dark = t === "dark";
+    const root = document.documentElement;
+    root.dataset.theme = dark ? "dark" : "light";
+    root.style.colorScheme = dark ? "dark" : "light";
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#0e1116" : "#ffffff");
+    const btn = document.getElementById("theme-toggle");
+    if (btn) {
+      btn.setAttribute("aria-pressed", String(dark));
+      btn.setAttribute("aria-label", dark ? "Activar modo claro" : "Activar modo oscuro");
+    }
+    if (persist) { try { localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); } catch (e) {} }
+    linksDirty = true;
+    scheduleLinks();
   }
 
   // ---------- Color / opacidad ----------
@@ -422,6 +546,8 @@
   // ---------- Conexiones (grafo estilo Obsidian) ----------
   let linksDirty = false;
   let linksRAF = null;
+  let prevEdgeKeys = null;   // claves de aristas del frame anterior (para animar solo las nuevas)
+  let justLinked = null;     // key de la conexión manual recién creada
 
   function scheduleLinks() {
     linksDirty = true;
@@ -460,23 +586,25 @@
   function makeEdge(r1, r2, cls, marker, srcId, tid) {
     const p1 = borderPoint(r1, rectCenter(r2), 8);
     const p2 = borderPoint(r2, rectCenter(r1), 8);
-    const dx = p2.x - p1.x, dy = p2.y - p1.y;
-    const dist = Math.hypot(dx, dy) || 1;
-    const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
-    const off = 0.12 * dist;
-    const cx = mx - (dy / dist) * off;
-    const cy = my + (dx / dist) * off;
-    const d = `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
+    const dx = p2.x - p1.x, dy = p2.y - p1.y, dist = Math.hypot(dx, dy) || 1;
+    const ux = dx / dist, uy = dy / dist, nx = -uy, ny = ux;
+    const bow = Math.min(0.18 * dist, 46);
+    const c1x = p1.x + ux * dist * 0.35 + nx * bow * 0.6, c1y = p1.y + uy * dist * 0.35 + ny * bow * 0.6;
+    const c2x = p2.x - ux * dist * 0.35 + nx * bow * 0.6, c2y = p2.y - uy * dist * 0.35 + ny * bow * 0.6;
+    const d = `M ${p1.x} ${p1.y} C ${c1x} ${c1y} ${c2x} ${c2y} ${p2.x} ${p2.y}`;
     const g = svgEl("g", { class: "edge " + cls });
-    const vis = svgEl("path", { d, class: "edge-line", "marker-end": marker });
+    g.append(svgEl("circle", { class: "edge-anchor", cx: p1.x, cy: p1.y, r: 3 }));
     if (srcId != null) {
       const hit = svgEl("path", { d, class: "edge-hit" });
       hit.addEventListener("click", e => { e.stopPropagation(); deleteLink(srcId, tid); });
-      g.append(hit, vis);
-    } else {
-      g.append(vis);
+      g.append(hit);
     }
+    g.append(svgEl("path", { d, class: "edge-line", "marker-end": marker, pathLength: "1" }));
     return g;
+  }
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
   function drawLinks() {
@@ -495,8 +623,8 @@
       });
     });
     const defs = svgEl("defs", {}, [
-      makeMarker("arrow-manual", "#5f6368"),
-      makeMarker("arrow-tag", "#9334e6")
+      makeMarker("arrow-manual", cssVar("--edge-manual")),
+      makeMarker("arrow-tag", cssVar("--edge-tag"))
     ]);
     const edges = [];
     notes.forEach(src => {
@@ -504,7 +632,7 @@
       if (!r1) return;
       (src.links || []).forEach(tid => {
         const r2 = rectMap.get(tid);
-        if (r2) edges.push(makeEdge(r1, r2, "edge-manual", "url(#arrow-manual)", src.id, tid));
+        if (r2) edges.push({ key: "m:" + src.id + "|" + tid, g: makeEdge(r1, r2, "edge-manual", "url(#arrow-manual)", src.id, tid) });
       });
     });
     const byTag = new Map();
@@ -524,11 +652,17 @@
           if (seen.has(key)) continue;
           seen.add(key);
           const r1 = rectMap.get(a), r2 = rectMap.get(b);
-          if (r1 && r2) edges.push(makeEdge(r1, r2, "edge-tag", "url(#arrow-tag)", null, null));
+          if (r1 && r2) edges.push({ key: "t:" + key, g: makeEdge(r1, r2, "edge-tag", "url(#arrow-tag)", null, null) });
         }
       }
     });
-    svg.replaceChildren(defs, ...edges);
+    edges.forEach(({ key, g }) => {
+      const isNew = (prevEdgeKeys != null && !prevEdgeKeys.has(key)) || key === justLinked;
+      if (isNew) g.classList.add("edge-new");
+    });
+    prevEdgeKeys = new Set(edges.map(e => e.key));
+    justLinked = null;
+    svg.replaceChildren(defs, ...edges.map(e => e.g));
   }
 
   function deleteLink(srcId, tid) {
@@ -591,6 +725,7 @@
     const src = notes.find(n => n.id === connectingSource);
     if (src && !src.links.includes(targetId)) {
       src.links.push(targetId);
+      justLinked = "m:" + src.id + "|" + targetId;
       save();
     }
     exitConnectMode();
@@ -599,8 +734,12 @@
   // ---------- Render ----------
   function render(focusId) {
     const root = document.getElementById("notes");
+    computeTagCounts();
     if (notes.length === 0) {
-      root.replaceChildren(el("p", { className: "empty", textContent: "Crea tu primera lista para empezar." }));
+      root.replaceChildren(el("p", { className: "empty" }, [
+        el("strong", { textContent: "Sin listas todavía" }),
+        document.createTextNode("Pulsa \"+ Nueva lista\" para empezar.")
+      ]));
     } else {
       root.replaceChildren(...notes.map(renderNote));
     }
@@ -663,6 +802,16 @@
       onchange: e => { note.tags = parseTags(e.target.value); save(); render(); }
     });
 
+    const st = sharedTag(note);
+    const chips = note.tags.length ? el("div", { className: "tag-chips", "aria-hidden": "true" },
+      note.tags.map(t => {
+        const chip = el("span", { className: "tag-chip", textContent: t });
+        chip.style.setProperty("--tag-h", tagHue(t));
+        return chip;
+      })
+    ) : null;
+    if (chips) chips.addEventListener("click", () => tags.focus());
+
     const pending = note.items.filter(i => !i.done);
     const done = note.items.filter(i => i.done);
 
@@ -681,6 +830,7 @@
     const children = [
       el("div", { className: "note-head" }, [title, styleBtn, connectBtn, delNote]),
       tags,
+      ...(chips ? [chips] : []),
       ...pending.map(item => renderItem(note, item)),
       add
     ];
@@ -703,10 +853,14 @@
     }
 
     const section = el("section", {
-      className: "note" + (openPopId === note.id ? " pop-open" : ""),
+      className: "note" + (openPopId === note.id ? " pop-open" : "") + (st ? " tag-linked" : ""),
       "data-id": note.id,
       "aria-label": note.title || "Lista sin título"
     }, children);
+    if (st) {
+      section.style.setProperty("--tag-h", tagHue(st));
+      section.dataset.tagShared = st;
+    }
 
     if (openPopId === note.id) section.append(renderPop(note, section));
     return section;
@@ -907,6 +1061,10 @@
   window.addEventListener("orientationchange", scheduleLinks);
 
   // ---------- Eventos globales ----------
+  document.getElementById("theme-toggle").addEventListener("click", () => {
+    applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true);
+  });
+
   document.getElementById("new-note").addEventListener("click", () => {
     const note = normalizeNote({ id: uid(), title: "", items: [], showDone: true });
     notes.unshift(note);
@@ -1033,6 +1191,7 @@
     navigator.serviceWorker.register("sw.js").catch(err => console.warn("SW no registrado:", err));
   }
 
+  applyTheme(document.documentElement.dataset.theme, false);
   render();
   migrate();
 </script>
