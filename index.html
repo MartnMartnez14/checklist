@@ -164,11 +164,13 @@
   .tag-chip{--chip:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l));font-size:11px;line-height:1;font-weight:650;padding:4px 8px;border-radius:var(--radius-pill);color:var(--chip);background:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.12);border:1px solid hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.40);}
   :root[data-theme="dark"] .tag-chip{background:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.18);}
   .note:not(:focus-within) .note-tags:not(:placeholder-shown){position:absolute;opacity:0;pointer-events:none;}
-  .item { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
-  .item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; margin: 0; }
+  .item { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; }
+  .item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; margin: 3px 0 0; }
   .item-text {
     flex: 1; min-width: 0; border: none; background: transparent; font: inherit;
-    padding: 4px 0; outline: none; border-bottom: 1px solid transparent;
+    padding: 2px 0; outline: none; border-bottom: 1px solid transparent;
+    resize: none; overflow: hidden; display: block; line-height: 1.35;
+    white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word;
   }
   .item-text:focus { border-bottom-color: var(--accent); }
   .item.done .item-text { color: var(--muted); text-decoration: line-through; }
@@ -853,6 +855,11 @@
     if (s) s.textContent = `${notes.length} ${notes.length === 1 ? "lista" : "listas"} · ${edges.length} ${edges.length === 1 ? "conexión" : "conexiones"}`;
   }
 
+  // Ajusta la altura de los ítems al contenido para que el texto largo se vea entero.
+  function growItems() {
+    document.querySelectorAll(".item-text").forEach(t => { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; });
+  }
+
   // Mide la cuadrícula actual y asigna posiciones a las notas que no tengan.
   function initMapPositions() {
     const main = document.getElementById("notes");
@@ -970,6 +977,7 @@
     scheduleLinks();
     observeNotes();
     updateStats();
+    growItems();
     if (popFocusKey) {
       const t = document.querySelector('[data-pop-key="' + popFocusKey + '"]');
       popFocusKey = null;
@@ -1100,15 +1108,17 @@
       onchange: e => { item.done = e.target.checked; save(); render(); }
     });
 
-    const text = el("input", {
-      type: "text", className: "item-text", value: item.text, "aria-label": "Texto del elemento",
+    const text = el("textarea", {
+      className: "item-text", rows: 1, "aria-label": "Texto del elemento",
       onchange: e => {
         const t = e.target.value.trim();
         if (t) { item.text = t; save(); }
         else { note.items = note.items.filter(i => i !== item); save(); render(); }
       },
-      onkeydown: e => { if (e.key === "Enter") e.target.blur(); }
+      oninput: e => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; },
+      onkeydown: e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.target.blur(); } }
     });
+    text.value = item.text;
 
     const del = el("button", {
       className: "icon-btn", title: "Eliminar elemento", "aria-label": "Eliminar elemento",
@@ -1285,7 +1295,7 @@
   if ("ResizeObserver" in window) {
     ro = new ResizeObserver(() => scheduleLinks());
   }
-  window.addEventListener("resize", () => { layoutCanvas(); scheduleLinks(); });
+  window.addEventListener("resize", () => { layoutCanvas(); growItems(); scheduleLinks(); });
   window.addEventListener("orientationchange", () => { layoutCanvas(); scheduleLinks(); });
 
   // ---------- Eventos globales ----------

@@ -21,6 +21,7 @@ Estado: **pendiente de diseñar e implementar.** Es la funcionalidad de mayor co
 
 ## 2. Pulido pendiente
 
+- **Editor ampliado** (opcional): vista o modal para leer/editar un ítem muy largo con más comodidad.
 - **Modo Mapa**: decidir entre scroll de página o *pan* del lienzo; y permitir anchos de tarjeta configurables.
 - **Móvil**: revisar el arrastre táctil y el tamaño de las áreas de toque en dispositivo real.
 - **Grafo**: valorar un reordenado automático (auto-layout) al entrar en modo Mapa.
@@ -28,6 +29,7 @@ Estado: **pendiente de diseñar e implementar.** Es la funcionalidad de mayor co
 
 ## 3. Hecho recientemente
 
+- Los ítems ajustan el texto en **varias líneas**: ya no se corta. Enter guarda, Shift+Enter añade línea.
 - Modo claro/oscuro, iconos SVG, cabecera con contadores.
 - Modo Mapa con arrastre (ratón/táctil) y teclado.
 - Bordes por conexión (sólido si hay una, multicolor si hay varias; sin borde si no hay conexiones).
