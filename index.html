@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checklist</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#1a73e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+  :root {
+    --bg: #f1f3f4; --card: #ffffff; --text: #202124; --muted: #5f6368;
+    --accent: #1a73e8; --line: #e0e0e0; --danger: #d93025;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+  }
+  header {
+    background: var(--card); border-bottom: 1px solid var(--line);
+    padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px;
+  }
+  header h1 { font-size: 20px; font-weight: 500; margin: 0; }
+  .btn {
+    border: 1px solid var(--line); background: var(--card); color: var(--accent);
+    border-radius: 18px; padding: 8px 16px; font: inherit; cursor: pointer;
+  }
+  .btn:hover { background: #e8f0fe; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn:focus-visible, .icon-btn:focus-visible, input:focus-visible,
+  .swatch:focus-visible, .toggle:focus-visible, .clear:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  .board { position: relative; }
+  main {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px; padding: 24px; align-items: start;
+  }
+  .empty { color: var(--muted); grid-column: 1 / -1; text-align: center; margin-top: 48px; }
+  .note {
+    position: relative; z-index: 2;
+    background-color: var(--card);
+    background-image: linear-gradient(var(--tint, transparent), var(--tint, transparent));
+    border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,.2);
+    padding: 12px 16px 8px;
+    --accent: #1a73e8;
+  }
+  .note.pop-open { z-index: 5; }
+  .note.has-bg {
+    --scrim: rgba(255,255,255,.82);
+    background-image: linear-gradient(var(--scrim), var(--scrim)), var(--bg-img, none);
+    background-size: cover; background-position: center;
+  }
+  .note.has-bg .add-input { background: rgba(255,255,255,.6); border-radius: 6px; }
+  .note.has-bg .add-input::placeholder { color: #3c4043; }
+  .note-head { display: flex; align-items: center; gap: 4px; }
+  .note-title {
+    flex: 1; min-width: 0; border: none; background: transparent; font: inherit;
+    font-size: 16px; font-weight: 500; padding: 6px 4px; border-bottom: 2px solid transparent; outline: none;
+  }
+  .note-title:focus { border-bottom-color: var(--accent); }
+  .note-tags {
+    width: 100%; border: none; background: transparent; font: inherit; font-size: 12px;
+    color: var(--muted); padding: 2px 4px 6px; outline: none;
+  }
+  .note-tags:focus { border-bottom: 1px solid var(--accent); }
+  .item { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+  .item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; margin: 0; }
+  .item-text {
+    flex: 1; min-width: 0; border: none; background: transparent; font: inherit;
+    padding: 4px 0; outline: none; border-bottom: 1px solid transparent;
+  }
+  .item-text:focus { border-bottom-color: var(--accent); }
+  .item.done .item-text { color: var(--muted); text-decoration: line-through; }
+  .add-input {
+    width: 100%; border: none; background: transparent; font: inherit; padding: 8px 0 8px 28px;
+    color: var(--text); outline: none;
+  }
+  .add-input::placeholder { color: var(--muted); }
+  .add-input:focus { border-bottom: 1px solid var(--accent); }
+  .icon-btn {
+    border: none; background: none; cursor: pointer; color: var(--muted); font-size: 16px;
+    width: 32px; height: 32px; border-radius: 50%; flex: none; opacity: .5;
+  }
+  .icon-btn:hover { background: #f1f3f4; color: var(--danger); opacity: 1; }
+  .note-design:hover { background: #f1f3f4; color: var(--accent); opacity: 1; }
+  .item:hover .icon-btn, .item:focus-within .icon-btn, .note:hover .note-head .icon-btn { opacity: 1; }
+  .done-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--line); margin-top: 6px; padding-top: 6px;
+  }
+  .toggle, .clear {
+    border: none; background: none; cursor: pointer; color: var(--muted); font: inherit; font-size: 13px; padding: 6px 4px;
+  }
+  .toggle:hover, .clear:hover { color: var(--accent); }
+  .actions { display: flex; gap: 8px; align-items: center; }
+  .btn-secondary { color: var(--text); }
+
+  /* --- Conexiones --- */
+  #links {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    overflow: visible; pointer-events: none; z-index: 1;
+  }
+  .edge-line { stroke: #5f6368; stroke-width: 2; fill: none; }
+  .edge-tag .edge-line { stroke: #9334e6; stroke-dasharray: 6 4; }
+  .edge-hit { stroke: transparent; stroke-width: 18; fill: none; pointer-events: stroke; cursor: pointer; }
+  main.connecting .note { cursor: crosshair; }
+  .note.is-origin { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .note.is-target { outline: 2px dashed #9334e6; outline-offset: 2px; cursor: crosshair; }
+  .note.is-target:hover { outline-style: solid; }
+
+  /* --- Popover de estilo --- */
+  .pop {
+    position: absolute; top: 44px; right: 8px; z-index: 10;
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.2); padding: 12px; width: 244px;
+  }
+  .pop-title { font-size: 11px; color: var(--muted); margin: 10px 0 6px; text-transform: uppercase; letter-spacing: .05em; }
+  .pop-title:first-child { margin-top: 0; }
+  .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .swatch {
+    width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid transparent;
+    background: var(--sw); cursor: pointer; padding: 0;
+  }
+  .swatch.swatch-none {
+    border-color: var(--line);
+    background-image: linear-gradient(to top right,
+      transparent 45%, var(--muted) 45%, var(--muted) 55%, transparent 55%);
+  }
+  .swatch.selected { border-color: var(--text); box-shadow: 0 0 0 2px #fff inset; }
+  .opacity-slider { width: 100%; accent-color: var(--accent); }
+  .pop-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .pop-btn { padding: 6px 10px; font-size: 13px; }
+  .bg-thumb {
+    width: 38px; height: 38px; border-radius: 6px; background-size: cover; background-position: center;
+    background-color: #eee; border: 1px solid var(--line); flex: none;
+  }
+  .pop-links { max-height: 140px; overflow: auto; }
+  .link-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+  .link-label { flex: 1; min-width: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .link-empty { font-size: 12px; color: var(--muted); margin: 2px 0; }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  @media (pointer: coarse) {
+    .icon-btn { width: 44px; height: 44px; font-size: 18px; }
+    .btn, .toggle, .clear { min-height: 44px; }
+    .pop-btn { min-height: 40px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Checklist</h1>
+  <div class="actions">
+    <button class="btn btn-secondary" id="export">Exportar</button>
+    <label class="btn btn-secondary" for="import-file">Importar</label>
+    <input type="file" id="import-file" accept="application/json" hidden>
+    <button class="btn" id="new-note">+ Nueva lista</button>
+  </div>
+</header>
+
+<div class="board">
+  <main id="notes"></main>
+  <svg id="links" aria-hidden="true" focusable="false"></svg>
+</div>
+<p id="sr-status" role="status" aria-live="polite" class="visually-hidden"></p>
+
+<script>
+  const KEY = "checklist-notas-v1";
+
+  const PALETTE = [
+    { bg: "#1a73e8", accent: "#1a73e8" }, // Azul
+    { bg: "#d93025", accent: "#c5221f" }, // Rojo
+    { bg: "#188038", accent: "#137333" }, // Verde
+    { bg: "#f9ab00", accent: "#b06000" }, // Amarillo
+    { bg: "#e8710a", accent: "#c5520a" }, // Naranja
+    { bg: "#9334e6", accent: "#8430ce" }, // Morado
+    { bg: "#00838f", accent: "#006a75" }, // Turquesa
+    { bg: "#e52592", accent: "#c2185b" }, // Rosa
+    { bg: "#5f6368", accent: "#3c4043" }, // Gris
+    { bg: "#795548", accent: "#5d4037" }  // Marrón
+  ];
+  const COLOR_NAMES = ["Azul", "Rojo", "Verde", "Amarillo", "Naranja", "Morado", "Turquesa", "Rosa", "Gris", "Marrón"];
+
+  let notes = load();
+  let connectingSource = null;   // id de la nota origen en modo conexión
+  let openPopId = null;          // id de la nota con popover abierto
+  let popFocusKey = null;        // selector a enfocar tras render()
+
+  function uid() {
+    return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+  }
+
+  function parseTags(v) {
+    if (Array.isArray(v)) v = v.join(",");
+    if (typeof v !== "string") return [];
+    return [...new Set(v.split(",").map(t => t.trim().toLowerCase()).filter(Boolean))];
+  }
+
+  // Normaliza una nota al modelo actual sin perder datos.
+  function normalizeNote(n) {
+    if (!n || typeof n !== "object") n = {};
+    n.id = typeof n.id === "string" && n.id ? n.id : uid();
+    n.title = typeof n.title === "string" ? n.title : "";
+    n.items = Array.isArray(n.items) ? n.items.map(it => {
+      it = it && typeof it === "object" ? it : {};
+      return {
+        id: typeof it.id === "string" && it.id ? it.id : uid(),
+        text: typeof it.text === "string" ? it.text : "",
+        done: !!it.done
+      };
+    }) : [];
+    n.showDone = n.showDone !== false;
+    n.tags = parseTags(n.tags);
+    n.links = Array.isArray(n.links) ? [...new Set(n.links.filter(x => typeof x === "string"))] : [];
+    n.color = (Number.isInteger(n.color) && n.color >= 0 && n.color <= 9) ? n.color : null;
+    n.opacity = (typeof n.opacity === "number" && n.opacity >= 0 && n.opacity <= 60) ? Math.round(n.opacity) : 18;
+    n.bgId = typeof n.bgId === "string" && n.bgId ? n.bgId : null;
+    return n;
+  }
+
+  function load() {
+    try { return (JSON.parse(localStorage.getItem(KEY)) || []).map(normalizeNote); }
+    catch { return []; }
+  }
+
+  let gcTimer = null;
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify(notes));
+    clearTimeout(gcTimer);
+    gcTimer = setTimeout(() => { gcImages(); }, 2000);
+  }
+
+  // Crea nodos sin innerHTML: el texto del usuario nunca se interpreta como HTML.
+  function el(tag, props = {}, children = []) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else if (k in n) n[k] = v;
+      else n.setAttribute(k, v);
+    }
+    n.append(...children);
+    return n;
+  }
+
+  function svgEl(tag, attrs = {}, children = []) {
+    const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    children.forEach(c => n.append(c));
+    return n;
+  }
+
+  function announce(msg) {
+    const s = document.getElementById("sr-status");
+    if (s) s.textContent = msg;
+  }
+
+  // ---------- Color / opacidad ----------
+  function hexToRgb(hex) {
+    const h = hex.replace("#", "");
+    return { r: parseInt(h.slice(0, 2), 16), g: parseInt(h.slice(2, 4), 16), b: parseInt(h.slice(4, 6), 16) };
+  }
+  function tintFor(note) {
+    if (note.color == null) return "transparent";
+    const c = PALETTE[note.color];
+    const { r, g, b } = hexToRgb(c.bg);
+    return `rgba(${r}, ${g}, ${b}, ${(note.opacity ?? 18) / 100})`;
+  }
+  function accentFor(note) {
+    return note.color == null ? "#1a73e8" : PALETTE[note.color].accent;
+  }
+
+  // ---------- IndexedDB (imágenes) ----------
+  const DB_NAME = "checklist-media";
+  const DB_VERSION = 1;
+  const STORE = "images";
+  let dbPromise = null;
+
+  function openDB() {
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(STORE)) {
+          const store = db.createObjectStore(STORE, { keyPath: "id" });
+          store.createIndex("hash", "hash", { unique: true });
+          store.createIndex("createdAt", "createdAt");
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    return dbPromise;
+  }
+
+  function reqP(request) {
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function sha256(blob) {
+    const buf = await blob.arrayBuffer();
+    const digest = await crypto.subtle.digest("SHA-256", buf);
+    return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function putImage(blob, name) {
+    const hash = await sha256(blob);
+    const db = await openDB();
+    const existing = await reqP(db.transaction(STORE, "readonly").objectStore(STORE).index("hash").get(hash));
+    if (existing) return existing.id;
+    const rec = { id: uid(), hash, blob, type: blob.type || "", name: name || "", size: blob.size, createdAt: Date.now() };
+    try {
+      await reqP(db.transaction(STORE, "readwrite").objectStore(STORE).put(rec));
+    } catch (err) {
+      if (err && err.name === "ConstraintError") {
+        const ex = await reqP(db.transaction(STORE, "readonly").objectStore(STORE).index("hash").get(hash));
+        if (ex) return ex.id;
+      }
+      throw err;
+    }
+    return rec.id;
+  }
+
+  async function getImage(id) {
+    const db = await openDB();
+    return reqP(db.transaction(STORE, "readonly").objectStore(STORE).get(id));
+  }
+
+  const urlCache = new Map(); // id -> objectURL
+  async function getImageURL(id) {
+    if (!id) return null;
+    if (urlCache.has(id)) return urlCache.get(id);
+    try {
+      const rec = await getImage(id);
+      if (!rec || !rec.blob) { urlCache.set(id, null); return null; }
+      const url = URL.createObjectURL(rec.blob);
+      urlCache.set(id, url);
+      return url;
+    } catch (e) {
+      console.warn("getImageURL", e);
+      return null;
+    }
+  }
+  function revokeImageURL(id) {
+    const url = urlCache.get(id);
+    if (url) { URL.revokeObjectURL(url); urlCache.delete(id); }
+  }
+  function revokeIfUnused(id) {
+    if (!id) return;
+    if (notes.some(n => n.bgId === id)) return;
+    revokeImageURL(id);
+  }
+
+  async function gcImages() {
+    try {
+      const db = await openDB();
+      const used = new Set(notes.map(n => n.bgId).filter(Boolean));
+      const keys = await reqP(db.transaction(STORE, "readonly").objectStore(STORE).getAllKeys());
+      const toDelete = keys.filter(k => !used.has(k));
+      if (!toDelete.length) return;
+      const store = db.transaction(STORE, "readwrite").objectStore(STORE);
+      toDelete.forEach(k => { store.delete(k); revokeImageURL(k); });
+    } catch (e) { /* IndexedDB no disponible */ }
+  }
+
+  // ---------- Fondo por nota ----------
+  async function applyBackground(section, note) {
+    const thumb = section.querySelector(".bg-thumb");
+    if (!note.bgId) {
+      section.classList.remove("has-bg");
+      section.style.removeProperty("--bg-img");
+      if (thumb) thumb.style.backgroundImage = "";
+      return;
+    }
+    const url = await getImageURL(note.bgId);
+    if (!url) { section.classList.remove("has-bg"); return; }
+    section.style.setProperty("--bg-img", `url("${url}")`);
+    section.classList.add("has-bg");
+    if (thumb) thumb.style.backgroundImage = `url("${url}")`;
+  }
+
+  function applyAllStyles() {
+    document.querySelectorAll(".note").forEach(sec => {
+      const note = notes.find(n => n.id === sec.dataset.id);
+      if (!note) return;
+      sec.style.setProperty("--tint", tintFor(note));
+      sec.style.setProperty("--accent", accentFor(note));
+      applyBackground(sec, note);
+    });
+  }
+
+  async function handleBgUpload(file, note) {
+    if (!file.type.startsWith("image/")) { alert("Selecciona un archivo de imagen."); return; }
+    if (file.size > 20 * 1024 * 1024 && !confirm("La imagen pesa más de 20 MB. ¿Continuar?")) return;
+    const prev = note.bgId;
+    try {
+      const id = await putImage(file, file.name);
+      note.bgId = id;
+      save();
+      if (prev && prev !== id) revokeIfUnused(prev);
+      render();
+    } catch (err) {
+      note.bgId = prev;
+      alert("Imagen demasiado grande o sin espacio.");
+      console.warn("putImage", err);
+    }
+  }
+
+  // ---------- Conexiones (grafo estilo Obsidian) ----------
+  let linksDirty = false;
+  let linksRAF = null;
+
+  function scheduleLinks() {
+    linksDirty = true;
+    if (linksRAF == null) {
+      linksRAF = requestAnimationFrame(() => { linksRAF = null; drawLinks(); });
+    }
+  }
+
+  function makeMarker(id, color) {
+    const m = svgEl("marker", {
+      id, viewBox: "0 0 10 10", refX: "9", refY: "5",
+      markerWidth: "6", markerHeight: "6", orient: "auto-start-reverse"
+    });
+    m.append(svgEl("path", { d: "M0 0 L10 5 L0 10 z", fill: color }));
+    return m;
+  }
+
+  function rectCenter(r) { return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+
+  // Punto sobre el borde del rect apuntando hacia `toward`, retrocedido `margin` px.
+  function borderPoint(r, toward, margin) {
+    const c = rectCenter(r);
+    const dx = toward.x - c.x, dy = toward.y - c.y;
+    const w = r.width / 2, h = r.height / 2;
+    let t = Infinity;
+    if (dx !== 0) t = Math.min(t, w / Math.abs(dx));
+    if (dy !== 0) t = Math.min(t, h / Math.abs(dy));
+    if (!isFinite(t)) t = 0;
+    const len = Math.hypot(dx, dy) || 1;
+    return {
+      x: c.x + dx * t - dx / len * margin,
+      y: c.y + dy * t - dy / len * margin
+    };
+  }
+
+  function makeEdge(r1, r2, cls, marker, srcId, tid) {
+    const p1 = borderPoint(r1, rectCenter(r2), 8);
+    const p2 = borderPoint(r2, rectCenter(r1), 8);
+    const dx = p2.x - p1.x, dy = p2.y - p1.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+    const off = 0.12 * dist;
+    const cx = mx - (dy / dist) * off;
+    const cy = my + (dx / dist) * off;
+    const d = `M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}`;
+    const g = svgEl("g", { class: "edge " + cls });
+    const vis = svgEl("path", { d, class: "edge-line", "marker-end": marker });
+    if (srcId != null) {
+      const hit = svgEl("path", { d, class: "edge-hit" });
+      hit.addEventListener("click", e => { e.stopPropagation(); deleteLink(srcId, tid); });
+      g.append(hit, vis);
+    } else {
+      g.append(vis);
+    }
+    return g;
+  }
+
+  function drawLinks() {
+    if (!linksDirty) return;
+    linksDirty = false;
+    const svg = document.getElementById("links");
+    const board = document.querySelector(".board");
+    if (!svg || !board) return;
+    const boardRect = board.getBoundingClientRect();
+    const rectMap = new Map();
+    board.querySelectorAll(".note").forEach(sec => {
+      const r = sec.getBoundingClientRect();
+      rectMap.set(sec.dataset.id, {
+        left: r.left - boardRect.left, top: r.top - boardRect.top,
+        width: r.width, height: r.height
+      });
+    });
+    const defs = svgEl("defs", {}, [
+      makeMarker("arrow-manual", "#5f6368"),
+      makeMarker("arrow-tag", "#9334e6")
+    ]);
+    const edges = [];
+    notes.forEach(src => {
+      const r1 = rectMap.get(src.id);
+      if (!r1) return;
+      (src.links || []).forEach(tid => {
+        const r2 = rectMap.get(tid);
+        if (r2) edges.push(makeEdge(r1, r2, "edge-manual", "url(#arrow-manual)", src.id, tid));
+      });
+    });
+    const byTag = new Map();
+    notes.forEach(n => {
+      (n.tags || []).forEach(t => {
+        let arr = byTag.get(t);
+        if (!arr) { arr = []; byTag.set(t, arr); }
+        arr.push(n.id);
+      });
+    });
+    const seen = new Set();
+    byTag.forEach(ids => {
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          const a = ids[i], b = ids[j];
+          const key = a < b ? a + "|" + b : b + "|" + a;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          const r1 = rectMap.get(a), r2 = rectMap.get(b);
+          if (r1 && r2) edges.push(makeEdge(r1, r2, "edge-tag", "url(#arrow-tag)", null, null));
+        }
+      }
+    });
+    svg.replaceChildren(defs, ...edges);
+  }
+
+  function deleteLink(srcId, tid) {
+    const src = notes.find(n => n.id === srcId);
+    if (!src) return;
+    if (!confirm("¿Eliminar esta conexión?")) return;
+    src.links = src.links.filter(x => x !== tid);
+    save();
+    render();
+  }
+
+  function updateConnectClasses() {
+    document.querySelectorAll(".note").forEach(s => {
+      const id = s.dataset.id;
+      s.classList.toggle("is-origin", id === connectingSource);
+      s.classList.toggle("is-target", connectingSource != null && id !== connectingSource);
+    });
+    document.querySelectorAll(".note-connect").forEach(b => {
+      b.setAttribute("aria-pressed", String(b.dataset.connect === connectingSource));
+    });
+  }
+
+  function enterConnectMode(id) {
+    connectingSource = id;
+    document.getElementById("notes").classList.add("connecting");
+    announce("Selecciona la lista de destino…");
+    updateConnectClasses();
+    document.addEventListener("mousedown", connectCapture, true);
+    document.addEventListener("click", connectCapture, true);
+    scheduleLinks();
+  }
+
+  function exitConnectMode() {
+    if (connectingSource == null) return;
+    const origin = connectingSource;
+    connectingSource = null;
+    document.getElementById("notes").classList.remove("connecting");
+    updateConnectClasses();
+    document.removeEventListener("mousedown", connectCapture, true);
+    document.removeEventListener("click", connectCapture, true);
+    const btn = document.getElementById("connect-" + origin);
+    if (btn) btn.focus();
+    scheduleLinks();
+  }
+
+  function connectCapture(e) {
+    if (connectingSource == null) return;
+    const section = e.target.closest ? e.target.closest(".note") : null;
+    if (e.type === "mousedown") {
+      if (section) { e.preventDefault(); e.stopPropagation(); }
+      return;
+    }
+    if (!section) { e.preventDefault(); e.stopPropagation(); exitConnectMode(); return; }
+    if (section.dataset.id === connectingSource && e.target.closest && e.target.closest(".note-connect")) {
+      e.preventDefault(); e.stopPropagation(); exitConnectMode(); return;
+    }
+    e.preventDefault(); e.stopPropagation();
+    const targetId = section.dataset.id;
+    if (targetId === connectingSource) return;
+    const src = notes.find(n => n.id === connectingSource);
+    if (src && !src.links.includes(targetId)) {
+      src.links.push(targetId);
+      save();
+    }
+    exitConnectMode();
+  }
+
+  // ---------- Render ----------
+  function render(focusId) {
+    const root = document.getElementById("notes");
+    if (notes.length === 0) {
+      root.replaceChildren(el("p", { className: "empty", textContent: "Crea tu primera lista para empezar." }));
+    } else {
+      root.replaceChildren(...notes.map(renderNote));
+    }
+    if (focusId) document.getElementById(focusId)?.focus();
+    updateConnectClasses();
+    applyAllStyles();
+    scheduleLinks();
+    observeNotes();
+    if (popFocusKey) {
+      const t = document.querySelector('[data-pop-key="' + popFocusKey + '"]');
+      popFocusKey = null;
+      if (t) t.focus();
+    }
+  }
+
+  function renderNote(note) {
+    const title = el("input", {
+      id: "title-" + note.id, type: "text", className: "note-title",
+      value: note.title, placeholder: "Sin título", "aria-label": "Título de la lista",
+      onchange: e => { note.title = e.target.value.trim(); save(); scheduleLinks(); },
+      onkeydown: e => { if (e.key === "Enter") e.target.blur(); }
+    });
+
+    const styleBtn = el("button", {
+      id: "style-" + note.id, type: "button",
+      className: "icon-btn note-design", textContent: "🎨",
+      "aria-haspopup": "dialog", "aria-expanded": String(openPopId === note.id),
+      "aria-label": "Estilo y fondo de la lista",
+      onclick: e => { e.stopPropagation(); openPop(note); }
+    });
+
+    const connectBtn = el("button", {
+      id: "connect-" + note.id, type: "button",
+      className: "icon-btn note-connect", textContent: "🔗",
+      "aria-pressed": String(connectingSource === note.id),
+      "aria-label": "Conectar con otra lista",
+      "data-connect": note.id,
+      onclick: e => { e.stopPropagation(); toggleConnect(note); }
+    });
+
+    const delNote = el("button", {
+      className: "icon-btn", textContent: "✕", title: "Eliminar lista", "aria-label": "Eliminar lista",
+      onclick: () => {
+        if (!confirm(`¿Eliminar "${note.title || "Sin título"}"?`)) return;
+        const bg = note.bgId;
+        notes = notes.filter(n => n !== note);
+        notes.forEach(n => { n.links = n.links.filter(id => id !== note.id); });
+        if (openPopId === note.id) openPopId = null;
+        save();
+        revokeIfUnused(bg);
+        render();
+      }
+    });
+
+    const tags = el("input", {
+      type: "text", className: "note-tags",
+      value: note.tags.join(", "),
+      placeholder: "tags separados por coma",
+      "aria-label": "Etiquetas de la lista",
+      onchange: e => { note.tags = parseTags(e.target.value); save(); render(); }
+    });
+
+    const pending = note.items.filter(i => !i.done);
+    const done = note.items.filter(i => i.done);
+
+    const add = el("input", {
+      id: "add-" + note.id, type: "text", className: "add-input",
+      placeholder: "+ Añadir elemento", "aria-label": "Añadir elemento",
+      onkeydown: e => {
+        if (e.key !== "Enter") return;
+        const text = e.target.value.trim();
+        if (!text) return;
+        note.items.push({ id: uid(), text, done: false });
+        save(); render("add-" + note.id);
+      }
+    });
+
+    const children = [
+      el("div", { className: "note-head" }, [title, styleBtn, connectBtn, delNote]),
+      tags,
+      ...pending.map(item => renderItem(note, item)),
+      add
+    ];
+
+    if (done.length) {
+      const open = note.showDone !== false;
+      const bar = el("div", { className: "done-bar" }, [
+        el("button", {
+          className: "toggle", "aria-expanded": String(open),
+          textContent: `${open ? "▾" : "▸"} Completados (${done.length})`,
+          onclick: () => { note.showDone = !open; save(); render(); }
+        }),
+        el("button", {
+          className: "clear", textContent: "Borrar completados",
+          onclick: () => { note.items = note.items.filter(i => !i.done); save(); render(); }
+        })
+      ]);
+      children.push(bar);
+      if (open) children.push(...done.map(item => renderItem(note, item)));
+    }
+
+    const section = el("section", {
+      className: "note" + (openPopId === note.id ? " pop-open" : ""),
+      "data-id": note.id,
+      "aria-label": note.title || "Lista sin título"
+    }, children);
+
+    if (openPopId === note.id) section.append(renderPop(note, section));
+    return section;
+  }
+
+  function renderItem(note, item) {
+    const cb = el("input", {
+      type: "checkbox", checked: item.done, "aria-label": "Marcar como completado",
+      onchange: e => { item.done = e.target.checked; save(); render(); }
+    });
+
+    const text = el("input", {
+      type: "text", className: "item-text", value: item.text, "aria-label": "Texto del elemento",
+      onchange: e => {
+        const t = e.target.value.trim();
+        if (t) { item.text = t; save(); }
+        else { note.items = note.items.filter(i => i !== item); save(); render(); }
+      },
+      onkeydown: e => { if (e.key === "Enter") e.target.blur(); }
+    });
+
+    const del = el("button", {
+      className: "icon-btn", textContent: "✕", title: "Eliminar elemento", "aria-label": "Eliminar elemento",
+      onclick: () => { note.items = note.items.filter(i => i !== item); save(); render(); }
+    });
+
+    return el("div", { className: "item" + (item.done ? " done" : "") }, [cb, text, del]);
+  }
+
+  // ---------- Popover de estilo ----------
+  function openPop(note) {
+    if (openPopId === note.id) {
+      openPopId = null;
+      render();
+      document.getElementById("style-" + note.id)?.focus();
+      return;
+    }
+    openPopId = note.id;
+    popFocusKey = note.color == null ? "color-none" : "color-" + note.color;
+    render();
+  }
+
+  function closePop() {
+    if (openPopId == null) return;
+    const id = openPopId;
+    openPopId = null;
+    render();
+    document.getElementById("style-" + id)?.focus();
+  }
+
+  function toggleConnect(note) {
+    if (connectingSource === note.id) { exitConnectMode(); return; }
+    if (openPopId != null) { openPopId = null; render(); }
+    enterConnectMode(note.id);
+  }
+
+  function renderPop(note, section) {
+    const pop = el("div", { className: "pop", role: "dialog", "aria-label": "Estilo y conexiones" });
+    pop.addEventListener("click", e => e.stopPropagation());
+
+    pop.append(el("p", { className: "pop-title", textContent: "Color" }));
+    const group = el("div", { className: "swatches", role: "radiogroup", "aria-label": "Color de la lista" });
+    const swatches = [];
+    const noneSelected = note.color == null;
+    const noneSw = el("button", {
+      type: "button", role: "radio", className: "swatch swatch-none" + (noneSelected ? " selected" : ""),
+      "aria-checked": String(noneSelected),
+      tabIndex: noneSelected ? 0 : -1,
+      "aria-label": "Sin color",
+      "data-pop-key": "color-none",
+      onclick: () => applyColor(null)
+    });
+    noneSw.style.setProperty("--sw", "#ffffff");
+    swatches.push(noneSw);
+    PALETTE.forEach((c, i) => {
+      const selected = note.color === i;
+      const sw = el("button", {
+        type: "button", role: "radio", className: "swatch" + (selected ? " selected" : ""),
+        "aria-checked": String(selected),
+        tabIndex: selected ? 0 : -1,
+        "aria-label": COLOR_NAMES[i],
+        "data-pop-key": "color-" + i,
+        onclick: () => applyColor(i)
+      });
+      sw.style.setProperty("--sw", c.bg);
+      swatches.push(sw);
+    });
+    swatches.forEach(b => group.append(b));
+
+    // val: null = sin color; 0..9 = índice de PALETTE
+    function applyColor(val) {
+      note.color = val;
+      save();
+      swatches.forEach((b, j) => {
+        const on = val == null ? j === 0 : j === val + 1;
+        b.classList.toggle("selected", on);
+        b.setAttribute("aria-checked", String(on));
+        b.tabIndex = on ? 0 : -1;
+      });
+      section.style.setProperty("--tint", tintFor(note));
+      section.style.setProperty("--accent", accentFor(note));
+      scheduleLinks();
+    }
+
+    group.addEventListener("keydown", e => {
+      const keys = ["ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "Home", "End"];
+      if (!keys.includes(e.key)) return;
+      e.preventDefault();
+      let idx = swatches.indexOf(document.activeElement);
+      if (idx < 0) idx = 0;
+      if (e.key === "Home") idx = 0;
+      else if (e.key === "End") idx = swatches.length - 1;
+      else if (e.key === "ArrowRight" || e.key === "ArrowDown") idx = (idx + 1) % swatches.length;
+      else idx = (idx - 1 + swatches.length) % swatches.length;
+      applyColor(idx === 0 ? null : idx - 1);
+      swatches[idx].focus();
+    });
+    pop.append(group);
+
+    pop.append(el("p", { className: "pop-title", textContent: "Opacidad" }));
+    const slider = el("input", {
+      type: "range", min: 0, max: 60, step: 1, value: note.opacity,
+      className: "opacity-slider", "aria-label": "Opacidad del color",
+      "data-pop-key": "opacity"
+    });
+    slider.setAttribute("aria-valuetext", note.opacity + "%");
+    slider.addEventListener("input", () => {
+      note.opacity = Number(slider.value);
+      slider.setAttribute("aria-valuetext", slider.value + "%");
+      section.style.setProperty("--tint", tintFor(note));
+    });
+    slider.addEventListener("change", () => { save(); });
+    pop.append(slider);
+
+    pop.append(el("p", { className: "pop-title", textContent: "Fondo" }));
+    const fileInput = el("input", { type: "file", accept: "image/*", hidden: true });
+    fileInput.addEventListener("change", async e => {
+      const f = e.target.files[0];
+      e.target.value = "";
+      if (f) await handleBgUpload(f, note);
+    });
+    const imgBtn = el("button", {
+      type: "button", className: "btn btn-secondary pop-btn",
+      textContent: note.bgId ? "Cambiar imagen" : "Imagen",
+      "data-pop-key": "image",
+      onclick: () => fileInput.click()
+    });
+    const removeBtn = el("button", {
+      type: "button", className: "btn btn-secondary pop-btn",
+      textContent: "Quitar fondo", disabled: !note.bgId,
+      "data-pop-key": "remove-bg",
+      onclick: () => {
+        const old = note.bgId;
+        note.bgId = null;
+        save();
+        revokeIfUnused(old);
+        render();
+      }
+    });
+    const thumb = el("span", { className: "bg-thumb", "aria-hidden": "true" });
+    pop.append(el("div", { className: "pop-row" }, [imgBtn, removeBtn, fileInput, thumb]));
+    if (note.bgId) getImageURL(note.bgId).then(u => { if (u) thumb.style.backgroundImage = `url("${u}")`; });
+
+    pop.append(el("p", { className: "pop-title", textContent: "Conexiones" }));
+    const list = el("div", { className: "pop-links" });
+    if (!note.links.length) {
+      list.append(el("p", { className: "link-empty", textContent: "Sin conexiones manuales." }));
+    }
+    note.links.forEach(id => {
+      const t = notes.find(n => n.id === id);
+      const label = t ? (t.title || "Sin título") : "(lista eliminada)";
+      list.append(el("div", { className: "link-row" }, [
+        el("span", { className: "link-label", textContent: label }),
+        el("button", {
+          type: "button", className: "icon-btn", textContent: "✕",
+          "aria-label": "Eliminar conexión con " + label,
+          onclick: () => { note.links = note.links.filter(x => x !== id); save(); render(); }
+        })
+      ]));
+    });
+    pop.append(list);
+    return pop;
+  }
+
+  // ---------- Redimensionado ----------
+  let ro = null;
+  function observeNotes() {
+    if (!ro) return;
+    ro.disconnect();
+    const board = document.querySelector(".board");
+    if (board) ro.observe(board);
+    document.querySelectorAll(".note").forEach(s => ro.observe(s));
+  }
+  if ("ResizeObserver" in window) {
+    ro = new ResizeObserver(() => scheduleLinks());
+  }
+  window.addEventListener("resize", scheduleLinks);
+  window.addEventListener("orientationchange", scheduleLinks);
+
+  // ---------- Eventos globales ----------
+  document.getElementById("new-note").addEventListener("click", () => {
+    const note = normalizeNote({ id: uid(), title: "", items: [], showDone: true });
+    notes.unshift(note);
+    save();
+    render("title-" + note.id);
+  });
+
+  document.addEventListener("click", e => {
+    if (openPopId == null) return;
+    if (e.target.closest && (e.target.closest(".pop") || e.target.closest(".note-design"))) return;
+    closePop();
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if (connectingSource != null) exitConnectMode();
+    else if (openPopId != null) closePop();
+  });
+
+  // ---------- Export / Import ----------
+  function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => { const s = String(fr.result); resolve(s.slice(s.indexOf(",") + 1)); };
+      fr.onerror = () => reject(fr.error);
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  function base64ToBlob(data, type) {
+    const chunkSize = 8192; // múltiplo de 4 para decodificar por bloques
+    const slices = [];
+    for (let i = 0; i < data.length; i += chunkSize) {
+      const bin = atob(data.slice(i, i + chunkSize));
+      const bytes = new Uint8Array(bin.length);
+      for (let j = 0; j < bin.length; j++) bytes[j] = bin.charCodeAt(j);
+      slices.push(bytes);
+    }
+    return new Blob(slices, { type: type || "application/octet-stream" });
+  }
+
+  document.getElementById("export").addEventListener("click", async () => {
+    const btn = document.getElementById("export");
+    btn.disabled = true;
+    try {
+      const images = {};
+      for (const n of notes) {
+        if (n.bgId && !images[n.bgId]) {
+          const rec = await getImage(n.bgId).catch(() => null);
+          if (rec) images[n.bgId] = { type: rec.type, name: rec.name, data: await blobToBase64(rec.blob) };
+        }
+      }
+      const envelope = { app: "checklist", schema: 2, exportedAt: new Date().toISOString(), notes, images };
+      const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = el("a", { href: url, download: `checklist-${new Date().toISOString().slice(0, 10)}.json` });
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (e) {
+      alert("No se pudo exportar: " + (e && e.message ? e.message : e));
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("import-file").addEventListener("change", async e => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+
+      // Formato antiguo (v1): array plano de notas.
+      if (Array.isArray(data)) {
+        const valid = data.every(n => n && typeof n.id === "string" && Array.isArray(n.items));
+        if (!valid) throw new Error("formato");
+        if (!confirm("¿Reemplazar las listas actuales por las del archivo?")) return;
+        notes = data.map(normalizeNote);
+        save(); render();
+        gcImages();
+        return;
+      }
+
+      // Envelope versionado con imágenes embebidas.
+      if (data && data.app === "checklist" && Array.isArray(data.notes)) {
+        if (!confirm("¿Reemplazar las listas actuales por las del archivo?")) return;
+        const idMap = {};
+        const images = data.images || {};
+        for (const [oldId, info] of Object.entries(images)) {
+          try {
+            if (!info || typeof info.data !== "string") continue;
+            const blob = base64ToBlob(info.data, info.type);
+            idMap[oldId] = await putImage(blob, info.name);
+          } catch (err) { console.warn("imagen importada", oldId, err); }
+        }
+        const incoming = data.notes.map(n => normalizeNote({ ...n }));
+        const ids = new Set(incoming.map(n => n.id));
+        incoming.forEach(n => {
+          n.bgId = (n.bgId && idMap[n.bgId]) ? idMap[n.bgId] : null;
+          n.links = n.links.filter(id => ids.has(id));
+        });
+        notes = incoming;
+        save(); render();
+        gcImages();
+        return;
+      }
+
+      throw new Error("formato");
+    } catch (err) {
+      alert("El archivo no es una copia válida de Checklist.");
+      console.warn(err);
+    }
+  });
+
+  // ---------- Migración / arranque ----------
+  async function migrate() {
+    try { await openDB(); }
+    catch (e) { console.warn("IndexedDB no disponible:", e); }
+    localStorage.setItem(KEY, JSON.stringify(notes));
+  }
+
+  if (navigator.storage?.persist) navigator.storage.persist();
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch(err => console.warn("SW no registrado:", err));
+  }
+
+  render();
+  migrate();
+</script>
+</body>
+</html>
