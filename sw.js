@@ -1,4 +1,4 @@
-const CACHE = "checklist-v4";
+const CACHE = "checklist-v5";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {

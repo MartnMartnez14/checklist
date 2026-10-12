@@ -7,7 +7,9 @@ PWA de listas y notas tipo tablero, **offline-first**. Funciona instalada en PC 
 ## Funcionalidades
 
 - Listas con elementos, tachado de completados y borrado.
-- **Conexiones entre listas** estilo grafo de Obsidian: manuales (modo conectar) y automáticas por etiquetas (tags) compartidas, dibujadas como flechas.
+- **Dos vistas**: cuadrícula y **mapa** (arrastra las listas libremente, con las conexiones siguiéndolas; también se mueven con el teclado).
+- **Modo claro / oscuro** con botón y preferencia guardada.
+- **Conexiones entre listas** estilo grafo de Obsidian: manuales (modo conectar) y automáticas por etiquetas (tags) compartidas, dibujadas como flechas curvas. Cada lista con conexiones lleva un **borde con el color de sus conexiones** (multicolor si tiene varias).
 - **Apariencia por lista**: 10 colores predefinidos con opacidad ajustable y fondo de imagen o GIF.
 - **Exportar / Importar** una copia de seguridad en JSON (con las imágenes incluidas).
 
