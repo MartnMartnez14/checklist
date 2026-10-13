@@ -1,4 +1,4 @@
-const CACHE = "checklist-v5";
+const CACHE = "checklist-v6";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", e => {
@@ -19,7 +19,7 @@ self.addEventListener("fetch", e => {
   // Navegación/documento: red primero (versión fresca); si falla, caché.
   if (e.request.mode === "navigate" || e.request.destination === "document") {
     e.respondWith(
-      fetch(e.request).then(res => {
+      fetch(e.request, { cache: "no-store" }).then(res => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
         return res;
