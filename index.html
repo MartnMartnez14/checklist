@@ -1059,17 +1059,22 @@
     const addInput = el("input", {
       id: "add-" + note.id, type: "text", className: "add-input",
       placeholder: "+ Añadir elemento", "aria-label": "Añadir elemento",
-      autocomplete: "off", enterkeyhint: "enter"
+      autocomplete: "off", enterkeyhint: "enter",
+      onchange: () => submitAdd()
     });
-    // Añade el elemento escrito. Compartido por keydown y submit: en móvil la tecla
-    // Enter/Go no siempre emite keydown (llega como Unidentified durante la composición
-    // del teclado predictivo), pero sí dispara el submit del formulario.
+    // Añade el elemento escrito. Compartido por keydown, submit y change (blur): en
+    // móvil la tecla Enter/Go no siempre emite keydown, pero sí dispara submit; y si
+    // el usuario sale del campo sin pulsar Enter, el change lo guarda igualmente.
+    // Inserta el nodo directamente en vez de re-renderizar la nota: así se conserva
+    // el foco (teclado móvil) y no se interrumpe el clic que provocó el blur.
     function submitAdd() {
       const text = addInput.value.trim();
       if (!text) return;
-      note.items.push({ id: uid(), text, done: false });
+      const item = { id: uid(), text, done: false };
+      note.items.push(item);
       addInput.value = "";
-      save(); render("add-" + note.id);
+      add.parentNode.insertBefore(renderItem(note, item), add);
+      save(); scheduleLinks(); growItems();
     }
     const add = el("form", {
       className: "add-form",
