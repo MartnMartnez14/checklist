@@ -176,6 +176,7 @@
   }
   .item-text:focus { border-bottom-color: var(--accent); }
   .item.done .item-text { color: var(--muted); text-decoration: line-through; }
+  .add-form { margin: 0; }
   .add-input {
     width: 100%; border: none; background: transparent; font: inherit; padding: 8px 0 8px 28px;
     color: var(--text); outline: none;
@@ -1055,16 +1056,27 @@
     const pending = note.items.filter(i => !i.done);
     const done = note.items.filter(i => i.done);
 
-    const add = el("input", {
+    const addInput = el("input", {
       id: "add-" + note.id, type: "text", className: "add-input",
       placeholder: "+ Añadir elemento", "aria-label": "Añadir elemento",
-      onkeydown: e => {
-        if (e.key !== "Enter") return;
-        const text = e.target.value.trim();
-        if (!text) return;
-        note.items.push({ id: uid(), text, done: false });
-        save(); render("add-" + note.id);
-      }
+      autocomplete: "off", enterkeyhint: "enter"
+    });
+    // Añade el elemento escrito. Compartido por keydown y submit: en móvil la tecla
+    // Enter/Go no siempre emite keydown (llega como Unidentified durante la composición
+    // del teclado predictivo), pero sí dispara el submit del formulario.
+    function submitAdd() {
+      const text = addInput.value.trim();
+      if (!text) return;
+      note.items.push({ id: uid(), text, done: false });
+      addInput.value = "";
+      save(); render("add-" + note.id);
+    }
+    const add = el("form", {
+      className: "add-form",
+      onsubmit: e => { e.preventDefault(); submitAdd(); }
+    }, [addInput]);
+    addInput.addEventListener("keydown", e => {
+      if (e.key === "Enter") { e.preventDefault(); submitAdd(); }
     });
 
     const children = [
