@@ -3,9 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Checklist</title>
+<title>Checklist Gato</title>
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#1a73e8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script>
@@ -79,7 +80,7 @@
   }
   header h1 { font-size: 18px; font-weight: 650; letter-spacing: -.01em; margin: 0; }
   .brand{display:flex;align-items:center;gap:10px;min-width:0;}
-  .brand-mark{width:34px;height:34px;border-radius:9px;flex:none;}
+  .brand-mark{width:34px;height:34px;border-radius:9px;flex:none;object-fit:cover;display:block;}
   h1{font-size:18px;font-weight:700;letter-spacing:-.02em;margin:0;line-height:1.1;}
   .brand-sub{margin:0;font-size:11.5px;color:var(--muted);letter-spacing:.01em;}
   .seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-pill);padding:3px;gap:2px;}
@@ -104,6 +105,8 @@
   .theme-toggle .i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
   :root[data-theme="light"] .i-moon{display:none;}
   :root[data-theme="dark"] .i-sun{display:none;}
+  :root[data-theme="light"] .brand-night{display:none;}
+  :root[data-theme="dark"] .brand-day{display:none;}
   .btn:focus-visible, .icon-btn:focus-visible, input:focus-visible,
   .swatch:focus-visible, .toggle:focus-visible, .clear:focus-visible {
     outline: 2px solid var(--accent); outline-offset: 2px;
@@ -338,12 +341,9 @@
 </svg>
 <header>
   <div class="brand">
-    <svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true" focusable="false">
-      <rect width="512" height="512" rx="96" fill="var(--accent)"/>
-      <rect x="120" y="110" width="272" height="292" rx="28" fill="var(--card)"/>
-      <path d="M170 236 l42 42 l92 -96" fill="none" stroke="var(--accent)" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <div class="brand-text"><h1>Checklist</h1><p class="brand-sub" id="stats">0 listas · 0 conexiones</p></div>
+    <img class="brand-mark brand-day" src="cat-day.png" width="34" height="34" alt="" aria-hidden="true">
+    <img class="brand-mark brand-night" src="cat-night.png" width="34" height="34" alt="" aria-hidden="true">
+    <div class="brand-text"><h1>Checklist Gato</h1><p class="brand-sub" id="stats">0 listas · 0 conexiones</p></div>
   </div>
   <div class="actions">
     <div class="seg" role="group" aria-label="Vista del tablero">
@@ -1826,10 +1826,10 @@
     try {
       let data;
       try { data = JSON.parse(await file.text()); }
-      catch { alert("El archivo no es una copia válida de Checklist."); return; }
+      catch { alert("El archivo no es una copia válida de Checklist Gato."); return; }
 
       const parsed = parseImport(data);
-      if (!parsed.ok) { alert("El archivo no es una copia válida de Checklist."); return; }
+      if (!parsed.ok) { alert("El archivo no es una copia válida de Checklist Gato."); return; }
 
       const incomingRaw = parsed.notes;
       const imagesRaw = parsed.images;
@@ -1892,7 +1892,7 @@
         buttons: [{ label: "Cerrar", value: "ok", primary: true }]
       });
     } catch (err) {
-      alert("El archivo no es una copia válida de Checklist.");
+      alert("El archivo no es una copia válida de Checklist Gato.");
       console.warn(err);
     }
   });
