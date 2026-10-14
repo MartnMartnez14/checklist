@@ -23,13 +23,19 @@ Estado: **pendiente de diseñar e implementar.** Es la funcionalidad de mayor co
 
 - **Editor ampliado** (opcional): vista o modal para leer/editar un ítem muy largo con más comodidad.
 - **Modo Mapa**: decidir entre scroll de página o *pan* del lienzo; y permitir anchos de tarjeta configurables.
-- **Móvil**: revisar el arrastre táctil y el tamaño de las áreas de toque en dispositivo real.
+- **Móvil**: validar en dispositivo real el arrastre táctil y el reordenamiento de elementos.
 - **Grafo**: valorar un reordenado automático (auto-layout) al entrar en modo Mapa.
 - **Tester**: pasada de casos borde (redimensión del lienzo, export/import con posiciones, uso táctil).
 
 ## 3. Hecho recientemente
 
-- Los ítems ajustan el texto en **varias líneas**: ya no se corta. Enter guarda, Shift+Enter añade línea.
+- Los ítems ajustan el texto en **varias líneas**: ya no se corta.
+- Reordenar elementos dentro de una lista: arrastre con asa (ratón/táctil) y teclado (↑/↓; con Mayús, más distancia). Se conserva el orden al recargar.
+- Enter en un elemento lo divide/inserta uno nuevo justo después, en la posición del cursor (`Shift+Enter` agrega línea).
+- Importación con dos modos: **Reemplazar** y **Fusionar (recomendada)**, con validación del archivo, copia de seguridad automática previa y resumen. Idempotente (importar dos veces el mismo archivo no duplica).
+- Fecha y hora de creación visible en cada nota (no se inventa para notas viejas).
+- Pie de página "Apoyar el proyecto" (Ko-fi, PayPal, Starlink como enlace de referido, Prex con botón copiar).
+- Arrastre de listas en vista Mapa más robusto en móvil (ya no se bloquea tras editar/crear).
 - Modo claro/oscuro, iconos SVG, cabecera con contadores.
 - Modo Mapa con arrastre (ratón/táctil) y teclado.
 - Bordes por conexión (sólido si hay una, multicolor si hay varias; sin borde si no hay conexiones).
