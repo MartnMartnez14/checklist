@@ -1,4 +1,4 @@
-# Checklist
+# Checklist Gato
 
 PWA de listas y notas tipo tablero, **offline-first**. Funciona instalada en PC y celular, y guarda todo en el propio dispositivo (nada se sube a un servidor).
 
@@ -44,7 +44,8 @@ Publicado con GitHub Pages (HTTPS), lo que permite instalarlo como app en el cel
 
 - `index.html` — toda la aplicación (HTML, CSS y JS, sin dependencias).
 - `sw.js` — Service Worker (offline; network-first para el HTML).
-- `manifest.json`, `icon.svg` — instalación como PWA.
+- `manifest.json`, `icon-192.png`, `icon-512.png` — instalación como PWA (íconos).
+- `cat-day.png` / `cat-night.png` — logo del header según el tema (claro / oscuro).
 
 ## Tests
 

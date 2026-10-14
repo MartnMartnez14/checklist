@@ -1,6 +1,6 @@
 # Roadmap
 
-Ideas y mejoras pendientes para Checklist. Lo de arriba tiene prioridad.
+Ideas y mejoras pendientes para Checklist Gato. Lo de arriba tiene prioridad.
 
 ## 1. Visor "Mapa estelar" (modo universo)
 
