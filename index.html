@@ -149,6 +149,7 @@
   .note.has-bg .add-input::placeholder { color: var(--on-image); }
   .note.has-bg .note-title,
   .note.has-bg .item-text { color: var(--on-image); }
+  .note-created { display: block; font-size: 11px; font-style: italic; color: var(--muted); margin: 0 0 2px; }
   .note-head { display: flex; align-items: center; gap: 4px; }
   .note-title {
     flex: 1; min-width: 0; border: none; background: transparent; font: inherit;
@@ -176,6 +177,9 @@
   }
   .item-text:focus { border-bottom-color: var(--accent); }
   .item.done .item-text { color: var(--muted); text-decoration: line-through; }
+  .item-grip { cursor: grab; touch-action: none; }
+  .item-grip:hover { color: var(--accent); }
+  .item.dragging { box-shadow: var(--shadow-2); border-radius: var(--radius-sm); background: var(--hover); }
   .add-form { margin: 0; }
   .add-input {
     width: 100%; border: none; background: transparent; font: inherit; padding: 8px 0 8px 28px;
@@ -266,6 +270,23 @@
   .link-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
   .link-label { flex: 1; min-width: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .link-empty { font-size: 12px; color: var(--muted); margin: 2px 0; }
+
+  /* --- Diálogo modal --- */
+  .dialog-scrim {
+    position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center; padding: 16px;
+  }
+  .dialog {
+    background: var(--card); color: var(--text); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-pop);
+    max-width: 420px; width: 100%; padding: 18px;
+  }
+  .dialog h2 { font-size: 16px; margin: 0 0 8px; }
+  .dialog p { margin: 0 0 10px; color: var(--muted); font-size: 14px; line-height: 1.45; white-space: pre-line; }
+  .dialog p:last-of-type { margin-bottom: 0; }
+  .dialog-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; margin-top: 14px; }
+  .btn.btn-danger { color: var(--danger); }
+
   .visually-hidden {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
     overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
@@ -279,6 +300,23 @@
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; animation: none !important; }
   }
+
+  /* --- Apoyar el proyecto --- */
+  .support { border-top: 1px solid var(--line); padding: clamp(20px,3vw,36px) clamp(16px,3vw,32px); color: var(--muted); }
+  .support-title { font-size: 14px; text-transform: uppercase; letter-spacing: .06em; margin: 0 0 6px; color: var(--text); }
+  .support-text { margin: 0 0 14px; max-width: 640px; font-size: 13.5px; line-height: 1.5; }
+  .support-links { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+  .support-card { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 14px;
+    box-shadow: var(--shadow-1); transition: background var(--t-fast), box-shadow var(--t-fast); }
+  a.support-card:hover { background: var(--hover); }
+  .support-card .i { width: 20px; height: 20px; color: var(--accent); flex: none; }
+  .support-card strong { display: block; font-size: 13.5px; }
+  .support-card small { display: block; font-size: 11.5px; color: var(--muted); }
+  .support-prex { cursor: default; }
+  .support-copy { padding: 6px 10px; font-size: 13px; }
+  .support-note { margin: 12px 0 0; font-size: 11.5px; }
+  @media (pointer: coarse) { a.support-card, .support-prex { min-height: 44px; } .support-copy { min-height: 40px; } }
 </style>
 </head>
 <body>
@@ -292,6 +330,11 @@
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 19h14"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 5h14"/></symbol>
+  <symbol id="i-coffee" viewBox="0 0 24 24"><path d="M4 9h12v5a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M7 3v3M10 3v3M13 3v3"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5C8 17.5 4 14 4 9.8 4 7.2 6 5 8.5 5c1.4 0 2.7.7 3.5 1.8C12.8 5.7 14.1 5 15.5 5 18 5 20 7.2 20 9.8c0 4.2-4 7.7-8 10.7z"/></symbol>
+  <symbol id="i-satellite" viewBox="0 0 24 24"><rect x="9" y="9" width="6" height="6" rx="1" transform="rotate(45 12 12)"/><path d="M5 5l3.5 3.5M15.5 15.5L19 19M5 9V5h4M19 15v4h-4"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
 </svg>
 <header>
   <div class="brand">
@@ -322,8 +365,35 @@
   <main id="notes"></main>
   <svg id="links" aria-hidden="true" focusable="false"></svg>
 </div>
+<footer class="support" aria-labelledby="support-title">
+  <h2 id="support-title" class="support-title">Apoyar el proyecto</h2>
+  <p class="support-text">¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.</p>
+  <div class="support-links">
+    <a class="support-card" href="https://ko-fi.com/martinmartinezgarcia" target="_blank" rel="noopener noreferrer">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-coffee"/></svg>
+      <span><strong>Ko-fi</strong><small>Invitame un cafecito</small></span>
+    </a>
+    <a class="support-card" href="https://www.paypal.com/paypalme/blufferedtwitch" target="_blank" rel="noopener noreferrer">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg>
+      <span><strong>PayPal</strong><small>Donación voluntaria</small></span>
+    </a>
+    <a class="support-card" href="https://starlink.com/es?referral=RC-DF-5848974-78640-68&app_source=share" target="_blank" rel="noopener noreferrer">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-satellite"/></svg>
+      <span><strong>Internet satelital Starlink</strong><small>Enlace de referido</small></span>
+    </a>
+    <div class="support-card support-prex">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
+      <span><strong>Prex</strong><small>Martín Martínez — Cuenta Prex: 35502</small></span>
+      <button type="button" class="btn support-copy" id="copy-prex" aria-label="Copiar número de cuenta Prex">
+        <svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>
+        <span class="btn-label">Copiar</span>
+      </button>
+    </div>
+  </div>
+  <p class="support-note">Las colaboraciones son 100% voluntarias. Starlink es un enlace de referido, no una donación directa.</p>
+</footer>
 <p id="sr-status" role="status" aria-live="polite" class="visually-hidden"></p>
-<p id="grip-help" class="visually-hidden">Pulsa las flechas para mover la lista; con Mayús, más distancia.</p>
+<p id="grip-help" class="visually-hidden">Pulsa las flechas para mover; con Mayús, más distancia.</p>
 
 <script>
   const KEY = "checklist-notas-v1";
@@ -401,6 +471,8 @@
     n.opacity = (typeof n.opacity === "number" && n.opacity >= 0 && n.opacity <= 60) ? Math.round(n.opacity) : 18;
     n.bgId = typeof n.bgId === "string" && n.bgId ? n.bgId : null;
     n.pos = (n.pos && Number.isFinite(n.pos.x) && Number.isFinite(n.pos.y)) ? { x: Math.max(0, n.pos.x), y: Math.max(0, n.pos.y) } : null;
+    n.createdAt = (typeof n.createdAt === "string" && n.createdAt) ? n.createdAt : null;
+    n.updatedAt = (typeof n.updatedAt === "string" && n.updatedAt) ? n.updatedAt : null;
     return n;
   }
 
@@ -449,6 +521,68 @@
   function announce(msg) {
     const s = document.getElementById("sr-status");
     if (s) s.textContent = msg;
+  }
+
+  // ISO (UTC) -> "DD/MM/AAAA — HH:MM:SS" en hora local. Solo para mostrar.
+  function fmtDate(iso) {
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return "";
+    const p = x => String(x).padStart(2, "0");
+    return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} — ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  }
+
+  // Actualiza SOLO updatedAt (nunca createdAt).
+  function touch(note) {
+    if (note) note.updatedAt = new Date().toISOString();
+  }
+
+  // Diálogo modal mínimo: resuelve con el `value` del botón, o null al cancelar.
+  function openDialog({ title, message, buttons }) {
+    return new Promise(resolve => {
+      const prevFocus = document.activeElement;
+      const scrim = el("div", { className: "dialog-scrim" });
+      const box = el("div", { className: "dialog", role: "dialog", "aria-modal": "true" });
+
+      const titleId = "dlg-title-" + uid();
+      box.setAttribute("aria-labelledby", titleId);
+      box.append(el("h2", { id: titleId, textContent: title }));
+
+      const lines = String(message == null ? "" : message).split("\n");
+      for (const line of lines) box.append(el("p", { textContent: line }));
+
+      const actions = el("div", { className: "dialog-actions" });
+      const btnEls = [];
+      const finish = value => {
+        document.removeEventListener("keydown", onKey, true);
+        scrim.remove();
+        if (prevFocus && typeof prevFocus.focus === "function") { try { prevFocus.focus(); } catch (e) {} }
+        resolve(value);
+      };
+      for (const b of buttons || []) {
+        const cls = "btn" + (b.primary ? " btn-primary" : "") + (b.danger ? " btn-danger" : "");
+        const btn = el("button", { type: "button", className: cls, textContent: b.label });
+        btn.addEventListener("click", () => finish(b.value));
+        actions.append(btn);
+        btnEls.push(btn);
+      }
+      box.append(actions);
+      scrim.append(box);
+
+      const onKey = e => {
+        if (e.key === "Escape") { e.preventDefault(); finish(null); return; }
+        if (e.key === "Tab" && btnEls.length) {
+          e.preventDefault();
+          const idx = btnEls.indexOf(document.activeElement);
+          const n = btnEls.length;
+          btnEls[e.shiftKey ? (idx - 1 + n) % n : (idx + 1) % n].focus();
+        }
+      };
+      scrim.addEventListener("mousedown", e => { if (e.target === scrim) finish(null); });
+      document.addEventListener("keydown", onKey, true);
+
+      document.body.append(scrim);
+      if (btnEls[0]) btnEls[0].focus();
+    });
   }
 
   // ---------- Tema (claro / oscuro) ----------
@@ -627,6 +761,7 @@
     try {
       const id = await putImage(file, file.name);
       note.bgId = id;
+      touch(note);
       save();
       if (prev && prev !== id) revokeIfUnused(prev);
       render();
@@ -787,6 +922,7 @@
     if (!src) return;
     if (!confirm("¿Eliminar esta conexión?")) return;
     src.links = src.links.filter(x => x !== tid);
+    touch(src);
     save();
     render();
   }
@@ -843,6 +979,7 @@
     if (src && !src.links.includes(targetId)) {
       src.links.push(targetId);
       justLinked = "m:" + pairKey(src.id, targetId);
+      touch(src);
       save();
     }
     exitConnectMode();
@@ -851,6 +988,7 @@
 
   // ---------- Vista: cuadrícula / mapa ----------
   let drag = null;
+  let itemDrag = null;
 
   function updateStats() {
     const { edges } = connectionModel();
@@ -913,10 +1051,27 @@
     announce(viewMode === "map" ? "Vista mapa. Usa el asa para mover cada lista." : "Vista cuadrícula");
   }
 
+  // Aplica la posición al nodo VIVO de la nota: el render puede haber reemplazado
+  // el section durante el arrastre, así que hay que resolverlo por id.
   function moveNote(sec, note, x, y) {
     note.pos = { x: Math.max(0, Math.round(x)), y: Math.max(0, Math.round(y)) };
-    sec.style.left = note.pos.x + "px"; sec.style.top = note.pos.y + "px";
+    const live = document.querySelector('.note[data-id="' + CSS.escape(note.id) + '"]');
+    const s = live || sec;
+    s.style.left = note.pos.x + "px"; s.style.top = note.pos.y + "px";
+    if (drag) {
+      document.querySelectorAll(".dragging").forEach(x => { if (x !== s) x.classList.remove("dragging"); });
+      s.classList.add("dragging");
+      drag.sec = s;
+    }
     scheduleLinks();
+  }
+
+  // Los listeners de arrastre viven en document (no en el section): si el render
+  // recrea el nodo, el drag sigue funcionando porque el nodo vivo se resuelve por id.
+  function detachDragListeners() {
+    document.removeEventListener("pointermove", onDragMove);
+    document.removeEventListener("pointerup", onDragEnd);
+    document.removeEventListener("pointercancel", onDragEnd);
   }
 
   function onGripDown(e, note, sec) {
@@ -925,6 +1080,10 @@
     try { sec.setPointerCapture(e.pointerId); } catch (err) {}
     drag = { note, sec, pid: e.pointerId, sx: e.clientX, sy: e.clientY, ox: note.pos.x, oy: note.pos.y, moved: false };
     sec.classList.add("dragging");
+    detachDragListeners();
+    document.addEventListener("pointermove", onDragMove);
+    document.addEventListener("pointerup", onDragEnd);
+    document.addEventListener("pointercancel", onDragEnd);
   }
   function onDragMove(e) {
     if (!drag || e.pointerId !== drag.pid) return;
@@ -934,7 +1093,8 @@
   }
   function onDragEnd(e) {
     if (!drag || e.pointerId !== drag.pid) return;
-    drag.sec.classList.remove("dragging");
+    detachDragListeners();
+    document.querySelectorAll(".dragging").forEach(x => x.classList.remove("dragging"));
     if (drag.moved) {
       save(); layoutCanvas(); scheduleLinks();
       announce("Lista movida a " + Math.round(drag.note.pos.x) + ", " + Math.round(drag.note.pos.y));
@@ -949,6 +1109,123 @@
     moveNote(sec, note, note.pos.x + d[0], note.pos.y + d[1]);
     save(); layoutCanvas();
     announce("Movida a " + Math.round(note.pos.x) + ", " + Math.round(note.pos.y));
+  }
+
+  // ---------- Reordenar ítems dentro de una lista ----------
+  // Reubica la fila en vivo comparando la Y del puntero con los puntos medios de
+  // las filas del MISMO grupo (pendientes/completados).
+  function onItemGripDown(e, note, item, row) {
+    e.preventDefault(); e.stopPropagation();
+    try { row.setPointerCapture(e.pointerId); } catch (err) {}
+    itemDrag = { note, item, row, pid: e.pointerId, sy: e.clientY, moved: false, isDone: item.done };
+    row.classList.add("dragging");
+    detachItemDragListeners();
+    document.addEventListener("pointermove", onItemDragMove);
+    document.addEventListener("pointerup", onItemDragEnd);
+    document.addEventListener("pointercancel", onItemDragEnd);
+  }
+
+  function detachItemDragListeners() {
+    document.removeEventListener("pointermove", onItemDragMove);
+    document.removeEventListener("pointerup", onItemDragEnd);
+    document.removeEventListener("pointercancel", onItemDragEnd);
+  }
+
+  function currentItemRow(note, item) {
+    const sec = document.querySelector('.note[data-id="' + CSS.escape(note.id) + '"]');
+    return sec ? sec.querySelector('.item[data-item-id="' + CSS.escape(item.id) + '"]') : null;
+  }
+
+  function itemGroupSelector(isDone) { return isDone ? '[data-done="true"]' : '[data-done="false"]'; }
+
+  function onItemDragMove(e) {
+    if (!itemDrag || e.pointerId !== itemDrag.pid) return;
+    if (!itemDrag.moved && Math.abs(e.clientY - itemDrag.sy) > 3) itemDrag.moved = true;
+    if (!itemDrag.moved) return;
+    const { note, item } = itemDrag;
+    let row = itemDrag.row;
+    if (!row || !row.isConnected) {
+      row = currentItemRow(note, item);
+      if (!row) return;
+      itemDrag.row = row;
+      row.classList.add("dragging");
+    }
+    const sec = row.closest(".note");
+    if (!sec) return;
+    const rows = [...sec.querySelectorAll(".item" + itemGroupSelector(itemDrag.isDone))];
+    let placed = false;
+    for (const r of rows) {
+      if (r === row) continue;
+      const rect = r.getBoundingClientRect();
+      if (e.clientY < rect.top + rect.height / 2) { r.before(row); placed = true; break; }
+    }
+    if (!placed && rows.length) rows[rows.length - 1].after(row);
+  }
+
+  function onItemDragEnd(e) {
+    if (!itemDrag || e.pointerId !== itemDrag.pid) return;
+    detachItemDragListeners();
+    const { note, row, moved } = itemDrag;
+    if (row && row.isConnected) row.classList.remove("dragging");
+    if (moved) { commitItemOrder(note); touch(note); save(); announce("Elemento movido"); }
+    itemDrag = null;
+  }
+
+  // Reescribe el orden de note.items según el orden DOM de cada grupo.
+  function commitItemOrder(note) {
+    const sec = document.querySelector('.note[data-id="' + CSS.escape(note.id) + '"]');
+    if (!sec) return;
+    [false, true].forEach(isDone => {
+      const idxs = [];
+      note.items.forEach((it, i) => { if (it.done === isDone) idxs.push(i); });
+      const rows = [...sec.querySelectorAll(".item" + itemGroupSelector(isDone))];
+      if (rows.length !== idxs.length) return;
+      const objs = rows.map(r => note.items.find(it => it.id === r.dataset.itemId)).filter(Boolean);
+      if (objs.length !== idxs.length) return;
+      idxs.forEach((idx, k) => { note.items[idx] = objs[k]; });
+    });
+  }
+
+  // Mueve el item `step` posiciones dentro de su grupo (teclado).
+  function moveItemBy(note, item, dir, step) {
+    const group = note.items.filter(i => i.done === item.done);
+    const pos = group.indexOf(item);
+    if (pos < 0) return;
+    const target = pos + dir * step;
+    if (target < 0 || target >= group.length || target === pos) return;
+    const ref = group[target];
+    note.items.splice(note.items.indexOf(item), 1);
+    const refIdx = note.items.indexOf(ref);
+    note.items.splice(dir > 0 ? refIdx + 1 : refIdx, 0, item);
+    touch(note);
+    save();
+    const sec = document.querySelector('.note[data-id="' + CSS.escape(note.id) + '"]');
+    const row = sec && sec.querySelector('.item[data-item-id="' + CSS.escape(item.id) + '"]');
+    if (row && sec) {
+      const group2 = note.items.filter(i => i.done === item.done);
+      const newPos = group2.indexOf(item);
+      const before = group2[newPos - 1];
+      const after = group2[newPos + 1];
+      const beforeRow = before && sec.querySelector('.item[data-item-id="' + CSS.escape(before.id) + '"]');
+      const afterRow = after && sec.querySelector('.item[data-item-id="' + CSS.escape(after.id) + '"]');
+      if (beforeRow) beforeRow.after(row);
+      else if (afterRow) afterRow.before(row);
+      const grip = row.querySelector(".item-grip");
+      if (grip) grip.focus();
+    }
+    announce("Movido");
+  }
+
+  // Construye el contenedor de chips de tags (o null si no hay tags).
+  function renderTagChips(tags) {
+    if (!tags.length) return null;
+    return el("div", { className: "tag-chips", "aria-hidden": "true" },
+      tags.map(t => {
+        const chip = el("span", { className: "tag-chip", textContent: t });
+        chip.style.setProperty("--tag-h", tagHue(t));
+        return chip;
+      })
+    );
   }
 
   // ---------- Render ----------
@@ -993,7 +1270,7 @@
       id: "title-" + note.id, rows: 1, className: "note-title",
       value: note.title, placeholder: "Sin título", "aria-label": "Título de la lista",
       oninput: e => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; },
-      onchange: e => { note.title = e.target.value.trim(); save(); scheduleLinks(); },
+      onchange: e => { note.title = e.target.value.trim(); touch(note); save(); scheduleLinks(); },
       onkeydown: e => { if (e.key === "Enter") { e.preventDefault(); e.target.blur(); } }
     });
 
@@ -1041,16 +1318,10 @@
       value: note.tags.join(", "),
       placeholder: "tags separados por coma",
       "aria-label": "Etiquetas de la lista",
-      onchange: e => { note.tags = parseTags(e.target.value); save(); render(); }
+      onchange: e => { note.tags = parseTags(e.target.value); touch(note); save(); render(); }
     });
 
-    const chips = note.tags.length ? el("div", { className: "tag-chips", "aria-hidden": "true" },
-      note.tags.map(t => {
-        const chip = el("span", { className: "tag-chip", textContent: t });
-        chip.style.setProperty("--tag-h", tagHue(t));
-        return chip;
-      })
-    ) : null;
+    const chips = renderTagChips(note.tags);
     if (chips) chips.addEventListener("click", () => tags.focus());
 
     const pending = note.items.filter(i => !i.done);
@@ -1074,6 +1345,7 @@
       note.items.push(item);
       addInput.value = "";
       add.parentNode.insertBefore(renderItem(note, item), add);
+      touch(note);
       save(); scheduleLinks(); growItems();
     }
     const add = el("form", {
@@ -1084,6 +1356,10 @@
       if (e.key === "Enter") { e.preventDefault(); submitAdd(); }
     });
 
+    const created = note.createdAt
+      ? el("time", { className: "note-created", dateTime: note.createdAt, textContent: fmtDate(note.createdAt) })
+      : null;
+
     const children = [
       el("div", { className: "note-head" }, [grip, title, styleBtn, connectBtn, delNote]),
       tags,
@@ -1091,6 +1367,7 @@
       ...pending.map(item => renderItem(note, item)),
       add
     ];
+    if (created) children.unshift(created);
 
     if (done.length) {
       const open = note.showDone !== false;
@@ -1102,7 +1379,7 @@
         }),
         el("button", {
           className: "clear", textContent: "Borrar completados",
-          onclick: () => { note.items = note.items.filter(i => !i.done); save(); render(); }
+          onclick: () => { note.items = note.items.filter(i => !i.done); touch(note); save(); render(); }
         })
       ]);
       children.push(bar);
@@ -1114,38 +1391,78 @@
       "data-id": note.id,
       "aria-label": note.title || "Lista sin título"
     }, children);
-    section.addEventListener("pointermove", onDragMove);
-    section.addEventListener("pointerup", onDragEnd);
-    section.addEventListener("pointercancel", onDragEnd);
 
     if (openPopId === note.id) section.append(renderPop(note, section));
     return section;
   }
 
+  // Divide el ítem en la posición del caret y agrega la cola como ítem nuevo.
+  function insertAfter(note, item, textareaEl) {
+    const v = textareaEl.value;
+    const a = textareaEl.selectionStart ?? v.length;
+    const b = textareaEl.selectionEnd ?? a;
+    const head = v.slice(0, a), tail = v.slice(b);
+    item.text = head;
+    const nuevo = { id: uid(), text: tail, done: item.done };
+    note.items.splice(note.items.indexOf(item) + 1, 0, nuevo);
+    textareaEl.value = head;
+    const fila = textareaEl.closest(".item");
+    if (fila) {
+      fila.after(renderItem(note, nuevo));
+      const t = fila.nextElementSibling?.querySelector(".item-text");
+      if (t) { t.focus(); t.setSelectionRange(0, 0); }
+    }
+    touch(note);
+    save(); scheduleLinks(); growItems();
+  }
+
   function renderItem(note, item) {
+    const grip = el("button", {
+      type: "button", className: "icon-btn item-grip",
+      "aria-label": "Mover elemento", "aria-describedby": "grip-help",
+      onpointerdown: e => onItemGripDown(e, note, item, row),
+      onkeydown: e => {
+        if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
+        e.preventDefault();
+        moveItemBy(note, item, e.key === "ArrowUp" ? -1 : 1, e.shiftKey ? 3 : 1);
+      }
+    }, [icon("i-grip")]);
+
     const cb = el("input", {
       type: "checkbox", checked: item.done, "aria-label": "Marcar como completado",
-      onchange: e => { item.done = e.target.checked; save(); render(); }
+      onchange: e => { item.done = e.target.checked; touch(note); save(); render(); }
     });
 
     const text = el("textarea", {
       className: "item-text", rows: 1, "aria-label": "Texto del elemento",
       onchange: e => {
-        const t = e.target.value.trim();
-        if (t) { item.text = t; save(); }
-        else { note.items = note.items.filter(i => i !== item); save(); render(); }
+        const raw = e.target.value;
+        if (raw === item.text) return; // sin cambio real (p. ej. split por Enter): no borrar
+        const t = raw.trim();
+        if (t) { item.text = t; touch(note); save(); }
+        else { note.items = note.items.filter(i => i !== item); touch(note); save(); render(); }
       },
       oninput: e => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; },
-      onkeydown: e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.target.blur(); } }
+      onkeydown: e => {
+        if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) {
+          e.preventDefault();
+          insertAfter(note, item, e.target);
+        }
+      }
     });
     text.value = item.text;
 
     const del = el("button", {
       className: "icon-btn", title: "Eliminar elemento", "aria-label": "Eliminar elemento",
-      onclick: () => { note.items = note.items.filter(i => i !== item); save(); render(); }
+      onclick: () => { note.items = note.items.filter(i => i !== item); touch(note); save(); render(); }
     }, [icon("i-x")]);
 
-    return el("div", { className: "item" + (item.done ? " done" : "") }, [cb, text, del]);
+    const row = el("div", {
+      className: "item" + (item.done ? " done" : ""),
+      "data-item-id": item.id,
+      "data-done": String(item.done)
+    }, [grip, cb, text, del]);
+    return row;
   }
 
   // ---------- Popover de estilo ----------
@@ -1211,6 +1528,7 @@
     // val: null = sin color; 0..9 = índice de PALETTE
     function applyColor(val) {
       note.color = val;
+      touch(note);
       save();
       swatches.forEach((b, j) => {
         const on = val == null ? j === 0 : j === val + 1;
@@ -1250,7 +1568,7 @@
       slider.setAttribute("aria-valuetext", slider.value + "%");
       section.style.setProperty("--tint", tintFor(note));
     });
-    slider.addEventListener("change", () => { save(); });
+    slider.addEventListener("change", () => { touch(note); save(); });
     pop.append(slider);
 
     pop.append(el("p", { className: "pop-title", textContent: "Fondo" }));
@@ -1273,6 +1591,7 @@
       onclick: () => {
         const old = note.bgId;
         note.bgId = null;
+        touch(note);
         save();
         revokeIfUnused(old);
         render();
@@ -1295,7 +1614,7 @@
         el("button", {
           type: "button", className: "icon-btn",
           "aria-label": "Eliminar conexión con " + label,
-          onclick: () => { note.links = note.links.filter(x => x !== id); save(); render(); }
+          onclick: () => { note.links = note.links.filter(x => x !== id); touch(note); save(); render(); }
         }, [icon("i-x")])
       ]));
     });
@@ -1326,7 +1645,7 @@
   document.getElementById("view-map").addEventListener("click", () => setView("map", true));
 
   document.getElementById("new-note").addEventListener("click", () => {
-    const note = normalizeNote({ id: uid(), title: "", items: [], showDone: true });
+    const note = normalizeNote({ id: uid(), title: "", items: [], showDone: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
     if (viewMode === "map") { const k = notes.length; note.pos = { x: 24 + (k % 6) * 28, y: 24 + (k % 6) * 28 }; }
     notes.unshift(note);
     save();
@@ -1343,6 +1662,31 @@
     if (e.key !== "Escape") return;
     if (connectingSource != null) exitConnectMode();
     else if (openPopId != null) closePop();
+  });
+
+  const prexBtn = document.getElementById("copy-prex");
+  if (prexBtn) prexBtn.addEventListener("click", async () => {
+    const nro = "35502";
+    let ok = true;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(nro);
+      else throw new Error("sin clipboard");
+    } catch (e) {
+      ok = false;
+      try {
+        const ta = el("textarea", { value: nro });
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove();
+        ok = true;
+      } catch (e2) { ok = false; }
+    }
+    const label = prexBtn.querySelector(".btn-label");
+    if (label) {
+      const prev = label.textContent;
+      label.textContent = ok ? "Copiado ✓" : "Copiá 35502";
+      announce(ok ? "Número de Prex copiado" : "No se pudo copiar, el número es 35502");
+      setTimeout(() => { label.textContent = prev; }, 1600);
+    }
   });
 
   // ---------- Export / Import ----------
@@ -1367,23 +1711,107 @@
     return new Blob(slices, { type: type || "application/octet-stream" });
   }
 
+  // Construye y descarga la copia exportable (reutilizable para backup/export).
+  async function buildEnvelope() {
+    const images = {};
+    for (const n of notes) {
+      if (n.bgId && !images[n.bgId]) {
+        const rec = await getImage(n.bgId).catch(() => null);
+        if (rec) images[n.bgId] = { type: rec.type, name: rec.name, data: await blobToBase64(rec.blob) };
+      }
+    }
+    return { app: "checklist", schema: 2, exportedAt: new Date().toISOString(), notes, images };
+  }
+
+  function downloadJSON(obj, filename) {
+    const blob = new Blob([JSON.stringify(obj, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = el("a", { href: url, download: filename });
+    a.style.display = "none";
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  // Valida el archivo importado sin tocar el estado. Devuelve {ok, notes, images, isV1}.
+  function parseImport(data) {
+    if (Array.isArray(data)) {
+      const valid = data.every(n => n && typeof n === "object" && typeof n.id === "string" && Array.isArray(n.items));
+      if (!valid) return { ok: false };
+      return { ok: true, notes: data, images: {}, isV1: true };
+    }
+    if (data && data.app === "checklist" && Array.isArray(data.notes) && data.notes.every(n => n && typeof n === "object")) {
+      return { ok: true, notes: data.notes, images: data.images || {}, isV1: false };
+    }
+    return { ok: false };
+  }
+
+  function noteSignature(n) {
+    return JSON.stringify({
+      title: n.title,
+      tags: [...(n.tags || [])].sort(),
+      items: (n.items || []).map(i => [i.text, !!i.done])
+    });
+  }
+
+  function noteUpdatedMs(n) {
+    const t = Date.parse((n && n.updatedAt) || "");
+    return Number.isFinite(t) ? t : null;
+  }
+
+  // Hash corto determinista para ids de copias por conflicto (idempotencia al reimportar).
+  function shortHash(str) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h.toString(36);
+  }
+
+  // Fusión pura: devuelve {next, stats} sin mutar el estado previo.
+  function mergeNotes(local, incoming) {
+    const next = local.slice();
+    const stats = { added: 0, existing: 0, unchanged: 0, updated: 0, conflicts: 0 };
+    const byId = new Map(next.map(n => [n.id, n]));
+    for (const inc of incoming) {
+      const cur = byId.get(inc.id);
+      if (cur) {
+        stats.existing++;
+        const a = noteUpdatedMs(cur), b = noteUpdatedMs(inc);
+        if (a != null && b != null && a !== b) {
+          if (b > a) {
+            const i = next.indexOf(cur);
+            const rep = { ...inc };
+            // Conservar las conexiones de ambas versiones.
+            rep.links = [...new Set([...(cur.links || []), ...(inc.links || [])])];
+            next[i] = rep; byId.set(rep.id, rep);
+            stats.updated++;
+          } else { stats.unchanged++; }
+          continue;
+        }
+        if (noteSignature(cur) === noteSignature(inc)) { stats.unchanged++; continue; }
+        // Conflicto ambiguo: conservar ambas. Id determinista por (id origen + contenido)
+        // para que reimportar el mismo archivo no duplique.
+        const copyId = inc.id + "~dup~" + shortHash(noteSignature(inc));
+        if (byId.has(copyId)) { stats.unchanged++; continue; }
+        const copy = { ...inc, id: copyId, bgId: inc.bgId || null };
+        next.push(copy); byId.set(copyId, copy);
+        stats.conflicts++;
+        continue;
+      }
+      // Id nuevo: es una lista nueva, se agrega siempre.
+      next.push(inc); byId.set(inc.id, inc);
+      stats.added++;
+    }
+    const ids = new Set(next.map(n => n.id));
+    next.forEach(n => { n.links = [...new Set((n.links || []).filter(x => ids.has(x)))]; });
+    return { next, stats };
+  }
+
   document.getElementById("export").addEventListener("click", async () => {
     const btn = document.getElementById("export");
     btn.disabled = true;
     try {
-      const images = {};
-      for (const n of notes) {
-        if (n.bgId && !images[n.bgId]) {
-          const rec = await getImage(n.bgId).catch(() => null);
-          if (rec) images[n.bgId] = { type: rec.type, name: rec.name, data: await blobToBase64(rec.blob) };
-        }
-      }
-      const envelope = { app: "checklist", schema: 2, exportedAt: new Date().toISOString(), notes, images };
-      const blob = new Blob([JSON.stringify(envelope, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = el("a", { href: url, download: `checklist-${new Date().toISOString().slice(0, 10)}.json` });
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      downloadJSON(await buildEnvelope(), `checklist-${new Date().toISOString().slice(0, 10)}.json`);
     } catch (e) {
       alert("No se pudo exportar: " + (e && e.message ? e.message : e));
     } finally {
@@ -1396,44 +1824,73 @@
     e.target.value = "";
     if (!file) return;
     try {
-      const data = JSON.parse(await file.text());
+      let data;
+      try { data = JSON.parse(await file.text()); }
+      catch { alert("El archivo no es una copia válida de Checklist."); return; }
 
-      // Formato antiguo (v1): array plano de notas.
-      if (Array.isArray(data)) {
-        const valid = data.every(n => n && typeof n.id === "string" && Array.isArray(n.items));
-        if (!valid) throw new Error("formato");
-        if (!confirm("¿Reemplazar las listas actuales por las del archivo?")) return;
-        notes = data.map(normalizeNote);
-        save(); render();
-        gcImages();
-        return;
-      }
+      const parsed = parseImport(data);
+      if (!parsed.ok) { alert("El archivo no es una copia válida de Checklist."); return; }
 
-      // Envelope versionado con imágenes embebidas.
-      if (data && data.app === "checklist" && Array.isArray(data.notes)) {
-        if (!confirm("¿Reemplazar las listas actuales por las del archivo?")) return;
-        const idMap = {};
-        const images = data.images || {};
-        for (const [oldId, info] of Object.entries(images)) {
+      const incomingRaw = parsed.notes;
+      const imagesRaw = parsed.images;
+
+      const choice = await openDialog({
+        title: "Importar datos",
+        message: `El archivo contiene ${incomingRaw.length} lista(s).\nSe descargará una copia de seguridad de tus datos actuales antes de continuar.`,
+        buttons: [
+          { label: "Fusionar (recomendada)", value: "merge", primary: true },
+          { label: "Reemplazar", value: "replace", danger: true },
+          { label: "Cancelar", value: null }
+        ]
+      });
+      if (choice == null) return;
+
+      // Copia de seguridad del estado ACTUAL antes de mutar.
+      downloadJSON(await buildEnvelope(), "checklist-backup-" + new Date().toISOString().replace(/[:.]/g, "-") + ".json");
+
+      // Remapear imágenes (solo v2).
+      const idMap = {};
+      if (!parsed.isV1) {
+        for (const [oldId, info] of Object.entries(imagesRaw)) {
           try {
             if (!info || typeof info.data !== "string") continue;
             const blob = base64ToBlob(info.data, info.type);
             idMap[oldId] = await putImage(blob, info.name);
           } catch (err) { console.warn("imagen importada", oldId, err); }
         }
-        const incoming = data.notes.map(n => normalizeNote({ ...n }));
+      }
+
+      const incoming = incomingRaw.map(n => normalizeNote({ ...n }));
+      if (!parsed.isV1) {
         const ids = new Set(incoming.map(n => n.id));
         incoming.forEach(n => {
           n.bgId = (n.bgId && idMap[n.bgId]) ? idMap[n.bgId] : null;
           n.links = n.links.filter(id => ids.has(id));
         });
+      }
+
+      if (choice === "replace") {
         notes = incoming;
         save(); render();
         gcImages();
+        announce("Datos importados (reemplazo)");
         return;
       }
 
-      throw new Error("formato");
+      const { next, stats } = mergeNotes(notes, incoming);
+      notes = next;
+      save(); render();
+      gcImages();
+      announce("Datos fusionados");
+      await openDialog({
+        title: "Fusión completada",
+        message:
+          `Nuevas listas: ${stats.added}\n` +
+          `Ya existentes (sin cambios): ${stats.unchanged}\n` +
+          `Actualizadas con la versión más reciente: ${stats.updated}\n` +
+          `Conflictos conservados por duplicado: ${stats.conflicts}`,
+        buttons: [{ label: "Cerrar", value: "ok", primary: true }]
+      });
     } catch (err) {
       alert("El archivo no es una copia válida de Checklist.");
       console.warn(err);
