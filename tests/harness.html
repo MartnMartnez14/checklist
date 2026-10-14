@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>RUNNING</title>
+<style>
+  html,body{margin:0;font-family:monospace}
+  #results{white-space:pre-wrap;padding:8px;font-size:12px}
+  #stage iframe{border:0;display:block}
+</style>
+</head>
+<body>
+<pre id="results"></pre>
+<div id="stage"></div>
+<script>
+(function () {
+  "use strict";
+
+  var KEY = "checklist-notas-v1";
+  var VIEW_KEY = "checklist-view";
+  var resultsEl = document.getElementById("results");
+  var stage = document.getElementById("stage");
+  var iframe = null, cw = null, cd = null;
+  var alerts = [];
+
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function log(name, status, detail) {
+    // "RES" + "ULT" para que el texto resultante no aparezca literalmente en
+    // el fuente y un grep sobre el DOM no cuente codigo como resultado.
+    resultsEl.textContent += "RES" + "ULT " + name + " " + status + " " + (detail == null ? "" : String(detail)) + "\n";
+  }
+
+  function assert(cond, msg) { if (!cond) throw new Error(msg || "assert failed"); }
+
+  function esc(s) { return String(s).replace(/\s+/g, " ").slice(0, 300); }
+
+  function stored() {
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; }
+    catch (e) { return []; }
+  }
+  function storedRaw() { return localStorage.getItem(KEY); }
+  function firstNote() { return stored()[0]; }
+  function itemTexts(n) { return (n.items || []).map(function (i) { return i.text; }); }
+  function ids(ns) { return ns.map(function (n) { return n.id; }); }
+
+  // held item spec: array of strings -> objects with stable derived ids.
+  // Emite la forma ya normalizada por la app para que el re-guardado inicial
+  // (migrate) escriba exactamente el mismo JSON y no altere localStorage.
+  function note(id, title, texts, extra) {
+    var n = {
+      id: id, title: title || "",
+      items: (texts || []).map(function (t, i) { return { id: id + "-i" + i, text: t, done: false }; }),
+      showDone: true,
+      tags: [], links: [], color: null, opacity: 18, bgId: null, pos: null,
+      createdAt: null, updatedAt: null
+    };
+    if (extra) Object.keys(extra).forEach(function (k) { n[k] = extra[k]; });
+    return n;
+  }
+
+  async function createFrame() {
+    iframe = document.createElement("iframe");
+    iframe.style.cssText = "width:1000px;height:2600px;border:0;display:block;";
+    var loaded = new Promise(function (res) { iframe.addEventListener("load", res, { once: true }); });
+    iframe.src = "../index.html";
+    stage.appendChild(iframe);
+    await loaded;
+    cw = iframe.contentWindow;
+    cd = iframe.contentDocument;
+    alerts = [];
+    cw.__alertCount = 0;
+    cw.alert = function (m) { alerts.push(m); cw.__alertCount++; };
+    cw.confirm = function () { return true; };
+    await sleep(70);
+  }
+
+  // Boot with a clean localStorage seeded with `seedNotes` (undefined = empty).
+  async function boot(seedNotes) {
+    if (iframe) { iframe.remove(); iframe = null; cw = null; cd = null; }
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    try { localStorage.removeItem(VIEW_KEY); } catch (e) {}
+    if (seedNotes !== undefined) localStorage.setItem(KEY, JSON.stringify(seedNotes));
+    await createFrame();
+  }
+
+  // Remount the iframe keeping localStorage as-is (persistence checks).
+  async function remount() {
+    if (iframe) { iframe.remove(); iframe = null; cw = null; cd = null; }
+    await sleep(20);
+    await createFrame();
+  }
+
+  // Iteration-based wait (virtual-time friendly).
+  async function waitFor(fn, timeoutMs) {
+    var iterations = Math.ceil((timeoutMs || 3000) / 25);
+    for (var i = 0; i < iterations; i++) {
+      var v = fn();
+      if (v) return v;
+      await sleep(25);
+    }
+    return null;
+  }
+
+  function dialogs() { return cd ? [].slice.call(cd.querySelectorAll(".dialog")) : []; }
+
+  function setImportFile(obj) {
+    var inp = cd.getElementById("import-file");
+    var dt = new cw.DataTransfer();
+    dt.items.add(new cw.File([JSON.stringify(obj)], "data.json", { type: "application/json" }));
+    inp.files = dt.files;
+    inp.dispatchEvent(new cw.Event("change", { bubbles: true }));
+  }
+
+  async function chooseDialog(text, timeout) {
+    var dlg = await waitFor(function () {
+      return dialogs().find(function (d) {
+        return [].slice.call(d.querySelectorAll(".btn")).some(function (b) { return b.textContent.indexOf(text) >= 0; });
+      });
+    }, timeout || 4000);
+    if (!dlg) throw new Error("no apareció diálogo con botón '" + text + "'");
+    var btn = [].slice.call(dlg.querySelectorAll(".btn")).find(function (b) { return b.textContent.indexOf(text) >= 0; });
+    btn.click();
+    await sleep(140);
+    return btn;
+  }
+
+  async function dismissDialogs() {
+    dialogs().forEach(function (d) {
+      [].slice.call(d.querySelectorAll(".btn")).forEach(function (b) { b.click(); });
+    });
+    await sleep(60);
+  }
+
+  async function importAndChoose(obj, text) {
+    setImportFile(obj);
+    await chooseDialog(text);
+  }
+
+  function v2(notes) { return { app: "checklist", schema: 2, notes: notes, images: {} }; }
+
+  // ---------------------------------------------------------------- tests
+
+  async function t_enter_mid() {
+    await boot([note("n1", "", ["A", "B", "C", "D"])]);
+    var ta = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i1"] .item-text');
+    assert(ta, "no encontré textarea de B");
+    ta.focus();
+    ta.setSelectionRange(1, 1);
+    ta.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+    await sleep(60);
+    var n = firstNote();
+    assert(JSON.stringify(itemTexts(n)) === JSON.stringify(["A", "B", "", "C", "D"]),
+      "textos=" + JSON.stringify(itemTexts(n)));
+    assert(n.items[2].text === "", "el nuevo item no está vacío en idx 2");
+    var active = cd.activeElement;
+    assert(active && active.classList && active.classList.contains("item-text"), "foco no está en textarea");
+    assert(active.value === "", "el textarea enfocado no está vacío");
+  }
+
+  async function t_enter_split() {
+    await boot([note("n1", "", ["ABCD"])]);
+    var ta = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-text');
+    ta.focus();
+    ta.setSelectionRange(2, 2);
+    ta.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+    await sleep(60);
+    var n = firstNote();
+    assert(JSON.stringify(itemTexts(n)) === JSON.stringify(["AB", "CD"]),
+      "textos=" + JSON.stringify(itemTexts(n)));
+  }
+
+  async function t_enter_last() {
+    await boot([note("n1", "", ["A", "B", "C"])]);
+    var ta = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i2"] .item-text');
+    ta.focus();
+    ta.setSelectionRange(1, 1);
+    ta.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+    await sleep(60);
+    var n = firstNote();
+    assert(JSON.stringify(itemTexts(n)) === JSON.stringify(["A", "B", "C", ""]),
+      "textos=" + JSON.stringify(itemTexts(n)));
+  }
+
+  // [BUG] Enter con caret en 0 borraba el item original. Debe dividir:
+  // el original queda con el texto a la izquierda ("") y se crea uno nuevo
+  // con el texto a la derecha ("ABC") justo después. El original NO se borra.
+  async function t_enter_caret0() {
+    await boot([note("n1", "", ["ABC"])]);
+    var ta = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-text');
+    assert(ta, "no encontré textarea de ABC");
+    ta.focus();
+    if (ta.setSelectionStart) ta.setSelectionStart(0); else ta.selectionStart = 0;
+    if (ta.setSelectionEnd) ta.setSelectionEnd(0); else ta.selectionEnd = 0;
+    ta.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true }));
+    var ok = await waitFor(function () {
+      var it = itemTexts(firstNote());
+      return (it.length === 2 && it[0] === "" && it[1] === "ABC") ? it : null;
+    }, 3000);
+    assert(ok, "textos=" + JSON.stringify(itemTexts(firstNote())) + " count=" + firstNote().items.length);
+    assert(firstNote().items.length === 2, "el original se borró: count=" + firstNote().items.length);
+    // Opcional: el textarea nuevo (con la cola "ABC") tiene foco y es otra fila.
+    var active = cd.activeElement;
+    assert(active && active.classList && active.classList.contains("item-text"), "foco no está en textarea");
+    assert(active.value === "ABC", "el textarea enfocado no es el nuevo: " + JSON.stringify(active.value));
+    var activeRow = active.closest(".item");
+    var origRow = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"]');
+    assert(activeRow && origRow && activeRow !== origRow, "el foco quedó en la fila original, no en la nueva");
+  }
+
+  async function t_shift_enter() {
+    await boot([note("n1", "", ["A", "B"])]);
+    var ta = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-text');
+    ta.focus();
+    ta.setSelectionRange(1, 1);
+    ta.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Enter", shiftKey: true, bubbles: true, cancelable: true }));
+    await sleep(60);
+    var n = firstNote();
+    assert(n.items.length === 2, "conteo items=" + n.items.length);
+  }
+
+  async function t_ime_guard() {
+    await boot([note("n1", "", ["A"])]);
+    var probe = new cw.KeyboardEvent("keydown", { key: "Enter", isComposing: true, bubbles: true, cancelable: true });
+    if (!probe.isComposing) {
+      return "NOVERIFY:KeyboardEvent.isComposing no asignable en este navegador";
+    }
+    var ta = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-text');
+    ta.focus();
+    ta.setSelectionRange(1, 1);
+    ta.dispatchEvent(probe);
+    await sleep(60);
+    var n = firstNote();
+    assert(n.items.length === 1, "se creó item con isComposing: length=" + n.items.length);
+  }
+
+  async function t_reorder_kbd() {
+    await boot([note("n1", "", ["A", "B", "C"])]);
+    var grip = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-grip');
+    assert(grip, "no grip de A");
+    grip.focus();
+    grip.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
+    await sleep(60);
+    var n = firstNote();
+    assert(JSON.stringify(itemTexts(n)) === JSON.stringify(["B", "A", "C"]),
+      "orden=" + JSON.stringify(itemTexts(n)));
+  }
+
+  async function t_reorder_drag() {
+    await boot([note("n1", "", ["A", "B", "C"])]);
+    var rowA = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"]');
+    var rowC = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i2"]');
+    var gripC = rowC.querySelector(".item-grip");
+    var rA = rowA.getBoundingClientRect();
+    var rC = rowC.getBoundingClientRect();
+    if (!(rA.height > 0 && rC.height > 0)) {
+      return "NOVERIFY:getBoundingClientRect devuelve 0 en headless (filas sin layout)";
+    }
+    var x = Math.round(rC.left + 12);
+    var yC = Math.round(rC.top + rC.height / 2);
+    var yAboveA = Math.round(rA.top + Math.max(1, rA.height * 0.1));
+    gripC.dispatchEvent(new cw.PointerEvent("pointerdown", { pointerId: 1, bubbles: true, cancelable: true, clientX: x, clientY: yC }));
+    await sleep(30);
+    cd.dispatchEvent(new cw.PointerEvent("pointermove", { pointerId: 1, bubbles: true, cancelable: true, clientX: x, clientY: yAboveA }));
+    await sleep(30);
+    cd.dispatchEvent(new cw.PointerEvent("pointerup", { pointerId: 1, bubbles: true, cancelable: true, clientX: x, clientY: yAboveA }));
+    await sleep(60);
+    var n = firstNote();
+    var order = itemTexts(n);
+    assert(order[0] === "C", "C no quedó primero: " + JSON.stringify(order));
+    assert(JSON.stringify(order) === JSON.stringify(["C", "A", "B"]), "orden inesperado: " + JSON.stringify(order));
+  }
+
+  async function t_persist() {
+    await boot([note("n1", "", ["A", "B", "C"])]);
+    var grip = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-grip');
+    grip.focus();
+    grip.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }));
+    await sleep(60);
+    assert(JSON.stringify(itemTexts(firstNote())) === JSON.stringify(["B", "A", "C"]), "pre-condición de orden falló");
+    await remount();
+    var n = firstNote();
+    assert(JSON.stringify(itemTexts(n)) === JSON.stringify(["B", "A", "C"]),
+      "orden no persistió tras remount: " + JSON.stringify(itemTexts(n)));
+  }
+
+  async function t_merge() {
+    await boot([note("n1", "Estudio", []), note("n2", "Compras", [])]);
+    await importAndChoose(v2([note("n3", "Ejercicio", []), note("n4", "Ideas", [])]), "Fusionar");
+    await dismissDialogs();
+    var ns = stored();
+    var got = ids(ns).sort();
+    assert(JSON.stringify(got) === JSON.stringify(["n1", "n2", "n3", "n4"]), "ids=" + JSON.stringify(got));
+    assert(new Set(got).size === 4, "hay ids duplicados");
+  }
+
+  async function t_merge_idempotent() {
+    await boot([note("n1", "Estudio", []), note("n2", "Compras", [])]);
+    var file = v2([note("n3", "Ejercicio", []), note("n4", "Ideas", [])]);
+    await importAndChoose(file, "Fusionar");
+    await dismissDialogs();
+    assert(stored().length === 4, "tras 1ra fusión length=" + stored().length);
+    await importAndChoose(file, "Fusionar");
+    await dismissDialogs();
+    var ns = stored();
+    assert(ns.length === 4, "tras 2da fusión length=" + ns.length + " ids=" + JSON.stringify(ids(ns)));
+  }
+
+  async function t_merge_conflict() {
+    await boot([note("n1", "Lista", ["X"], { updatedAt: null })]);
+    await importAndChoose(v2([note("n1", "Lista", ["Y"], { updatedAt: null })]), "Fusionar");
+    await dismissDialogs();
+    var ns = stored();
+    assert(ns.length === 2, "se esperaban 2 notas, hay " + ns.length);
+    var all = [];
+    ns.forEach(function (n) { all = all.concat(itemTexts(n)); });
+    assert(all.indexOf("X") >= 0 && all.indexOf("Y") >= 0, "se perdió info: " + JSON.stringify(all));
+    assert(ns[0].id !== ns[1].id, "las copias comparten id");
+  }
+
+  // [BUG] La nota importada n1 (items ["C"], sin updatedAt) choca por id con
+  // la local n1 (items ["X"]) y su firma coincide con OTRA nota local n2
+  // (items ["C"]). No debe descartarse: se conserva como copia con id
+  // determinista inc.id + "~dup~" + shortHash(firma). Reimportar es idempotente.
+  async function t_merge_conflict_shared_sig() {
+    await boot([note("n1", "", ["X"]), note("n2", "", ["C"])]);
+    var file = v2([note("n1", "", ["C"])]); // updatedAt null por defecto
+    await importAndChoose(file, "Fusionar");
+    await dismissDialogs();
+    var ns = stored();
+    assert(ns.length === 3, "tras 1ra fusión se esperaban 3 listas, hay " + ns.length + " ids=" + JSON.stringify(ids(ns)));
+    var cNotes = ns.filter(function (n) { return itemTexts(n)[0] === "C" && itemTexts(n).length === 1; });
+    assert(cNotes.length === 2, "se esperaban 2 notas con primer item 'C', hay " + cNotes.length);
+    var orig = ns.find(function (n) { return n.id === "n1"; });
+    assert(orig && JSON.stringify(itemTexts(orig)) === JSON.stringify(["X"]),
+      "n1 perdió su contenido: " + JSON.stringify(orig && itemTexts(orig)));
+
+    await importAndChoose(file, "Fusionar");
+    await dismissDialogs();
+    var ns2 = stored();
+    assert(ns2.length === 3, "reimportar duplicó: length=" + ns2.length + " ids=" + JSON.stringify(ids(ns2)));
+    assert(new Set(ids(ns2)).size === 3, "hay ids duplicados: " + JSON.stringify(ids(ns2)));
+  }
+
+  async function t_import_invalid() {
+    await boot([note("n1", "Base", [])]);
+    var before = storedRaw();
+    setImportFile({ foo: 1 });
+    var alerted = await waitFor(function () { return cw.__alertCount > 0 ? true : null; }, 3000);
+    await sleep(40);
+    assert(cw.__alertCount === 1, "alert count=" + cw.__alertCount + " (esperado 1)");
+    assert(alerted, "no se llamó a alert con JSON inválido");
+    assert(dialogs().length === 0, "se abrió diálogo con JSON inválido");
+    assert(storedRaw() === before, "localStorage cambió con JSON inválido");
+  }
+
+  async function t_replace() {
+    await boot([note("n1", "Local", [])]);
+    await importAndChoose(v2([note("n3", "A", []), note("n4", "B", [])]), "Reemplazar");
+    var ns = stored();
+    assert(JSON.stringify(ids(ns).sort()) === JSON.stringify(["n3", "n4"]),
+      "ids tras replace=" + JSON.stringify(ids(ns)));
+  }
+
+  async function t_created_at() {
+    await boot([]);
+    cd.getElementById("new-note").click();
+    await sleep(80);
+    var ns = stored();
+    assert(ns.length === 1, "no se creó la nota");
+    var n = ns[0];
+    assert(typeof n.createdAt === "string" && !isNaN(Date.parse(n.createdAt)),
+      "createdAt inválido: " + n.createdAt);
+    var created = cd.querySelector('.note[data-id="' + n.id + '"] .note-created');
+    assert(created, "no hay .note-created en el DOM");
+    var txt = created.textContent.trim();
+    assert(/^\d{2}\/\d{2}\/\d{4} — \d{2}:\d{2}:\d{2}$/.test(txt), "formato de fecha: " + txt);
+    var beforeCreated = n.createdAt;
+    var beforeUpdated = n.updatedAt;
+    var title = cd.querySelector('.note[data-id="' + n.id + '"] .note-title');
+    title.value = "Hola";
+    title.dispatchEvent(new cw.Event("input", { bubbles: true }));
+    title.dispatchEvent(new cw.Event("change", { bubbles: true }));
+    await sleep(40);
+    var n2 = stored()[0];
+    assert(n2.createdAt === beforeCreated, "createdAt cambió al editar: " + beforeCreated + " -> " + n2.createdAt);
+    assert(n2.title === "Hola", "título no se guardó: " + JSON.stringify(n2.title));
+    assert(typeof n2.updatedAt === "string", "updatedAt ausente tras editar");
+    if (n2.updatedAt === beforeUpdated) log("created-at", "INFO", "updatedAt no cambió (posible misma ms)");
+  }
+
+  async function t_legacy_no_date() {
+    await boot([{ id: "n1", title: "Vieja", items: [], showDone: true }]);
+    var n = firstNote();
+    assert(n.createdAt == null, "se inventó createdAt: " + n.createdAt);
+    var created = cd.querySelector('.note[data-id="n1"] .note-created');
+    assert(!created, ".note-created no debería existir para nota legacy");
+  }
+
+  async function t_footer() {
+    await boot([]);
+    assert(cd.getElementById("support-title"), "falta #support-title");
+    var links = [].slice.call(cd.querySelectorAll('.support-links a[target="_blank"]'));
+    assert(links.length === 3, "enlaces target=_blank=" + links.length);
+    links.forEach(function (a) {
+      var rel = a.getAttribute("rel") || "";
+      assert(/noopener/.test(rel) && /noreferrer/.test(rel), "rel incompleto: " + rel);
+    });
+    var sl = links.find(function (a) { return /starlink/i.test(a.href); });
+    assert(sl, "no hay enlace Starlink");
+    var expected = "https://starlink.com/es?referral=RC-DF-5848974-78640-68&app_source=share";
+    assert(sl.href === expected, "URL starlink=" + sl.href);
+    assert(cd.getElementById("copy-prex"), "falta #copy-prex");
+
+    var copyCalled = false;
+    var stubbed = false;
+    try {
+      Object.defineProperty(cw.navigator, "clipboard", {
+        value: { writeText: async function () { copyCalled = true; } },
+        configurable: true
+      });
+      stubbed = true;
+    } catch (e) {
+      try { cw.navigator.clipboard = { writeText: async function () { copyCalled = true; } }; stubbed = true; } catch (e2) {}
+    }
+    cd.getElementById("copy-prex").click();
+    await sleep(80);
+    var label = cd.querySelector("#copy-prex .btn-label");
+    var labelText = label ? label.textContent : "";
+    if (stubbed) {
+      assert(copyCalled, "clipboard.writeText no fue llamado (stub activo)");
+      assert(/Copiado/.test(labelText), "label no dice Copiado: " + labelText);
+    } else {
+      assert(/Copiado/.test(labelText), "sin stub clipboard, label esperado Copiado: " + labelText);
+      return "NOVERIFY:navigator.clipboard no asignable; solo se verificó el label";
+    }
+  }
+
+  // [BUG] dos listas distintas con contenido idéntico en el mismo archivo.
+  async function t_probe_merge_distinct_same_content() {
+    await boot([]);
+    await importAndChoose(v2([
+      note("p1", "Duplicada", ["uno"]),
+      note("p2", "Duplicada", ["uno"])
+    ]), "Fusionar");
+    await dismissDialogs();
+    var ns = stored();
+    assert(ns.length === 2, "se perdió una lista de contenido idéntico: length=" + ns.length + " ids=" + JSON.stringify(ids(ns)));
+  }
+
+  // [BUG] misma lista, mismos title/tags/items, pero color distinto y updatedAt MÁS NUEVO.
+  async function t_probe_merge_metadata_newer() {
+    await boot([note("n1", "L", [], { color: null, updatedAt: "2020-01-01T00:00:00.000Z" })]);
+    await importAndChoose(v2([
+      note("n1", "L", [], { color: 3, updatedAt: "2030-01-01T00:00:00.000Z" })
+    ]), "Fusionar");
+    await dismissDialogs();
+    var ns = stored();
+    assert(ns.length === 1, "length=" + ns.length);
+    assert(ns[0].color === 3, "no se aplicó el color más nuevo (color=" + ns[0].color + "); se descartó la versión con updatedAt más reciente");
+  }
+
+  // ---------------------------------------------------------------- runner
+
+  var tests = [
+    ["merge-metadata-newer", t_probe_merge_metadata_newer],
+    ["merge-distinct-same-content", t_probe_merge_distinct_same_content],
+    ["enter-mid", t_enter_mid],
+    ["enter-split", t_enter_split],
+    ["enter-last", t_enter_last],
+    ["enter-caret0", t_enter_caret0],
+    ["shift-enter", t_shift_enter],
+    ["ime-guard", t_ime_guard],
+    ["reorder-kbd", t_reorder_kbd],
+    ["reorder-drag", t_reorder_drag],
+    ["persist", t_persist],
+    ["merge", t_merge],
+    ["merge-idempotent", t_merge_idempotent],
+    ["merge-conflict", t_merge_conflict],
+    ["merge-conflict-shared-sig", t_merge_conflict_shared_sig],
+    ["import-invalid", t_import_invalid],
+    ["replace", t_replace],
+    ["created-at", t_created_at],
+    ["legacy-no-date", t_legacy_no_date],
+    ["footer", t_footer]
+  ];
+
+  var watchdog = setTimeout(function () {
+    if (document.title !== "DONE") {
+      log("HARNESS", "FAIL", "timeout: los tests no terminaron a tiempo");
+      document.title = "DONE";
+    }
+  }, 13500);
+
+  (async function () {
+    for (var i = 0; i < tests.length; i++) {
+      var name = tests[i][0], fn = tests[i][1];
+      try {
+        var r = await fn();
+        if (typeof r === "string" && r.indexOf("NOVERIFY:") === 0) log(name, "NOVERIFY", r.slice(9));
+        else log(name, "PASS", "");
+      } catch (e) {
+        log(name, "FAIL", esc(e && e.message ? e.message : e));
+      }
+    }
+    clearTimeout(watchdog);
+    document.title = "DONE";
+  })();
+})();
+</script>
+</body>
+</html>
