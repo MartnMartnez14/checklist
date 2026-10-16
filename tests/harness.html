@@ -427,6 +427,67 @@
     await sleep(80);
     var label = cd.querySelector("#copy-prex .btn-label");
     var labelText = label ? label.textContent : "";
+    // Checks de enlaces GitHub (Open Source) y etiquetas visibles en móvil (sin re-boot).
+    var repoUrl = "https://github.com/MartnMartnez14/checklist";
+    var ghHeader = cd.getElementById("github-header");
+    var ghFooter = cd.getElementById("github-footer");
+    assert(ghHeader, "falta #github-header en el header");
+    assert(ghFooter, "falta #github-footer en el footer");
+    [ghHeader, ghFooter].forEach(function (a) {
+      assert(a.href === repoUrl, "URL GitHub inesperada: " + a.href);
+      assert(a.getAttribute("target") === "_blank", "falta target=_blank en " + a.id);
+      var rel = a.getAttribute("rel") || "";
+      assert(/noopener/.test(rel) && /noreferrer/.test(rel), "rel incompleto en " + a.id + ": " + rel);
+    });
+    var seal = cd.querySelector(".oss-seal");
+    assert(seal && /100%\s*Open\s*Source\s*y\s*auditable/i.test(seal.textContent),
+      "sello Open Source ausente o texto incorrecto: " + (seal ? seal.textContent : "null"));
+
+    iframe.style.width = "375px";
+    try {
+      var expLabel = cd.querySelector("#export .btn-label");
+      var impLabel = cd.querySelector('label[for="import-file"] .btn-label');
+      var newLabel = cd.querySelector("#new-note .btn-label");
+      assert(expLabel && impLabel && newLabel, "faltan .btn-label en botones del header");
+      [expLabel, impLabel, newLabel].forEach(function (lbl) {
+        var disp = cw.getComputedStyle(lbl).display;
+        assert(disp !== "none", "etiqueta oculta en móvil (" + lbl.textContent + "): display=" + disp);
+        var rect = lbl.getBoundingClientRect();
+        assert(rect.width > 0 && rect.height > 0, "etiqueta sin dimensiones en móvil (" + lbl.textContent + ")");
+      });
+    } finally {
+      iframe.style.width = "1000px";
+    }
+
+    // Check de selector de idioma ES <-> EN (Checklist Gato <-> Checklist Cat).
+    var langBtn = cd.getElementById("lang-toggle");
+    assert(langBtn, "falta #lang-toggle");
+    assert(langBtn.textContent.trim() === "ES", "idioma inicial esperado ES, fue: " + langBtn.textContent);
+    assert(cd.getElementById("app-title").textContent === "Checklist Gato", "título ES incorrecto");
+    langBtn.click();
+    assert(langBtn.textContent.trim() === "EN", "tras click esperado EN, fue: " + langBtn.textContent);
+    assert(cd.documentElement.lang === "en", "html lang esperado en, fue: " + cd.documentElement.lang);
+    assert(cd.getElementById("app-title").textContent === "Checklist Cat", "título EN incorrecto");
+    assert(cd.querySelector("#new-note .btn-label").textContent === "New list", "botón New list no tradujo");
+    assert(localStorage.getItem("checklist-lang") === "en", "checklist-lang no persistió 'en'");
+    langBtn.click();
+    assert(langBtn.textContent.trim() === "ES", "no volvió a ES");
+    assert(cd.getElementById("app-title").textContent === "Checklist Gato", "no volvió a Checklist Gato");
+
+    // Check de bloque de Feedback / Contacto (mmartinez23bio@hotmail.com).
+    var fbTitle = cd.getElementById("feedback-title");
+    var fbMail = cd.getElementById("feedback-mailto");
+    var fbCopy = cd.getElementById("copy-email");
+    assert(fbTitle && fbMail && fbCopy, "faltan elementos del bloque de feedback en el footer");
+    assert(fbMail.textContent.trim() === "mmartinez23bio@hotmail.com", "correo visible incorrecto: " + fbMail.textContent);
+    assert(/^mailto:mmartinez23bio@hotmail\.com/i.test(fbMail.href), "href mailto incorrecto: " + fbMail.href);
+
+    // Check de bloque desplegable "Próximos pasos" (CAT-07).
+    var rmDetails = cd.getElementById("roadmap-details");
+    var rmSummary = cd.getElementById("roadmap-summary");
+    assert(rmDetails && rmSummary, "falta #roadmap-details / #roadmap-summary");
+    assert(/Próximos pasos/i.test(rmSummary.textContent), "texto summary incorrecto: " + rmSummary.textContent);
+
     if (stubbed) {
       assert(copyCalled, "clipboard.writeText no fue llamado (stub activo)");
       assert(/Copiado/.test(labelText), "label no dice Copiado: " + labelText);

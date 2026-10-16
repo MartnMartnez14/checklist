@@ -89,7 +89,13 @@
   .i,.icon-btn .i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
   .btn .i{vertical-align:-3px;margin-right:6px;}
   .sprite{position:absolute;width:0;height:0;overflow:hidden;}
-  @media (max-width:560px){.btn .i{margin-right:0;}.btn .btn-label{display:none;}.brand-sub{display:none;}}
+  @media (max-width:560px){
+    header{padding:10px 12px;gap:6px;}
+    .actions{gap:6px;flex-wrap:wrap;}
+    .actions .btn:not(.theme-toggle):not(.lang-toggle){padding:7px 11px;font-size:13px;}
+    .actions .btn .i{margin-right:4px;}
+    .brand-sub{display:none;}
+  }
   .btn {
     border: 1px solid var(--line); background: var(--card); color: var(--accent);
     border-radius: var(--radius-pill); padding: 8px 16px; font: inherit; font-weight: 550; cursor: pointer;
@@ -102,6 +108,7 @@
   .btn.btn-primary:hover { background: var(--accent); filter: brightness(1.05); }
   :root[data-theme="dark"] .btn.btn-primary { color: #0e1116; }
   .theme-toggle{display:inline-flex;align-items:center;justify-content:center;padding:8px;border-radius:var(--radius-pill);}
+  .lang-toggle{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:var(--radius-pill);font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--text);}
   .theme-toggle .i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
   :root[data-theme="light"] .i-moon{display:none;}
   :root[data-theme="dark"] .i-sun{display:none;}
@@ -319,6 +326,20 @@
   .support-prex { cursor: default; }
   .support-copy { padding: 6px 10px; font-size: 13px; }
   .support-note { margin: 12px 0 0; font-size: 11.5px; }
+  .feedback-block { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--line); }
+  .feedback-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .roadmap-details { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); }
+  .roadmap-summary { cursor: pointer; font-weight: 650; color: var(--text); font-size: 13.5px; padding: 4px 0; user-select: none; }
+  .roadmap-summary:hover { color: var(--accent); }
+  .roadmap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 10px; }
+  .roadmap-col { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 10px 14px; box-shadow: var(--shadow-1); }
+  .roadmap-col h3 { margin: 0 0 6px; font-size: 12.5px; color: var(--text); }
+  .roadmap-col ul { margin: 0; padding-left: 18px; line-height: 1.45; font-size: 12.5px; }
+  .roadmap-col li + li { margin-top: 4px; }
+  .oss-seal { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+  .oss-seal .i { width: 16px; height: 16px; color: var(--text); flex: none; }
+  .oss-link { color: var(--accent); font-weight: 550; text-decoration: none; }
+  .oss-link:hover { text-decoration: underline; }
   @media (pointer: coarse) { a.support-card, .support-prex { min-height: 44px; } .support-copy { min-height: 40px; } }
 </style>
 </head>
@@ -338,26 +359,32 @@
   <symbol id="i-satellite" viewBox="0 0 24 24"><rect x="9" y="9" width="6" height="6" rx="1" transform="rotate(45 12 12)"/><path d="M5 5l3.5 3.5M15.5 15.5L19 19M5 9V5h4M19 15v4h-4"/></symbol>
   <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></symbol>
 </svg>
 <header>
   <div class="brand">
     <img class="brand-mark brand-day" src="cat-day.png" width="34" height="34" alt="" aria-hidden="true">
     <img class="brand-mark brand-night" src="cat-night.png" width="34" height="34" alt="" aria-hidden="true">
-    <div class="brand-text"><h1>Checklist Gato</h1><p class="brand-sub" id="stats">0 listas · 0 conexiones</p></div>
+    <div class="brand-text"><h1 id="app-title">Checklist Gato</h1><p class="brand-sub" id="stats">0 listas · 0 conexiones</p></div>
   </div>
   <div class="actions">
-    <div class="seg" role="group" aria-label="Vista del tablero">
+    <div class="seg" id="view-group" role="group" aria-label="Vista del tablero">
       <button class="seg-btn" id="view-grid" type="button" aria-pressed="true" aria-label="Vista cuadrícula"><svg class="i" aria-hidden="true"><use href="#i-grid"/></svg></button>
       <button class="seg-btn" id="view-map" type="button" aria-pressed="false" aria-label="Vista mapa"><svg class="i" aria-hidden="true"><use href="#i-map"/></svg></button>
     </div>
+    <button class="btn lang-toggle" id="lang-toggle" type="button" aria-label="Cambiar idioma a inglés" title="Español / English">ES</button>
     <button class="btn theme-toggle" id="theme-toggle" type="button" aria-label="Activar modo oscuro" aria-pressed="false">
       <svg class="i i-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
       <svg class="i i-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"/></svg>
     </button>
-    <button class="btn btn-secondary" id="export"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-down"/></svg><span class="btn-label">Exportar</span></button>
-    <label class="btn btn-secondary" for="import-file"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-up"/></svg><span class="btn-label">Importar</span></label>
+    <a class="btn theme-toggle" id="github-header" href="https://github.com/MartnMartnez14/checklist" target="_blank" rel="noopener noreferrer" aria-label="Código fuente en GitHub (abre en pestaña nueva)" title="Repositorio Open Source en GitHub">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-github"/></svg>
+    </a>
+    <button class="btn btn-secondary" id="export"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-down"/></svg><span class="btn-label" id="export-label">Exportar</span></button>
+    <label class="btn btn-secondary" for="import-file"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-up"/></svg><span class="btn-label" id="import-label">Importar</span></label>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <button class="btn btn-primary" id="new-note"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="btn-label">Nueva lista</span></button>
+    <button class="btn btn-primary" id="new-note"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="btn-label" id="new-note-label">Nueva lista</span></button>
   </div>
 </header>
 
@@ -367,30 +394,78 @@
 </div>
 <footer class="support" aria-labelledby="support-title">
   <h2 id="support-title" class="support-title">Apoyar el proyecto</h2>
-  <p class="support-text">¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.</p>
+  <p id="support-text" class="support-text">¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.</p>
   <div class="support-links">
     <a class="support-card" href="https://ko-fi.com/martinmartinezgarcia" target="_blank" rel="noopener noreferrer">
       <svg class="i" aria-hidden="true" focusable="false"><use href="#i-coffee"/></svg>
-      <span><strong>Ko-fi</strong><small>Invitame un cafecito</small></span>
+      <span><strong>Ko-fi</strong><small id="kofi-sub">Invitame un cafecito</small></span>
     </a>
     <a class="support-card" href="https://www.paypal.com/paypalme/blufferedtwitch" target="_blank" rel="noopener noreferrer">
       <svg class="i" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg>
-      <span><strong>PayPal</strong><small>Donación voluntaria</small></span>
+      <span><strong>PayPal</strong><small id="paypal-sub">Donación voluntaria</small></span>
     </a>
     <a class="support-card" href="https://starlink.com/es?referral=RC-DF-5848974-78640-68&app_source=share" target="_blank" rel="noopener noreferrer">
       <svg class="i" aria-hidden="true" focusable="false"><use href="#i-satellite"/></svg>
-      <span><strong>Internet satelital Starlink</strong><small>Enlace de referido</small></span>
+      <span><strong id="starlink-title">Internet satelital Starlink</strong><small id="starlink-sub">Enlace de referido</small></span>
     </a>
     <div class="support-card support-prex">
       <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
-      <span><strong>Prex</strong><small>Martín Martínez — Cuenta Prex: 35502</small></span>
+      <span><strong>Prex</strong><small id="prex-sub">Martín Martínez — Cuenta Prex: 35502</small></span>
       <button type="button" class="btn support-copy" id="copy-prex" aria-label="Copiar número de cuenta Prex">
         <svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>
-        <span class="btn-label">Copiar</span>
+        <span class="btn-label" id="copy-prex-label">Copiar</span>
       </button>
     </div>
   </div>
-  <p class="support-note">Las colaboraciones son 100% voluntarias. Starlink es un enlace de referido, no una donación directa.</p>
+  <p id="support-note" class="support-note">Las colaboraciones son 100% voluntarias. Starlink es un enlace de referido, no una donación directa.</p>
+  <div class="feedback-block" aria-labelledby="feedback-title">
+    <h2 id="feedback-title" class="support-title">Ayudanos a mejorar Checklist Gato</h2>
+    <p id="feedback-text" class="support-text">Checklist Gato es un proyecto independiente que continúa creciendo. Si encontraste un error, tenés alguna sugerencia o simplemente querés compartir tu experiencia, podés escribirme. Leo los comentarios y los tengo en cuenta para futuras mejoras.</p>
+    <div class="feedback-actions">
+      <div class="support-card support-prex">
+        <svg class="i" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg>
+        <span>
+          <a id="feedback-mailto" class="oss-link" href="mailto:mmartinez23bio@hotmail.com?subject=Checklist%20Gato%20-%20Comentarios">mmartinez23bio@hotmail.com</a>
+          <small id="feedback-sub">Reportar errores, sugerencias o comentarios</small>
+        </span>
+        <button type="button" class="btn support-copy" id="copy-email" aria-label="Copiar correo de contacto">
+          <svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>
+          <span class="btn-label" id="copy-email-label">Copiar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <details class="roadmap-details" id="roadmap-details">
+    <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
+    <div class="roadmap-grid">
+      <div class="roadmap-col">
+        <h3 id="rm-dev-title">🛠️ En desarrollo</h3>
+        <ul>
+          <li id="rm-dev-1">Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.</li>
+          <li id="rm-dev-2">Tercera vista de tablero: Calendario por fecha.</li>
+        </ul>
+      </div>
+      <div class="roadmap-col">
+        <h3 id="rm-soon-title">🔜 Próximamente</h3>
+        <ul>
+          <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
+          <li id="rm-soon-2">Buscador y filtro rápido de listas, tareas y etiquetas.</li>
+        </ul>
+      </div>
+      <div class="roadmap-col">
+        <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
+        <ul>
+          <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
+          <li id="rm-ideas-2">Plantillas opcionales, atajos de teclado y vista ampliada.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+  <div class="oss-seal">
+    <svg class="i" aria-hidden="true" focusable="false"><use href="#i-github"/></svg>
+    <span id="oss-text">Proyecto escalable a largo plazo, 100% Open Source y auditable.</span>
+    <a class="oss-link" id="github-footer" href="https://github.com/MartnMartnez14/checklist" target="_blank" rel="noopener noreferrer">Ver repositorio en GitHub</a>
+  </div>
 </footer>
 <p id="sr-status" role="status" aria-live="polite" class="visually-hidden"></p>
 <p id="grip-help" class="visually-hidden">Pulsa las flechas para mover; con Mayús, más distancia.</p>
@@ -410,7 +485,241 @@
     { bg: "#5f6368", accent: "#3c4043" }, // Gris
     { bg: "#795548", accent: "#5d4037" }  // Marrón
   ];
-  const COLOR_NAMES = ["Azul", "Rojo", "Verde", "Amarillo", "Naranja", "Morado", "Turquesa", "Rosa", "Gris", "Marrón"];
+  const COLOR_NAMES_I18N = {
+    es: ["Azul", "Rojo", "Verde", "Amarillo", "Naranja", "Morado", "Turquesa", "Rosa", "Gris", "Marrón"],
+    en: ["Blue", "Red", "Green", "Yellow", "Orange", "Purple", "Teal", "Pink", "Gray", "Brown"]
+  };
+
+  const LANG_KEY = "checklist-lang";
+  let lang = "es";
+  try {
+    const storedLang = localStorage.getItem(LANG_KEY);
+    if (storedLang === "en" || storedLang === "es") lang = storedLang;
+  } catch (e) {}
+
+  const I18N = {
+    es: {
+      appName: "Checklist Gato",
+      viewGroup: "Vista del tablero",
+      viewGrid: "Vista cuadrícula",
+      viewMap: "Vista mapa",
+      langAria: "Cambiar idioma a inglés",
+      themeLight: "Activar modo claro",
+      themeDark: "Activar modo oscuro",
+      ghHeaderAria: "Código fuente en GitHub (abre en pestaña nueva)",
+      ghHeaderTitle: "Repositorio Open Source en GitHub",
+      exportBtn: "Exportar",
+      importBtn: "Importar",
+      newNoteBtn: "Nueva lista",
+      supportTitle: "Apoyar el proyecto",
+      supportText: "¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.",
+      kofiSub: "Invitame un cafecito",
+      paypalSub: "Donación voluntaria",
+      starlinkTitle: "Internet satelital Starlink",
+      starlinkSub: "Enlace de referido",
+      prexSub: "Martín Martínez — Cuenta Prex: 35502",
+      copyPrexAria: "Copiar número de cuenta Prex",
+      copyBtn: "Copiar",
+      copiedOk: "Copiado ✓",
+      copiedFail: "Copiá 35502",
+      copiedAnnounceOk: "Número de Prex copiado",
+      copiedAnnounceFail: "No se pudo copiar, el número es 35502",
+      supportNote: "Las colaboraciones son 100% voluntarias. Starlink es un enlace de referido, no una donación directa.",
+      feedbackTitle: "Ayudanos a mejorar Checklist Gato",
+      feedbackText: "Checklist Gato es un proyecto independiente que continúa creciendo. Si encontraste un error, tenés alguna sugerencia o simplemente querés compartir tu experiencia, podés escribirme. Leo los comentarios y los tengo en cuenta para futuras mejoras.",
+      feedbackSub: "Reportar errores, sugerencias o comentarios",
+      copyEmailAria: "Copiar correo de contacto",
+      copiedEmailFail: "Copiá mmartinez23bio@hotmail.com",
+      copiedEmailAnnounceOk: "Correo de contacto copiado",
+      copiedEmailAnnounceFail: "No se pudo copiar, el correo es mmartinez23bio@hotmail.com",
+      roadmapSummary: "🐾 Próximos pasos (Hoja de ruta)",
+      rmDevTitle: "🛠️ En desarrollo",
+      rmDev1: "Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.",
+      rmDev2: "Tercera vista de tablero: Calendario por fecha.",
+      rmSoonTitle: "🔜 Próximamente",
+      rmSoon1: "Optimización de rendimiento para tableros con cientos o miles de listas.",
+      rmSoon2: "Buscador y filtro rápido de listas, tareas y etiquetas.",
+      rmIdeasTitle: "💡 Ideas a futuro",
+      rmIdeas1: "Visor «Mapa estelar» (modo universo de nodos y conexiones).",
+      rmIdeas2: "Plantillas opcionales, atajos de teclado y vista ampliada.",
+      quotaTitle: "Almacenamiento lleno",
+      quotaMsg: "La memoria local del navegador alcanzó su límite y no se pudieron guardar los últimos cambios.\nPodés descargar una copia de seguridad ahora para no perder tus datos.",
+      quotaExportBtn: "Descargar respaldo",
+      clearDoneConfirm: n => `¿Borrar ${n} elemento(s) completado(s)?`,
+      ossText: "Proyecto escalable a largo plazo, 100% Open Source y auditable.",
+      ossLink: "Ver repositorio en GitHub",
+      gripHelp: "Pulsa las flechas para mover; con Mayús, más distancia.",
+      emptyStrong: "Sin listas todavía",
+      emptyHint: 'Pulsa "+ Nueva lista" para empezar.',
+      untitled: "Sin título",
+      untitledList: "Lista sin título",
+      noteTitleAria: "Título de la lista",
+      styleBtnAria: "Estilo y fondo de la lista",
+      connectBtnAria: "Conectar con otra lista",
+      moveListAria: "Mover lista",
+      delListTitle: "Eliminar lista",
+      tagsPlaceholder: "tags separados por coma",
+      tagsAria: "Etiquetas de la lista",
+      addPlaceholder: "+ Añadir elemento",
+      addAria: "Añadir elemento",
+      doneToggle: (open, n) => `${open ? "▾" : "▸"} Completados (${n})`,
+      clearDone: "Borrar completados",
+      moveItemAria: "Mover elemento",
+      checkItemAria: "Marcar como completado",
+      itemTextAria: "Texto del elemento",
+      delItemTitle: "Eliminar elemento",
+      popAria: "Estilo y conexiones",
+      popColor: "Color",
+      popColorGroup: "Color de la lista",
+      colorNone: "Sin color",
+      popOpacity: "Opacidad",
+      popOpacityAria: "Opacidad del color",
+      popBg: "Fondo",
+      changeImg: "Cambiar imagen",
+      addImg: "Imagen",
+      removeBg: "Quitar fondo",
+      popLinks: "Conexiones",
+      noLinks: "Sin conexiones manuales.",
+      deletedList: "(lista eliminada)",
+      delLinkWith: label => "Eliminar conexión con " + label,
+      stats: (n, e) => `${n} ${n === 1 ? "lista" : "listas"} · ${e} ${e === 1 ? "conexión" : "conexiones"}`,
+      selectTarget: "Selecciona la lista de destino…",
+      viewMapAnnounce: "Vista mapa. Usa el asa para mover cada lista.",
+      viewGridAnnounce: "Vista cuadrícula",
+      listMovedTo: (x, y) => `Lista movida a ${x}, ${y}`,
+      movedTo: (x, y) => `Movida a ${x}, ${y}`,
+      itemMoved: "Elemento movido",
+      moved: "Movido",
+      selectImageAlert: "Selecciona un archivo de imagen.",
+      largeImageConfirm: "La imagen pesa más de 20 MB. ¿Continuar?",
+      imageTooLargeAlert: "Imagen demasiado grande o sin espacio.",
+      deleteLinkConfirm: "¿Eliminar esta conexión?",
+      deleteListConfirm: title => `¿Eliminar "${title}"?`,
+      exportError: msg => "No se pudo exportar: " + msg,
+      invalidBackupAlert: "El archivo no es una copia válida de Checklist Gato.",
+      importTitle: "Importar datos",
+      importMsg: n => `El archivo contiene ${n} lista(s).\nSe descargará una copia de seguridad de tus datos actuales antes de continuar.`,
+      mergeBtn: "Fusionar (recomendada)",
+      replaceBtn: "Reemplazar",
+      cancelBtn: "Cancelar",
+      importedReplaceAnnounce: "Datos importados (reemplazo)",
+      importedMergeAnnounce: "Datos fusionados",
+      mergeDoneTitle: "Fusión completada",
+      mergeDoneMsg: s => `Nuevas listas: ${s.added}\nYa existentes (sin cambios): ${s.unchanged}\nActualizadas con la versión más reciente: ${s.updated}\nConflictos conservados por duplicado: ${s.conflicts}`,
+      closeBtn: "Cerrar"
+    },
+    en: {
+      appName: "Checklist Cat",
+      viewGroup: "Board view",
+      viewGrid: "Grid view",
+      viewMap: "Map view",
+      langAria: "Switch language to Spanish",
+      themeLight: "Activate light mode",
+      themeDark: "Activate dark mode",
+      ghHeaderAria: "Source code on GitHub (opens in new tab)",
+      ghHeaderTitle: "Open Source repository on GitHub",
+      exportBtn: "Export",
+      importBtn: "Import",
+      newNoteBtn: "New list",
+      supportTitle: "Support the project",
+      supportText: "Did you like the project? If you'd like to contribute voluntarily, you can buy me a coffee or mate. It's completely optional and helps me keep improving the app.",
+      kofiSub: "Buy me a coffee",
+      paypalSub: "Voluntary donation",
+      starlinkTitle: "Starlink satellite internet",
+      starlinkSub: "Referral link",
+      prexSub: "Martín Martínez — Prex account: 35502",
+      copyPrexAria: "Copy Prex account number",
+      copyBtn: "Copy",
+      copiedOk: "Copied ✓",
+      copiedFail: "Copy 35502",
+      copiedAnnounceOk: "Prex number copied",
+      copiedAnnounceFail: "Could not copy, the number is 35502",
+      supportNote: "Contributions are 100% voluntary. Starlink is a referral link, not a direct donation.",
+      feedbackTitle: "Help us improve Checklist Cat",
+      feedbackText: "Checklist Cat is an independent project that keeps growing. If you found a bug, have a suggestion, or simply want to share your experience, feel free to write to me. I read all feedback and take it into account for future improvements.",
+      feedbackSub: "Report bugs, suggestions, or feedback",
+      copyEmailAria: "Copy contact email",
+      copiedEmailFail: "Copy mmartinez23bio@hotmail.com",
+      copiedEmailAnnounceOk: "Contact email copied",
+      copiedEmailAnnounceFail: "Could not copy, the email is mmartinez23bio@hotmail.com",
+      roadmapSummary: "🐾 What's next (Roadmap)",
+      rmDevTitle: "🛠️ In development",
+      rmDev1: "Continuous stability, safe confirmations, and local storage protection.",
+      rmDev2: "Third board view: Calendar by date.",
+      rmSoonTitle: "🔜 Coming soon",
+      rmSoon1: "Performance optimization for boards with hundreds or thousands of lists.",
+      rmSoon2: "Quick search and filter for lists, tasks, and tags.",
+      rmIdeasTitle: "💡 Future ideas",
+      rmIdeas1: "Star Map viewer (universe mode for nodes and connections).",
+      rmIdeas2: "Optional templates, keyboard shortcuts, and expanded note view.",
+      quotaTitle: "Storage full",
+      quotaMsg: "Browser local storage reached its limit and recent changes could not be saved.\nYou can download a backup copy now so you don't lose your data.",
+      quotaExportBtn: "Download backup",
+      clearDoneConfirm: n => `Delete ${n} completed item(s)?`,
+      ossText: "Long-term scalable project, 100% Open Source and auditable.",
+      ossLink: "View repository on GitHub",
+      gripHelp: "Press arrow keys to move; hold Shift for larger steps.",
+      emptyStrong: "No lists yet",
+      emptyHint: 'Click "+ New list" to get started.',
+      untitled: "Untitled",
+      untitledList: "Untitled list",
+      noteTitleAria: "List title",
+      styleBtnAria: "List style and background",
+      connectBtnAria: "Connect with another list",
+      moveListAria: "Move list",
+      delListTitle: "Delete list",
+      tagsPlaceholder: "comma-separated tags",
+      tagsAria: "List tags",
+      addPlaceholder: "+ Add item",
+      addAria: "Add item",
+      doneToggle: (open, n) => `${open ? "▾" : "▸"} Completed (${n})`,
+      clearDone: "Clear completed",
+      moveItemAria: "Move item",
+      checkItemAria: "Mark as completed",
+      itemTextAria: "Item text",
+      delItemTitle: "Delete item",
+      popAria: "Style and connections",
+      popColor: "Color",
+      popColorGroup: "List color",
+      colorNone: "No color",
+      popOpacity: "Opacity",
+      popOpacityAria: "Color opacity",
+      popBg: "Background",
+      changeImg: "Change image",
+      addImg: "Image",
+      removeBg: "Remove background",
+      popLinks: "Connections",
+      noLinks: "No manual connections.",
+      deletedList: "(deleted list)",
+      delLinkWith: label => "Remove connection with " + label,
+      stats: (n, e) => `${n} ${n === 1 ? "list" : "lists"} · ${e} ${e === 1 ? "connection" : "connections"}`,
+      selectTarget: "Select destination list…",
+      viewMapAnnounce: "Map view. Use the handle to move each list.",
+      viewGridAnnounce: "Grid view",
+      listMovedTo: (x, y) => `List moved to ${x}, ${y}`,
+      movedTo: (x, y) => `Moved to ${x}, ${y}`,
+      itemMoved: "Item moved",
+      moved: "Moved",
+      selectImageAlert: "Please select an image file.",
+      largeImageConfirm: "The image is larger than 20 MB. Continue?",
+      imageTooLargeAlert: "Image too large or out of storage space.",
+      deleteLinkConfirm: "Remove this connection?",
+      deleteListConfirm: title => `Delete "${title}"?`,
+      exportError: msg => "Could not export: " + msg,
+      invalidBackupAlert: "The file is not a valid Checklist Cat backup.",
+      importTitle: "Import data",
+      importMsg: n => `The file contains ${n} list(s).\nA backup copy of your current data will be downloaded before continuing.`,
+      mergeBtn: "Merge (recommended)",
+      replaceBtn: "Replace",
+      cancelBtn: "Cancel",
+      importedReplaceAnnounce: "Data imported (replaced)",
+      importedMergeAnnounce: "Data merged",
+      mergeDoneTitle: "Merge complete",
+      mergeDoneMsg: s => `New lists: ${s.added}\nAlready existing (unchanged): ${s.unchanged}\nUpdated with newer version: ${s.updated}\nConflicts kept as duplicates: ${s.conflicts}`,
+      closeBtn: "Close"
+    }
+  };
+  function tr(key) { return (I18N[lang] && I18N[lang][key]) || I18N.es[key]; }
 
   let notes = load();
   let connectingSource = null;   // id de la nota origen en modo conexión
@@ -482,8 +791,33 @@
   }
 
   let gcTimer = null;
+  let quotaWarnOpen = false;
+  async function notifyQuotaExceeded() {
+    if (quotaWarnOpen) return;
+    quotaWarnOpen = true;
+    try {
+      const action = await openDialog({
+        title: tr("quotaTitle"),
+        message: tr("quotaMsg"),
+        buttons: [
+          { label: tr("quotaExportBtn"), value: "export", primary: true },
+          { label: tr("closeBtn"), value: null }
+        ]
+      });
+      if (action === "export") {
+        downloadJSON(await buildEnvelope(), `checklist-${new Date().toISOString().slice(0, 10)}.json`);
+      }
+    } catch (e) { console.warn("notifyQuotaExceeded", e); }
+    finally { quotaWarnOpen = false; }
+  }
+
   function save() {
-    localStorage.setItem(KEY, JSON.stringify(notes));
+    try {
+      localStorage.setItem(KEY, JSON.stringify(notes));
+    } catch (err) {
+      console.warn("save quota error:", err);
+      notifyQuotaExceeded();
+    }
     clearTimeout(gcTimer);
     gcTimer = setTimeout(() => { gcImages(); }, 2000);
   }
@@ -597,11 +931,80 @@
     const btn = document.getElementById("theme-toggle");
     if (btn) {
       btn.setAttribute("aria-pressed", String(dark));
-      btn.setAttribute("aria-label", dark ? "Activar modo claro" : "Activar modo oscuro");
+      btn.setAttribute("aria-label", dark ? tr("themeLight") : tr("themeDark"));
     }
     if (persist) { try { localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); } catch (e) {} }
     linksDirty = true;
     scheduleLinks();
+  }
+
+  function applyLang(nextLang, persist) {
+    lang = nextLang === "en" ? "en" : "es";
+    if (!persist && lang === "es" && document.documentElement.lang === "es") return;
+    document.documentElement.lang = lang;
+    document.title = tr("appName");
+    const setTxt = (id, key) => { const n = document.getElementById(id); if (n) n.textContent = tr(key); };
+    setTxt("app-title", "appName");
+    setTxt("export-label", "exportBtn");
+    setTxt("import-label", "importBtn");
+    setTxt("new-note-label", "newNoteBtn");
+    setTxt("support-title", "supportTitle");
+    setTxt("support-text", "supportText");
+    setTxt("kofi-sub", "kofiSub");
+    setTxt("paypal-sub", "paypalSub");
+    setTxt("starlink-title", "starlinkTitle");
+    setTxt("starlink-sub", "starlinkSub");
+    setTxt("prex-sub", "prexSub");
+    setTxt("copy-prex-label", "copyBtn");
+    setTxt("support-note", "supportNote");
+    setTxt("feedback-title", "feedbackTitle");
+    setTxt("feedback-text", "feedbackText");
+    setTxt("feedback-sub", "feedbackSub");
+    setTxt("copy-email-label", "copyBtn");
+    setTxt("roadmap-summary", "roadmapSummary");
+    setTxt("rm-dev-title", "rmDevTitle");
+    setTxt("rm-dev-1", "rmDev1");
+    setTxt("rm-dev-2", "rmDev2");
+    setTxt("rm-soon-title", "rmSoonTitle");
+    setTxt("rm-soon-1", "rmSoon1");
+    setTxt("rm-soon-2", "rmSoon2");
+    setTxt("rm-ideas-title", "rmIdeasTitle");
+    setTxt("rm-ideas-1", "rmIdeas1");
+    setTxt("rm-ideas-2", "rmIdeas2");
+    setTxt("oss-text", "ossText");
+    setTxt("github-footer", "ossLink");
+    setTxt("grip-help", "gripHelp");
+
+    const vg = document.getElementById("view-group");
+    if (vg) vg.setAttribute("aria-label", tr("viewGroup"));
+    const vGrid = document.getElementById("view-grid");
+    if (vGrid) vGrid.setAttribute("aria-label", tr("viewGrid"));
+    const vMap = document.getElementById("view-map");
+    if (vMap) vMap.setAttribute("aria-label", tr("viewMap"));
+    const lBtn = document.getElementById("lang-toggle");
+    if (lBtn) {
+      lBtn.textContent = lang.toUpperCase();
+      lBtn.setAttribute("aria-label", tr("langAria"));
+    }
+    const tBtn = document.getElementById("theme-toggle");
+    if (tBtn) {
+      const dark = document.documentElement.dataset.theme === "dark";
+      tBtn.setAttribute("aria-label", dark ? tr("themeLight") : tr("themeDark"));
+    }
+    const gh = document.getElementById("github-header");
+    if (gh) {
+      gh.setAttribute("aria-label", tr("ghHeaderAria"));
+      gh.setAttribute("title", tr("ghHeaderTitle"));
+    }
+    const cp = document.getElementById("copy-prex");
+    if (cp) cp.setAttribute("aria-label", tr("copyPrexAria"));
+    const ce = document.getElementById("copy-email");
+    if (ce) ce.setAttribute("aria-label", tr("copyEmailAria"));
+
+    if (persist) {
+      try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+      render();
+    }
   }
 
   // ---------- Color / opacidad ----------
@@ -755,8 +1158,8 @@
   }
 
   async function handleBgUpload(file, note) {
-    if (!file.type.startsWith("image/")) { alert("Selecciona un archivo de imagen."); return; }
-    if (file.size > 20 * 1024 * 1024 && !confirm("La imagen pesa más de 20 MB. ¿Continuar?")) return;
+    if (!file.type.startsWith("image/")) { alert(tr("selectImageAlert")); return; }
+    if (file.size > 20 * 1024 * 1024 && !confirm(tr("largeImageConfirm"))) return;
     const prev = note.bgId;
     try {
       const id = await putImage(file, file.name);
@@ -767,7 +1170,7 @@
       render();
     } catch (err) {
       note.bgId = prev;
-      alert("Imagen demasiado grande o sin espacio.");
+      alert(tr("imageTooLargeAlert"));
       console.warn("putImage", err);
     }
   }
@@ -920,7 +1323,7 @@
   function deleteLink(srcId, tid) {
     const src = notes.find(n => n.id === srcId);
     if (!src) return;
-    if (!confirm("¿Eliminar esta conexión?")) return;
+    if (!confirm(tr("deleteLinkConfirm"))) return;
     src.links = src.links.filter(x => x !== tid);
     touch(src);
     save();
@@ -941,7 +1344,7 @@
   function enterConnectMode(id) {
     connectingSource = id;
     document.getElementById("notes").classList.add("connecting");
-    announce("Selecciona la lista de destino…");
+    announce(tr("selectTarget"));
     updateConnectClasses();
     document.addEventListener("mousedown", connectCapture, true);
     document.addEventListener("click", connectCapture, true);
@@ -993,7 +1396,7 @@
   function updateStats() {
     const { edges } = connectionModel();
     const s = document.getElementById("stats");
-    if (s) s.textContent = `${notes.length} ${notes.length === 1 ? "lista" : "listas"} · ${edges.length} ${edges.length === 1 ? "conexión" : "conexiones"}`;
+    if (s) s.textContent = tr("stats")(notes.length, edges.length);
   }
 
   // Ajusta la altura de los ítems al contenido para que el texto largo se vea entero.
@@ -1048,7 +1451,7 @@
     if (g) g.setAttribute("aria-pressed", String(viewMode === "grid"));
     if (mp) mp.setAttribute("aria-pressed", String(viewMode === "map"));
     render();
-    announce(viewMode === "map" ? "Vista mapa. Usa el asa para mover cada lista." : "Vista cuadrícula");
+    announce(viewMode === "map" ? tr("viewMapAnnounce") : tr("viewGridAnnounce"));
   }
 
   // Aplica la posición al nodo VIVO de la nota: el render puede haber reemplazado
@@ -1097,7 +1500,7 @@
     document.querySelectorAll(".dragging").forEach(x => x.classList.remove("dragging"));
     if (drag.moved) {
       save(); layoutCanvas(); scheduleLinks();
-      announce("Lista movida a " + Math.round(drag.note.pos.x) + ", " + Math.round(drag.note.pos.y));
+      announce(tr("listMovedTo")(Math.round(drag.note.pos.x), Math.round(drag.note.pos.y)));
     }
     drag = null;
   }
@@ -1108,7 +1511,7 @@
     e.preventDefault();
     moveNote(sec, note, note.pos.x + d[0], note.pos.y + d[1]);
     save(); layoutCanvas();
-    announce("Movida a " + Math.round(note.pos.x) + ", " + Math.round(note.pos.y));
+    announce(tr("movedTo")(Math.round(note.pos.x), Math.round(note.pos.y)));
   }
 
   // ---------- Reordenar ítems dentro de una lista ----------
@@ -1167,7 +1570,7 @@
     detachItemDragListeners();
     const { note, row, moved } = itemDrag;
     if (row && row.isConnected) row.classList.remove("dragging");
-    if (moved) { commitItemOrder(note); touch(note); save(); announce("Elemento movido"); }
+    if (moved) { commitItemOrder(note); touch(note); save(); announce(tr("itemMoved")); }
     itemDrag = null;
   }
 
@@ -1213,7 +1616,7 @@
       const grip = row.querySelector(".item-grip");
       if (grip) grip.focus();
     }
-    announce("Movido");
+    announce(tr("moved"));
   }
 
   // Construye el contenedor de chips de tags (o null si no hay tags).
@@ -1234,8 +1637,8 @@
     computeTagCounts();
     if (notes.length === 0) {
       root.replaceChildren(el("p", { className: "empty" }, [
-        el("strong", { textContent: "Sin listas todavía" }),
-        document.createTextNode("Pulsa \"+ Nueva lista\" para empezar.")
+        el("strong", { textContent: tr("emptyStrong") }),
+        document.createTextNode(tr("emptyHint"))
       ]));
     } else {
       root.replaceChildren(...notes.map(renderNote));
@@ -1268,7 +1671,7 @@
   function renderNote(note) {
     const title = el("textarea", {
       id: "title-" + note.id, rows: 1, className: "note-title",
-      value: note.title, placeholder: "Sin título", "aria-label": "Título de la lista",
+      value: note.title, placeholder: tr("untitled"), "aria-label": tr("noteTitleAria"),
       oninput: e => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; },
       onchange: e => { note.title = e.target.value.trim(); touch(note); save(); scheduleLinks(); },
       onkeydown: e => { if (e.key === "Enter") { e.preventDefault(); e.target.blur(); } }
@@ -1278,7 +1681,7 @@
       id: "style-" + note.id, type: "button",
       className: "icon-btn note-design",
       "aria-haspopup": "dialog", "aria-expanded": String(openPopId === note.id),
-      "aria-label": "Estilo y fondo de la lista",
+      "aria-label": tr("styleBtnAria"),
       onclick: e => { e.stopPropagation(); openPop(note); }
     }, [icon("i-palette")]);
 
@@ -1286,23 +1689,23 @@
       id: "connect-" + note.id, type: "button",
       className: "icon-btn note-connect",
       "aria-pressed": String(connectingSource === note.id),
-      "aria-label": "Conectar con otra lista",
+      "aria-label": tr("connectBtnAria"),
       "data-connect": note.id,
       onclick: e => { e.stopPropagation(); toggleConnect(note); }
     }, [icon("i-link")]);
 
     const grip = el("button", {
       type: "button", className: "icon-btn note-grip",
-      "aria-label": "Mover lista", "aria-describedby": "grip-help",
+      "aria-label": tr("moveListAria"), "aria-describedby": "grip-help",
       disabled: viewMode !== "map",
       onpointerdown: e => onGripDown(e, note, section),
       onkeydown: e => onGripKey(e, note, section)
     }, [icon("i-grip")]);
 
     const delNote = el("button", {
-      className: "icon-btn", title: "Eliminar lista", "aria-label": "Eliminar lista",
+      className: "icon-btn", title: tr("delListTitle"), "aria-label": tr("delListTitle"),
       onclick: () => {
-        if (!confirm(`¿Eliminar "${note.title || "Sin título"}"?`)) return;
+        if (!confirm(tr("deleteListConfirm")(note.title || tr("untitled")))) return;
         const bg = note.bgId;
         notes = notes.filter(n => n !== note);
         notes.forEach(n => { n.links = n.links.filter(id => id !== note.id); });
@@ -1316,8 +1719,8 @@
     const tags = el("input", {
       type: "text", className: "note-tags",
       value: note.tags.join(", "),
-      placeholder: "tags separados por coma",
-      "aria-label": "Etiquetas de la lista",
+      placeholder: tr("tagsPlaceholder"),
+      "aria-label": tr("tagsAria"),
       onchange: e => { note.tags = parseTags(e.target.value); touch(note); save(); render(); }
     });
 
@@ -1329,7 +1732,7 @@
 
     const addInput = el("input", {
       id: "add-" + note.id, type: "text", className: "add-input",
-      placeholder: "+ Añadir elemento", "aria-label": "Añadir elemento",
+      placeholder: tr("addPlaceholder"), "aria-label": tr("addAria"),
       autocomplete: "off", enterkeyhint: "enter",
       onchange: () => submitAdd()
     });
@@ -1374,12 +1777,16 @@
       const bar = el("div", { className: "done-bar" }, [
         el("button", {
           className: "toggle", "aria-expanded": String(open),
-          textContent: `${open ? "▾" : "▸"} Completados (${done.length})`,
+          textContent: tr("doneToggle")(open, done.length),
           onclick: () => { note.showDone = !open; save(); render(); }
         }),
         el("button", {
-          className: "clear", textContent: "Borrar completados",
-          onclick: () => { note.items = note.items.filter(i => !i.done); touch(note); save(); render(); }
+          className: "clear", textContent: tr("clearDone"),
+          onclick: () => {
+            if (!confirm(tr("clearDoneConfirm")(done.length))) return;
+            note.items = note.items.filter(i => !i.done);
+            touch(note); save(); render();
+          }
         })
       ]);
       children.push(bar);
@@ -1389,7 +1796,7 @@
     const section = el("section", {
       className: "note" + (openPopId === note.id ? " pop-open" : ""),
       "data-id": note.id,
-      "aria-label": note.title || "Lista sin título"
+      "aria-label": note.title || tr("untitledList")
     }, children);
 
     if (openPopId === note.id) section.append(renderPop(note, section));
@@ -1419,7 +1826,7 @@
   function renderItem(note, item) {
     const grip = el("button", {
       type: "button", className: "icon-btn item-grip",
-      "aria-label": "Mover elemento", "aria-describedby": "grip-help",
+      "aria-label": tr("moveItemAria"), "aria-describedby": "grip-help",
       onpointerdown: e => onItemGripDown(e, note, item, row),
       onkeydown: e => {
         if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
@@ -1429,12 +1836,12 @@
     }, [icon("i-grip")]);
 
     const cb = el("input", {
-      type: "checkbox", checked: item.done, "aria-label": "Marcar como completado",
+      type: "checkbox", checked: item.done, "aria-label": tr("checkItemAria"),
       onchange: e => { item.done = e.target.checked; touch(note); save(); render(); }
     });
 
     const text = el("textarea", {
-      className: "item-text", rows: 1, "aria-label": "Texto del elemento",
+      className: "item-text", rows: 1, "aria-label": tr("itemTextAria"),
       onchange: e => {
         const raw = e.target.value;
         if (raw === item.text) return; // sin cambio real (p. ej. split por Enter): no borrar
@@ -1453,7 +1860,7 @@
     text.value = item.text;
 
     const del = el("button", {
-      className: "icon-btn", title: "Eliminar elemento", "aria-label": "Eliminar elemento",
+      className: "icon-btn", title: tr("delItemTitle"), "aria-label": tr("delItemTitle"),
       onclick: () => { note.items = note.items.filter(i => i !== item); touch(note); save(); render(); }
     }, [icon("i-x")]);
 
@@ -1493,30 +1900,31 @@
   }
 
   function renderPop(note, section) {
-    const pop = el("div", { className: "pop", role: "dialog", "aria-label": "Estilo y conexiones" });
+    const pop = el("div", { className: "pop", role: "dialog", "aria-label": tr("popAria") });
     pop.addEventListener("click", e => e.stopPropagation());
 
-    pop.append(el("p", { className: "pop-title", textContent: "Color" }));
-    const group = el("div", { className: "swatches", role: "radiogroup", "aria-label": "Color de la lista" });
+    pop.append(el("p", { className: "pop-title", textContent: tr("popColor") }));
+    const group = el("div", { className: "swatches", role: "radiogroup", "aria-label": tr("popColorGroup") });
     const swatches = [];
     const noneSelected = note.color == null;
     const noneSw = el("button", {
       type: "button", role: "radio", className: "swatch swatch-none" + (noneSelected ? " selected" : ""),
       "aria-checked": String(noneSelected),
       tabIndex: noneSelected ? 0 : -1,
-      "aria-label": "Sin color",
+      "aria-label": tr("colorNone"),
       "data-pop-key": "color-none",
       onclick: () => applyColor(null)
     });
     noneSw.style.setProperty("--sw", "#ffffff");
     swatches.push(noneSw);
+    const colorNames = COLOR_NAMES_I18N[lang] || COLOR_NAMES_I18N.es;
     PALETTE.forEach((c, i) => {
       const selected = note.color === i;
       const sw = el("button", {
         type: "button", role: "radio", className: "swatch" + (selected ? " selected" : ""),
         "aria-checked": String(selected),
         tabIndex: selected ? 0 : -1,
-        "aria-label": COLOR_NAMES[i],
+        "aria-label": colorNames[i],
         "data-pop-key": "color-" + i,
         onclick: () => applyColor(i)
       });
@@ -1556,10 +1964,10 @@
     });
     pop.append(group);
 
-    pop.append(el("p", { className: "pop-title", textContent: "Opacidad" }));
+    pop.append(el("p", { className: "pop-title", textContent: tr("popOpacity") }));
     const slider = el("input", {
       type: "range", min: 0, max: 60, step: 1, value: note.opacity,
-      className: "opacity-slider", "aria-label": "Opacidad del color",
+      className: "opacity-slider", "aria-label": tr("popOpacityAria"),
       "data-pop-key": "opacity"
     });
     slider.setAttribute("aria-valuetext", note.opacity + "%");
@@ -1571,7 +1979,7 @@
     slider.addEventListener("change", () => { touch(note); save(); });
     pop.append(slider);
 
-    pop.append(el("p", { className: "pop-title", textContent: "Fondo" }));
+    pop.append(el("p", { className: "pop-title", textContent: tr("popBg") }));
     const fileInput = el("input", { type: "file", accept: "image/*", hidden: true });
     fileInput.addEventListener("change", async e => {
       const f = e.target.files[0];
@@ -1580,13 +1988,13 @@
     });
     const imgBtn = el("button", {
       type: "button", className: "btn btn-secondary pop-btn",
-      textContent: note.bgId ? "Cambiar imagen" : "Imagen",
+      textContent: note.bgId ? tr("changeImg") : tr("addImg"),
       "data-pop-key": "image",
       onclick: () => fileInput.click()
     });
     const removeBtn = el("button", {
       type: "button", className: "btn btn-secondary pop-btn",
-      textContent: "Quitar fondo", disabled: !note.bgId,
+      textContent: tr("removeBg"), disabled: !note.bgId,
       "data-pop-key": "remove-bg",
       onclick: () => {
         const old = note.bgId;
@@ -1601,19 +2009,19 @@
     pop.append(el("div", { className: "pop-row" }, [imgBtn, removeBtn, fileInput, thumb]));
     if (note.bgId) getImageURL(note.bgId).then(u => { if (u) thumb.style.backgroundImage = `url("${u}")`; });
 
-    pop.append(el("p", { className: "pop-title", textContent: "Conexiones" }));
+    pop.append(el("p", { className: "pop-title", textContent: tr("popLinks") }));
     const list = el("div", { className: "pop-links" });
     if (!note.links.length) {
-      list.append(el("p", { className: "link-empty", textContent: "Sin conexiones manuales." }));
+      list.append(el("p", { className: "link-empty", textContent: tr("noLinks") }));
     }
     note.links.forEach(id => {
       const t = notes.find(n => n.id === id);
-      const label = t ? (t.title || "Sin título") : "(lista eliminada)";
+      const label = t ? (t.title || tr("untitled")) : tr("deletedList");
       list.append(el("div", { className: "link-row" }, [
         el("span", { className: "link-label", textContent: label }),
         el("button", {
           type: "button", className: "icon-btn",
-          "aria-label": "Eliminar conexión con " + label,
+          "aria-label": tr("delLinkWith")(label),
           onclick: () => { note.links = note.links.filter(x => x !== id); touch(note); save(); render(); }
         }, [icon("i-x")])
       ]));
@@ -1638,6 +2046,9 @@
   window.addEventListener("orientationchange", () => { layoutCanvas(); scheduleLinks(); });
 
   // ---------- Eventos globales ----------
+  document.getElementById("lang-toggle").addEventListener("click", () => {
+    applyLang(lang === "es" ? "en" : "es", true);
+  });
   document.getElementById("theme-toggle").addEventListener("click", () => {
     applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark", true);
   });
@@ -1682,10 +2093,33 @@
     }
     const label = prexBtn.querySelector(".btn-label");
     if (label) {
-      const prev = label.textContent;
-      label.textContent = ok ? "Copiado ✓" : "Copiá 35502";
-      announce(ok ? "Número de Prex copiado" : "No se pudo copiar, el número es 35502");
-      setTimeout(() => { label.textContent = prev; }, 1600);
+      label.textContent = ok ? tr("copiedOk") : tr("copiedFail");
+      announce(ok ? tr("copiedAnnounceOk") : tr("copiedAnnounceFail"));
+      setTimeout(() => { label.textContent = tr("copyBtn"); }, 1600);
+    }
+  });
+
+  const emailBtn = document.getElementById("copy-email");
+  if (emailBtn) emailBtn.addEventListener("click", async () => {
+    const mail = "mmartinez23bio@hotmail.com";
+    let ok = true;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(mail);
+      else throw new Error("sin clipboard");
+    } catch (e) {
+      ok = false;
+      try {
+        const ta = el("textarea", { value: mail });
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.append(ta); ta.select(); document.execCommand("copy"); ta.remove();
+        ok = true;
+      } catch (e2) { ok = false; }
+    }
+    const label = emailBtn.querySelector(".btn-label");
+    if (label) {
+      label.textContent = ok ? tr("copiedOk") : tr("copiedEmailFail");
+      announce(ok ? tr("copiedEmailAnnounceOk") : tr("copiedEmailAnnounceFail"));
+      setTimeout(() => { label.textContent = tr("copyBtn"); }, 1600);
     }
   });
 
@@ -1751,7 +2185,12 @@
     return JSON.stringify({
       title: n.title,
       tags: [...(n.tags || [])].sort(),
-      items: (n.items || []).map(i => [i.text, !!i.done])
+      items: (n.items || []).map(i => [i.text, !!i.done]),
+      color: n.color ?? null,
+      opacity: n.opacity ?? 18,
+      bgId: n.bgId ?? null,
+      links: [...(n.links || [])].sort(),
+      pos: n.pos ? [Math.round(n.pos.x), Math.round(n.pos.y)] : null
     });
   }
 
@@ -1813,7 +2252,7 @@
     try {
       downloadJSON(await buildEnvelope(), `checklist-${new Date().toISOString().slice(0, 10)}.json`);
     } catch (e) {
-      alert("No se pudo exportar: " + (e && e.message ? e.message : e));
+      alert(tr("exportError")(e && e.message ? e.message : e));
     } finally {
       btn.disabled = false;
     }
@@ -1826,21 +2265,21 @@
     try {
       let data;
       try { data = JSON.parse(await file.text()); }
-      catch { alert("El archivo no es una copia válida de Checklist Gato."); return; }
+      catch { alert(tr("invalidBackupAlert")); return; }
 
       const parsed = parseImport(data);
-      if (!parsed.ok) { alert("El archivo no es una copia válida de Checklist Gato."); return; }
+      if (!parsed.ok) { alert(tr("invalidBackupAlert")); return; }
 
       const incomingRaw = parsed.notes;
       const imagesRaw = parsed.images;
 
       const choice = await openDialog({
-        title: "Importar datos",
-        message: `El archivo contiene ${incomingRaw.length} lista(s).\nSe descargará una copia de seguridad de tus datos actuales antes de continuar.`,
+        title: tr("importTitle"),
+        message: tr("importMsg")(incomingRaw.length),
         buttons: [
-          { label: "Fusionar (recomendada)", value: "merge", primary: true },
-          { label: "Reemplazar", value: "replace", danger: true },
-          { label: "Cancelar", value: null }
+          { label: tr("mergeBtn"), value: "merge", primary: true },
+          { label: tr("replaceBtn"), value: "replace", danger: true },
+          { label: tr("cancelBtn"), value: null }
         ]
       });
       if (choice == null) return;
@@ -1862,10 +2301,10 @@
 
       const incoming = incomingRaw.map(n => normalizeNote({ ...n }));
       if (!parsed.isV1) {
-        const ids = new Set(incoming.map(n => n.id));
+        const validLinkIds = new Set([...incoming.map(n => n.id), ...(choice === "merge" ? notes.map(n => n.id) : [])]);
         incoming.forEach(n => {
           n.bgId = (n.bgId && idMap[n.bgId]) ? idMap[n.bgId] : null;
-          n.links = n.links.filter(id => ids.has(id));
+          n.links = n.links.filter(id => validLinkIds.has(id));
         });
       }
 
@@ -1873,7 +2312,7 @@
         notes = incoming;
         save(); render();
         gcImages();
-        announce("Datos importados (reemplazo)");
+        announce(tr("importedReplaceAnnounce"));
         return;
       }
 
@@ -1881,18 +2320,14 @@
       notes = next;
       save(); render();
       gcImages();
-      announce("Datos fusionados");
+      announce(tr("importedMergeAnnounce"));
       await openDialog({
-        title: "Fusión completada",
-        message:
-          `Nuevas listas: ${stats.added}\n` +
-          `Ya existentes (sin cambios): ${stats.unchanged}\n` +
-          `Actualizadas con la versión más reciente: ${stats.updated}\n` +
-          `Conflictos conservados por duplicado: ${stats.conflicts}`,
-        buttons: [{ label: "Cerrar", value: "ok", primary: true }]
+        title: tr("mergeDoneTitle"),
+        message: tr("mergeDoneMsg")(stats),
+        buttons: [{ label: tr("closeBtn"), value: "ok", primary: true }]
       });
     } catch (err) {
-      alert("El archivo no es una copia válida de Checklist Gato.");
+      alert(tr("invalidBackupAlert"));
       console.warn(err);
     }
   });
@@ -1901,7 +2336,8 @@
   async function migrate() {
     try { await openDB(); }
     catch (e) { console.warn("IndexedDB no disponible:", e); }
-    localStorage.setItem(KEY, JSON.stringify(notes));
+    try { localStorage.setItem(KEY, JSON.stringify(notes)); }
+    catch (err) { console.warn("migrate quota error:", err); notifyQuotaExceeded(); }
   }
 
   if (navigator.storage?.persist) navigator.storage.persist();
@@ -1909,6 +2345,7 @@
     navigator.serviceWorker.register("sw.js").catch(err => console.warn("SW no registrado:", err));
   }
 
+  applyLang(lang, false);
   applyTheme(document.documentElement.dataset.theme, false);
   render();
   document.getElementById("view-grid").setAttribute("aria-pressed", String(viewMode === "grid"));

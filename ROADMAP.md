@@ -56,19 +56,20 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
   - Exportación en JSON incluyendo notas e imágenes codificadas en Base64.
   - Importación con validación estructural, descarga automática de copia de seguridad previa y dos modos: **Fusionar (idempotente)** y **Reemplazar**.
 - **PWA e infraestructura:**
-  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v8`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
+  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v9`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
+  - Dominio personalizado `https://checklistgato.com` (DNS en Hostinger apuntando a GitHub Pages con `CNAME` y HTTPS activo).
 - **Seguridad XSS:**
   - Creación de nodos DOM exclusivamente mediante `el()` / `svgEl()` y `textContent` (cero uso de `innerHTML` con datos del usuario).
-- **Sección «Apoyar el proyecto»:**
-  - Footer con enlaces seguros (`rel="noopener noreferrer"`) a Ko-fi, PayPal, referido de Starlink y copia rápida de cuenta Prex (`35502`).
+- **Sección «Apoyar el proyecto» y Sello Open Source:**
+  - Footer con enlaces seguros (`rel="noopener noreferrer"`) a Ko-fi, PayPal, referido de Starlink, copia rápida de cuenta Prex (`35502`) y sello Open Source con acceso al repositorio en `header` y `footer`.
 
-### 2.2 Hallazgos técnicos a corregir en próximas iteraciones
-1. **Manejo de cuota en `localStorage` (`save()` y `migrate()`):** Envolver `localStorage.setItem` en bloques `try/catch` para capturar `QuotaExceededError` y avisar al usuario mediante un diálogo claro sin romper la ejecución.
-2. **Afinado de `mergeNotes()` y enlaces al importar:**
-   - Evitar que la limpieza previa de `incoming` (`index.html:1868`) descarte enlaces dirigidos hacia listas que ya existen localmente antes de fusionar.
-   - Incluir metadatos visuales (`color`, `opacity`, `bgId`, `links`, `pos`) en la comparación de respaldo cuando dos notas tienen el mismo ID pero carecen de `updatedAt` diferenciador.
-3. **Unificación de diálogos de confirmación:** Reemplazar los `confirm()` y `alert()` nativos restantes (eliminar lista, eliminar conexión, errores de imagen/importación) por el modal propio accesible `openDialog()`, y añadir confirmación al botón `"Borrar completados"`.
-4. **Higiene del repositorio:** Añadir `.gitignore` para excluir la carpeta local de pruebas `repositorio testeos json/`.
+### 2.2 Hallazgos técnicos resueltos en esta iteración (v1.1)
+1. **Manejo de cuota en `localStorage` (`save()` y `migrate()`):** *(Resuelto)* `localStorage.setItem` envuelto en bloques `try/catch` que abren un diálogo claro (`notifyQuotaExceeded()`) ofreciendo descargar un respaldo JSON inmediato sin romper la ejecución.
+2. **Afinado de `mergeNotes()` y enlaces al importar:** *(Resuelto)*
+   - En modo `merge`, la validación previa conserva los enlaces dirigidos hacia listas que ya existen localmente.
+   - `noteSignature()` contempla metadatos visuales (`color`, `opacity`, `bgId`, `links`, `pos`) cuando dos notas tienen el mismo ID pero carecen de `updatedAt` diferenciador.
+3. **Confirmación en «Borrar completados»:** *(Resuelto)* Se solicita confirmación antes de eliminar en bloque las tareas completadas de una lista.
+4. **Higiene del repositorio:** *(Resuelto)* `.gitignore` añadido para excluir la carpeta local de pruebas `repositorio testeos json/`.
 
 ---
 
@@ -83,23 +84,23 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
-| **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (20/20 tests PASS; pendiente ajuste fino en `mergeNotes`) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (Operativo en producción; mejoras futuras opcionales) |
+| **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (20/20 tests PASS; `mergeNotes` refinado con metadatos y enlaces locales) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (Operativo en producción con `checklist-v9`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
-| **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Pendiente (Etapa 1)** |
-| **CAT-05** | Confirmaciones coherentes con `openDialog()` y en "Borrar completados" | **P1** | Baja | **Pendiente (Etapa 1)** |
-| **CAT-06** | Sistema de Feedback por correo en el footer (`mmartinez23v@hotmail.com`) | **P1/P2** | Baja | **Pendiente (Etapa 3)** |
-| **CAT-07** | Sección pública «🐾 Próximos pasos» dentro de la app | **P2** | Baja | **Pendiente (Sección 5)** |
-| **CAT-08** | Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`) | **P2** | Media | **Pendiente (Etapa 4)** |
+| **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
+| **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
+| **CAT-06** | Sistema de Feedback por correo en el footer (`mmartinez23bio@hotmail.com`) | **P1/P2** | Baja | **Hecho (Etapa 3 / Backlog Paso 4.B)** |
+| **CAT-07** | Sección pública «🐾 Próximos pasos» dentro de la app | **P2** | Baja | **Hecho (Sección 5 / Backlog Paso 4.C)** |
+| **CAT-08** | Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`) | **P2** | Media | **Hecho (Etapa 4 / Backlog Paso 4)** |
 | **CAT-09** | Optimización y rendimiento a gran escala (100 a 10.000 listas) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2)** |
 | **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Pendiente (Etapa 5)** |
-| **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **En progreso (Etapa 8)** |
+| **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho (Etapa 8 / Backlog Paso 2; tags Git según lanzamientos)** |
 | **CAT-12** | Buscador / filtro rápido de listas, notas y etiquetas | **P3** | Baja-Media | **Idea (Etapa 10.A)** |
 | **CAT-13** | Visor "Mapa estelar" (3.ª vista modo universo) | **P3** | Alta | **Idea (Etapa 3.3 / 10.E)** |
 | **CAT-14** | Plantillas, atajos de teclado y estadísticas discretas | **P3/P4** | Baja-Media | **Idea (Etapa 10.B/C/D)** |
 | **CAT-15** | Distribución en Google Play / Sincronización Cloud / IA | **P4** | Alta | **Idea futura (Etapas 7.1 y 10.F/G)** |
-| **CAT-16** | Sello Open Source + enlace al repositorio (footer + ícono en header) | **P2** | Baja | **Pendiente (Etapa 11 / Backlog Paso 1)** |
-| **CAT-17** | Etiquetas visibles en botones «Importar» / «Exportar» en móvil | **P2** | Baja | **Pendiente (Etapa 5 / Backlog Paso 3)** |
+| **CAT-16** | Sello Open Source + enlace al repositorio (footer + ícono en header) | **P2** | Baja | **Hecho (Etapa 11 / Backlog Paso 1)** |
+| **CAT-17** | Etiquetas visibles en botones «Importar» / «Exportar» en móvil | **P2** | Baja | **Hecho (Etapa 5 / Backlog Paso 3)** |
 | **CAT-18** | Tercera vista: **Calendario** (junto a Cuadrícula y Mapa) | **P3** | Media-Alta | **Idea (Etapa 10.H / Backlog Paso 5)** |
 
 ---
@@ -131,8 +132,8 @@ Permitir que una persona construya desde una simple checklist hasta un espacio e
 
 ### ETAPA 3 — Sistema de Feedback (Prioridad: ALTA — P1/P2)
 Agregar un mecanismo sencillo, privado y directo para que los usuarios compartan su experiencia.
-- **3.1 Ubicación:** Sección discreta en el pie de página (`footer`), integrada armónicamente junto al bloque de apoyo al proyecto.
-- **3.2 Correo confirmado:** `mmartinez23v@hotmail.com` (mediante enlace `mailto:` accesible, compatible con móviles y con asunto prellenado opcional, cuidando la exposición al spam).
+- **3.1 Ubicación:** Sección discreta en el pie de página (`footer`), debajo del bloque de donaciones y apoyo al proyecto.
+- **3.2 Correo confirmado:** `mmartinez23bio@hotmail.com` (mediante enlace `mailto:` accesible y opción de copiar correo para reportar bugs, sugerencias o comentarios al desarrollador).
 - **3.3 Texto oficial en español:**
   > **💌 Ayudanos a mejorar Checklist Gato**  
   > «Checklist Gato es un proyecto independiente que continúa creciendo. Si encontraste un error, tenés alguna sugerencia o simplemente querés compartir tu experiencia, podés escribirme.  
@@ -285,24 +286,33 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 
 > Plan de trabajo incremental para los próximos días. **Ningún ítem se implementa sin autorización explícita**; el orden va de menor a mayor complejidad. Cada paso se cierra con `bash tests/run.sh` en verde y su actualización correspondiente de documentación.
 
-### PASO 1 — Sello Open Source + enlace al repositorio *(Muy fácil — CAT-16 / Etapa 11)*
+### ✅ PASO 1 — Sello Open Source + enlace al repositorio *(Completado — CAT-16 / Etapa 11)*
 - `footer`: bloque «Proyecto escalable a largo plazo, 100% Open Source y auditable» con enlace al repositorio (`https://github.com/MartnMartnez14/checklist`).
-- `header`: ícono discreto de GitHub que abre el repositorio.
-- Enlaces externos con `target="_blank"` y `rel="noopener noreferrer"`; coherente en modo claro y oscuro.
+- `header`: ícono discreto de GitHub (`#github-header`) que abre el repositorio.
+- Enlaces externos con `target="_blank"` y `rel="noopener noreferrer"`; coherente en modo claro y oscuro, verificado con test automatizado (`open-source` en `tests/harness.html`).
 
-### PASO 2 — README orientado a confianza y privacidad *(Muy fácil — CAT-11 / Etapa 8)*
-- Explicar la idea general de **Checklist Gato** para público técnico y no técnico.
-- Aclarar, en lenguaje simple, que los datos viven **solo en el dispositivo** (`localStorage` + `IndexedDB`): sin servidores, sin cuentas, sin telemetría y sin riesgo de filtración en la nube; código abierto y auditable.
-- Explicar cómo pasar datos entre PC y celular con **Exportar / Importar** y la importancia de respaldos periódicos.
-- Mantener `README.md` y `ROADMAP.md` sincronizados con el repositorio público.
+### ✅ PASO 2 — README orientado a confianza y privacidad *(Completado — CAT-11 / Etapa 8)*
+- Explicada la propuesta de **Checklist Gato** tanto para público general como para desarrolladores/auditores.
+- Documentado en lenguaje claro que los datos viven **exclusivamente en el dispositivo** (`localStorage` + `IndexedDB`): sin servidores, sin cuentas, sin telemetría y sin riesgo de filtración en la nube; código 100% abierto y auditable.
+- Detallado el flujo para pasar datos entre PC y celular con **Exportar / Importar** (modos Fusionar idempotente y Reemplazar, más respaldo automático previo) y la importancia de respaldos periódicos.
+- `README.md` y `ROADMAP.md` sincronizados con el estado real del repositorio.
 
-### PASO 3 — Etiquetas de Importar / Exportar en móvil *(Fácil — CAT-17 / Etapa 5)*
-- Hoy `@media (max-width:560px){.btn .btn-label{display:none;}}` oculta el texto y quedan solo las flechas.
-- Mostrar el texto visible («Exportar» / «Importar») para que cualquier usuario nuevo entienda su función sin adivinar.
+### ✅ PASO 3 — Etiquetas de Importar / Exportar en móvil *(Completado — CAT-17 / Etapa 5)*
+- Se eliminó `display:none` sobre `.btn .btn-label` en `@media (max-width:560px)` y se ajustó el espaciado compacto del `header` y `.actions`.
+- Ahora los botones muestran claramente su etiqueta («Exportar», «Importar», «Nueva lista») en pantallas móviles, verificado en viewport de `375px` dentro de `tests/harness.html`.
 
-### PASO 4 — Selector de idioma Español / Inglés *(Media — CAT-08 / Etapa 4)*
-- Alternar la interfaz entre **Checklist Gato (ES)** y **Checklist Cat (EN)**, con preferencia en `localStorage` (`checklist-lang`) y detección inicial del idioma del navegador.
-- **Regla de oro:** nunca traducir ni alterar el contenido escrito por el usuario.
+### ✅ PASO 4 — Selector de idioma Español / Inglés *(Completado — CAT-08 / Etapa 4)*
+- Selector discreto `#lang-toggle` (`ES` / `EN`) en el `header` que alterna toda la interfaz entre **Checklist Gato (ES)** y **Checklist Cat (EN)** con persistencia en `localStorage` (`checklist-lang`).
+- Diccionario nativo completo (`I18N.es` / `I18N.en`) para botones, estados vacíos, diálogos de importación/fusión, colores, `aria-label`, anuncios de lector de pantalla y sección de apoyo/Open Source.
+- **Regla de oro respetada:** jamás traduce ni altera el contenido escrito por el usuario (títulos, ítems, etiquetas).
+
+### ✅ PASO 4.B — Contacto / Feedback al desarrollador en el `footer` *(Completado — CAT-06 / Etapa 3)*
+- Añadido debajo de las donaciones en el `footer` el bloque «Ayudanos a mejorar Checklist Gato» / «Help us improve Checklist Cat» con enlace `mailto:mmartinez23bio@hotmail.com`, botón de copiado rápido (`#copy-email`) y soporte completo Español / Inglés.
+
+### ✅ PASO 4.C — Cierre de tareas fáciles pendientes *(Completado — CAT-04, CAT-05, CAT-07 / Etapa 1 y Sección 5)*
+- **CAT-04:** Protección de cuota en `save()` y `migrate()` con `try/catch` y diálogo `notifyQuotaExceeded()` para descargar respaldo inmediato si `localStorage` se llena.
+- **CAT-05 y Etapa 1.3:** Confirmación añadida en «Borrar completados» y refinamiento de `mergeNotes()` / `noteSignature()` para preservar enlaces hacia listas locales y detectar cambios de estilo en notas sin `updatedAt`.
+- **CAT-07:** Panel desplegable `<details id="roadmap-details">` («🐾 Próximos pasos» / «🐾 What's next») en el `footer` con las 3 columnas de evolución en Español e Inglés.
 
 ### PASO 5 — Tercera vista «Calendario» *(Media-Alta — CAT-18 / Etapa 10.H)*
 - Nueva 3.ª opción en el selector de vistas del `header` (junto a *Cuadrícula* y *Mapa*).
