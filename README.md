@@ -40,6 +40,10 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
   - **División rápida con `Enter`:** Al presionar `Enter` en medio de un elemento, el texto se divide en la posición del cursor e inserta un ítem nuevo justo debajo (`Shift + Enter` inserta un salto de línea dentro del mismo ítem).
   - **Reordenamiento intuitivo:** Arrastrá cada tarea desde su asa lateral `≡` con el ratón o pantalla táctil, o reordenala con el teclado (`↑` / `↓` sobre el asa; con `Shift` se mueve de a 3 posiciones).
   - **Fecha y hora de creación:** Visible en la parte superior de cada nota en horario local (respetando notas antiguas sin inventarles fecha).
+  - **Progreso por lista:** Barra discreta y contador `completados/total` en cada tarjeta con elementos.
+  - **Atajos de teclado:** `N` nueva lista, `G` vista cuadrícula, `M` vista mapa, `/` buscar y `?` para ver la ayuda (se desactivan mientras escribís).
+  - **Buscador global:** Filtrá al instante por título, tarea o etiqueta, sin importar mayúsculas ni acentos (`Escape` limpia el filtro).
+  - **Plantillas rápidas:** Creá listas de Compras, Estudios, Proyectos, Hábitos, Viajes u Organización personal con ítems de ejemplo editables.
 - **Dos modos de visualización:**
   - **Vista Cuadrícula:** Tablero organizado automáticamente en columnas adaptables.
   - **Vista Mapa:** Lienzo libre donde podés arrastrar y ubicar cada lista donde quieras (con ratón, pantalla táctil o flechas del teclado).
@@ -52,6 +56,7 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
   - **Modo claro y modo oscuro:** Con detección automática del sistema, botón de cambio instantáneo y logos dedicados (`cat-day.png` / `cat-night.png`).
   - **Estilo por lista:** Paleta de 10 colores con control deslizable de opacidad (0 % a 60 %) y soporte para subir imágenes o GIFs animados de fondo.
 - **Accesibilidad:** Navegación completa por teclado, avisos para lectores de pantalla (`aria-live`) y respeto por la preferencia de movimiento reducido (`prefers-reduced-motion`).
+- **Enlace compartible:** Metadatos SEO/OpenGraph y Twitter Card con imagen, para que el enlace muestre una vista previa clara al compartirlo.
 
 ---
 
@@ -88,7 +93,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal, ejecuta todos los casos de `tests/harness.html` y reporta el resumen final (`PASS=20 FAIL=0 NOVERIFY=0`).
+Requiere `google-chrome` y `python3`. Levanta un servidor temporal, ejecuta todos los casos de `tests/harness.html` y reporta el resumen final (`PASS=25 FAIL=0 NOVERIFY=0`).
 
 ---
 

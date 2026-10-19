@@ -33,7 +33,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 
 ## 2. DIAGNÓSTICO Y AUDITORÍA TÉCNICA DEL ESTADO ACTUAL (BASE v1.0)
 
-### 2.1 Lo que ya existe y funciona (Verificado con `PASS=20 FAIL=0`)
+### 2.1 Lo que ya existe y funciona (Verificado con `PASS=25 FAIL=0`)
 - **Arquitectura cero-dependencias:** HTML5, CSS moderno (variables CSS, `color-mix`, `conic-gradient`) y JavaScript vanilla en `index.html`.
 - **Gestión de listas y elementos:**
   - Creación, edición y borrado de listas y elementos.
@@ -41,6 +41,8 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
   - `Enter` divide el elemento activo en la posición del cursor e inserta uno nuevo justo debajo (`insertAfter`); `Shift+Enter` inserta salto de línea; protección IME (`isComposing`).
   - Reordenamiento de elementos dentro de cada grupo (pendientes / completados) mediante arrastre (ratón/táctil) y teclado (`ArrowUp`/`ArrowDown`, `Shift` mueve 3 posiciones).
   - Marcado de tareas completadas, barra plegable de completados y borrado rápido.
+  - **Buscador global:** filtro en tiempo real por título, tareas y etiquetas, insensible a mayúsculas y acentos, sin modificar los datos guardados.
+  - **Plantillas rápidas:** Compras, Estudios, Proyectos, Hábitos, Viajes y Organización personal, con elementos de ejemplo editables.
   - Fecha y hora de creación (`createdAt`) en formato local (sin inventar fechas para notas antiguas).
 - **Dos vistas de tablero:**
   - **Vista Cuadrícula:** diseño adaptable en columnas.
@@ -56,8 +58,9 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
   - Exportación en JSON incluyendo notas e imágenes codificadas en Base64.
   - Importación con validación estructural, descarga automática de copia de seguridad previa y dos modos: **Fusionar (idempotente)** y **Reemplazar**.
 - **PWA e infraestructura:**
-  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v9`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
+  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v11`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
   - Dominio personalizado `https://checklistgato.com` (DNS en Hostinger apuntando a GitHub Pages con `CNAME` y HTTPS activo).
+  - **Descubrimiento y metadatos:** `description`, `canonical`, OpenGraph (título, descripción, URL e imagen absoluta), Twitter Card y `manifest.json` enriquecido (`lang`, `description`, `categories`), listos para compartir el enlace con vista previa.
 - **Seguridad XSS:**
   - Creación de nodos DOM exclusivamente mediante `el()` / `svgEl()` y `textContent` (cero uso de `innerHTML` con datos del usuario).
 - **Sección «Apoyar el proyecto» y Sello Open Source:**
@@ -95,13 +98,14 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 | **CAT-09** | Optimización y rendimiento a gran escala (100 a 10.000 listas) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2)** |
 | **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Pendiente (Etapa 5)** |
 | **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho (Etapa 8 / Backlog Paso 2; tags Git según lanzamientos)** |
-| **CAT-12** | Buscador / filtro rápido de listas, notas y etiquetas | **P3** | Baja-Media | **Idea (Etapa 10.A)** |
+| **CAT-12** | Buscador / filtro rápido de listas, notas y etiquetas | **P3** | Baja-Media | **Hecho (Paso 8)** |
 | **CAT-13** | Visor "Mapa estelar" (3.ª vista modo universo) | **P3** | Alta | **Idea (Etapa 3.3 / 10.E)** |
-| **CAT-14** | Plantillas, atajos de teclado y estadísticas discretas | **P3/P4** | Baja-Media | **Idea (Etapa 10.B/C/D)** |
+| **CAT-14** | Plantillas, atajos de teclado y estadísticas discretas | **P3/P4** | Baja-Media | **Hecho: atajos, progreso y plantillas (Pasos 7-8); falta vista ampliada (Etapa 5.4)** |
 | **CAT-15** | Distribución en Google Play / Sincronización Cloud / IA | **P4** | Alta | **Idea futura (Etapas 7.1 y 10.F/G)** |
 | **CAT-16** | Sello Open Source + enlace al repositorio (footer + ícono en header) | **P2** | Baja | **Hecho (Etapa 11 / Backlog Paso 1)** |
 | **CAT-17** | Etiquetas visibles en botones «Importar» / «Exportar» en móvil | **P2** | Baja | **Hecho (Etapa 5 / Backlog Paso 3)** |
 | **CAT-18** | Tercera vista: **Calendario** (junto a Cuadrícula y Mapa) | **P3** | Media-Alta | **Idea (Etapa 10.H / Backlog Paso 5)** |
+| **CAT-19** | Metadatos SEO / OpenGraph y manifest PWA enriquecido | **P3** | Baja | **Hecho (Etapa 9 / Backlog Paso 6)** |
 
 ---
 
@@ -198,7 +202,7 @@ Consolidar la ventaja competitiva de ser una herramienta 100% local y privada.
 ---
 
 ### ETAPA 9 — Difusión y Crecimiento Orgánico (Prioridad: FUTURA — P3/P4)
-- Mejorar metadatos SEO y OpenGraph (`description`, `og:title`, `og:image`) en `index.html`.
+- ✅ **Metadatos SEO y OpenGraph** (`description`, `canonical`, `og:title`, `og:description`, `og:url`, `og:image` absoluta, `twitter:card`) en `index.html`, más `lang`, `description` y `categories` en `manifest.json`. Verificado con el test `seo-meta`.
 - Compartir avances y demostraciones breves en GitHub y comunidades de productividad/organización personal, sin publicidad invasiva ni telemetría.
 
 ---
@@ -206,15 +210,15 @@ Consolidar la ventaja competitiva de ser una herramienta 100% local y privada.
 ### ETAPA 10 — Ideas Experimentales (Prioridad: BAJA / INVESTIGACIÓN — P3/P4)
 *Propuestas sujetas a evaluación previa de utilidad real y costo de mantenimiento (no implementar automáticamente):*
 
-- **A. Buscador global (P3):** Filtrar rápidamente listas, notas, tareas y etiquetas en tiempo real (muy útil en tableros grandes).
+- **A. Buscador global (P3):** ✅ Implementado con filtro en tiempo real por título, tareas y etiquetas (insensible a acentos), atajo `/` y limpieza con `Escape`.
 - **B. Visor «Mapa estelar» / Modo Universo (P3):**
   - Tercera vista dentro del tablero (*Cuadrícula*, *Mapa* y *Mapa estelar*): un lienzo tipo cielo nocturno (y variante clara) donde cada lista es un punto luminoso.
   - **Punto por lista:** Color según su conexión (degradado si tiene varias; blanco como una estrella si no tiene conexiones). Tamaño proporcional al número de conexiones.
   - **Aristas:** Líneas finas con el color de la conexión.
   - **Interacción y accesibilidad:** Pasar el ratón o enfocar con teclado (`aria-label` con título) muestra el nombre; clic o `Enter`/`Espacio` abre la nota completa en un panel o modal para editarla.
-- **C. Plantillas opcionales (P3/P4):** Compras, Estudios, Proyectos, Hábitos, Viajes, Organización personal.
-- **D. Atajos de teclado (P3/P4):** Acciones rápidas para usuarios avanzados.
-- **E. Estadísticas básicas (P4):** Progreso discreto por lista sin convertir la app en un sistema de presión de productividad.
+- **C. Plantillas opcionales (P3/P4):** ✅ Implementadas (Compras, Estudios, Proyectos, Hábitos, Viajes y Organización personal) con diálogo bilingüe.
+- **D. Atajos de teclado (P3/P4):** ✅ Implementados `N` (nueva lista), `G` (cuadrícula), `M` (mapa) y `?` (ayuda), con guardas para no dispararse al escribir.
+- **E. Estadísticas básicas (P4):** ✅ Progreso discreto por lista (barra + `completados/total`), sin convertirlo en un sistema de presión de productividad.
 - **F. Sincronización entre dispositivos (P4):** Investigación a largo plazo (requeriría infraestructura, cifrado y resolución de conflictos; hoy se resuelve de forma privada con Exportar/Importar con Fusión).
 - **G. Integración con IA (P4):** Exclusivamente como experimento futuro, opcional, transparente y respetuoso de la privacidad.
 - **H. Tercera vista «Calendario» (P3, CAT-18):**
@@ -240,19 +244,16 @@ Dejar explícito que el proyecto es abierto, auditable y pensado para durar, par
 Se incorporará en la interfaz (como panel desplegable discreto en el pie de página, accesible y adaptado a modo claro y oscuro) con tres categorías claras:
 
 ### 🛠️ En desarrollo
-- Mejoras continuas de estabilidad, confirmaciones seguras y protección del almacenamiento local.
-- Canal directo de contacto y sugerencias por correo electrónico.
-- Sello **Open Source** con acceso directo al repositorio público del proyecto.
+- Tercera vista de tablero: **Calendario** por fecha.
+- Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.
 
 ### 🔜 Próximamente
-- Idioma inglés (selector **Español / English** — *Checklist Gato / Checklist Cat*).
 - Optimización de rendimiento para tableros con gran cantidad de listas y conexiones.
-- Búsqueda rápida de listas, tareas y etiquetas.
+- Vista ampliada para leer y editar notas largas.
 
 ### 💡 Ideas a futuro *(en evaluación)*
 - **Visor «Mapa estelar» (modo universo):** vista panorámica de nodos y conexiones.
-- Plantillas opcionales para crear listas rápidas.
-- Atajos de teclado adicionales y vista ampliada de notas largas.
+- Sincronización entre dispositivos e integraciones futuras.
 
 ---
 
@@ -278,7 +279,10 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - **Fecha y hora de creación** visible en cada nota (respetando notas antiguas sin fecha).
 - Pie de página **«Apoyar el proyecto»** (Ko-fi, PayPal, Starlink como enlace de referido y cuenta Prex con botón de copiado rápido).
 - Modo **Mapa** con arrastre robusto en móvil y teclado, y bordes coloreados por conexión (sólido o multicolor).
-- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 20 pruebas de regresión en verde.
+- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 25 pruebas de regresión en verde.
+- Atajos de teclado (`N`, `G`, `M`, `/`, `?`), progreso discreto por lista y buscador global insensible a acentos.
+- Plantillas rápidas bilingües (Compras, Estudios, Proyectos, Hábitos, Viajes y Organización personal).
+- Metadatos de descubrimiento (SEO/OpenGraph/Twitter) y manifest PWA enriquecido, con vista previa correcta al compartir `https://checklistgato.com`.
 
 ---
 
@@ -318,3 +322,19 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Nueva 3.ª opción en el selector de vistas del `header` (junto a *Cuadrícula* y *Mapa*).
 - Ver y organizar listas o tareas por fecha (aprovechando `createdAt` o una fecha asignada), sin sobrecargar ni desvirtuar la esencia de un checklist.
 - Diseñar un boceto previo antes de implementar.
+
+### ✅ PASO 6 — Metadatos SEO / OpenGraph *(Completado — CAT-19 / Etapa 9)*
+- `index.html`: `description`, `canonical`, OpenGraph completo (`og:type`, `og:site_name`, `og:url`, `og:title`, `og:description`, `og:image` absoluta con dimensiones y `og:locale`) y Twitter Card.
+- `manifest.json`: añadidos `lang`, `dir`, `description` y `categories`; nombre ampliado sin cambiar `short_name`.
+- `sw.js`: caché elevada a `checklist-v10` para que el manifest actualizado se refresque en instalaciones existentes.
+- Nuevo test `seo-meta` en `tests/harness.html` (suite: `PASS=21 FAIL=0`).
+
+### ✅ PASO 7 — Atajos de teclado y progreso por lista *(Completado — CAT-14 / Etapa 10.D-E)*
+- **Atajos globales:** `N` crea una lista, `G` y `M` cambian de vista, `?` abre la ayuda con todos los atajos. Se ignoran con modificadores, al escribir en campos o con un diálogo/popover abierto. Añadidos `aria-keyshortcuts` a los botones correspondientes.
+- **Progreso por lista:** barra fina + contador `completados/total` en cada tarjeta con elementos, con `role="progressbar"` y `aria-valuenow`/`aria-valuemax`. Se actualiza sin re-renderizar al añadir o dividir tareas (se conserva el foco).
+- Nuevos tests `list-stats` y `shortcuts` (suite: `PASS=23 FAIL=0`).
+
+### ✅ PASO 8 — Buscador global y plantillas *(Completado — CAT-12 y CAT-14 / Etapa 10.A-C)*
+- **Buscador:** input en el `header` con filtro en tiempo real por título, tareas y etiquetas; insensible a mayúsculas y acentos; atajo `/`, limpieza con `Escape` y mensaje de «Sin resultados». No altera los datos ni la persistencia.
+- **Plantillas:** botón «Plantillas» que abre un diálogo con seis opciones bilingües (Compras, Estudios, Proyectos, Hábitos, Viajes y Organización personal), creando una lista con ítems pendientes editables.
+- Nuevos tests `search-filter` y `templates` (suite: `PASS=25 FAIL=0`). Caché PWA elevada a `checklist-v11`.

@@ -27,7 +27,7 @@ done
 
 google-chrome --headless=new --disable-gpu --no-sandbox \
   --window-size=1200,2800 \
-  --virtual-time-budget=15000 \
+  --virtual-time-budget=30000 \
   --dump-dom "http://127.0.0.1:$PORT/tests/harness.html" \
   >"$DOM_OUT" 2>"$ERR_LOG"
 CHROME_RC=$?

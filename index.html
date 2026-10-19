@@ -3,7 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Checklist Gato</title>
+<title>Checklist Gato — Listas, notas y tareas privadas</title>
+<meta name="description" content="Checklist Gato: aplicación web gratuita, privada y offline para listas, notas y tareas. Tus datos se guardan solo en tu dispositivo, sin cuentas ni servidores.">
+<meta name="application-name" content="Checklist Gato">
+<link rel="canonical" href="https://checklistgato.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Checklist Gato">
+<meta property="og:url" content="https://checklistgato.com/">
+<meta property="og:title" content="Checklist Gato — Listas, notas y tareas privadas">
+<meta property="og:description" content="Listas, notas y tareas 100 % privadas y offline. Tus datos viven solo en tu dispositivo: sin cuentas, sin servidores y sin telemetría.">
+<meta property="og:image" content="https://checklistgato.com/cat-day.png">
+<meta property="og:image:width" content="512">
+<meta property="og:image:height" content="512">
+<meta property="og:image:alt" content="Logo de Checklist Gato">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Checklist Gato — Listas, notas y tareas privadas">
+<meta name="twitter:description" content="Listas, notas y tareas 100 % privadas y offline. Tus datos viven solo en tu dispositivo.">
+<meta name="twitter:image" content="https://checklistgato.com/cat-day.png">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -96,6 +114,15 @@
     .actions .btn .i{margin-right:4px;}
     .brand-sub{display:none;}
   }
+  .search-box{display:flex;align-items:center;gap:6px;height:38px;padding:0 11px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-pill);min-width:0;}
+  .search-box .i{width:16px;height:16px;color:var(--muted);flex:none;}
+  .search-box input{border:0;background:none;color:var(--text);font:inherit;font-size:13px;outline:none;padding:0;width:200px;min-width:0;}
+  .search-box input::placeholder{color:var(--muted);}
+  .search-box:focus-within{border-color:var(--accent);}
+  @media (max-width:560px){
+    .search-box{flex:1 1 100%;order:-1;height:36px;}
+    .search-box input{width:100%;}
+  }
   .btn {
     border: 1px solid var(--line); background: var(--card); color: var(--accent);
     border-radius: var(--radius-pill); padding: 8px 16px; font: inherit; font-weight: 550; cursor: pointer;
@@ -176,6 +203,11 @@
   .tag-chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 4px 6px;}
   .tag-chip{--chip:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l));font-size:11px;line-height:1;font-weight:650;padding:4px 8px;border-radius:var(--radius-pill);color:var(--chip);background:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.12);border:1px solid hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.40);}
   :root[data-theme="dark"] .tag-chip{background:hsl(var(--tag-h,216) var(--tag-s) var(--tag-l)/.18);}
+  .note-progress{display:flex;align-items:center;gap:8px;padding:0 4px 6px;}
+  .note-progress-track{flex:1;height:3px;border-radius:var(--radius-pill);background:var(--line);overflow:hidden;}
+  .note-progress-fill{height:100%;border-radius:inherit;background:var(--accent);transition:width var(--t-med);}
+  .note-progress-text{font-size:11px;font-variant-numeric:tabular-nums;color:var(--muted);flex:none;}
+  @media (prefers-reduced-motion: reduce){.note-progress-fill{transition:none;}}
   .note:not(:focus-within) .note-tags:not(:placeholder-shown){position:absolute;opacity:0;pointer-events:none;}
   .item { display: flex; align-items: flex-start; gap: 10px; padding: 4px 0; }
   .item input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; flex: none; margin: 3px 0 0; }
@@ -212,7 +244,7 @@
     border: none; background: none; cursor: pointer; color: var(--muted); font: inherit; font-size: 13px; padding: 6px 4px;
   }
   .toggle:hover, .clear:hover { color: var(--accent); }
-  .actions { display: flex; gap: 8px; align-items: center; }
+  .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
   .btn-secondary { color: var(--text); }
 
   /* --- Conexiones --- */
@@ -361,6 +393,8 @@
   <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-template" viewBox="0 0 24 24"><path d="M4 6h10M4 12h10M4 18h6M18 14v6M15 17h6"/></symbol>
 </svg>
 <header>
   <div class="brand">
@@ -369,9 +403,13 @@
     <div class="brand-text"><h1 id="app-title">Checklist Gato</h1><p class="brand-sub" id="stats">0 listas · 0 conexiones</p></div>
   </div>
   <div class="actions">
+    <label class="search-box" for="search">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-search"/></svg>
+      <input id="search" type="search" placeholder="Buscar listas, tareas o etiquetas" aria-label="Buscar listas, tareas o etiquetas" aria-keyshortcuts="/" autocomplete="off">
+    </label>
     <div class="seg" id="view-group" role="group" aria-label="Vista del tablero">
-      <button class="seg-btn" id="view-grid" type="button" aria-pressed="true" aria-label="Vista cuadrícula"><svg class="i" aria-hidden="true"><use href="#i-grid"/></svg></button>
-      <button class="seg-btn" id="view-map" type="button" aria-pressed="false" aria-label="Vista mapa"><svg class="i" aria-hidden="true"><use href="#i-map"/></svg></button>
+      <button class="seg-btn" id="view-grid" type="button" aria-pressed="true" aria-label="Vista cuadrícula" aria-keyshortcuts="G"><svg class="i" aria-hidden="true"><use href="#i-grid"/></svg></button>
+      <button class="seg-btn" id="view-map" type="button" aria-pressed="false" aria-label="Vista mapa" aria-keyshortcuts="M"><svg class="i" aria-hidden="true"><use href="#i-map"/></svg></button>
     </div>
     <button class="btn lang-toggle" id="lang-toggle" type="button" aria-label="Cambiar idioma a inglés" title="Español / English">ES</button>
     <button class="btn theme-toggle" id="theme-toggle" type="button" aria-label="Activar modo oscuro" aria-pressed="false">
@@ -384,7 +422,8 @@
     <button class="btn btn-secondary" id="export"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-down"/></svg><span class="btn-label" id="export-label">Exportar</span></button>
     <label class="btn btn-secondary" for="import-file"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-up"/></svg><span class="btn-label" id="import-label">Importar</span></label>
     <input type="file" id="import-file" accept="application/json" hidden>
-    <button class="btn btn-primary" id="new-note"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="btn-label" id="new-note-label">Nueva lista</span></button>
+    <button class="btn btn-secondary" id="templates" type="button" aria-haspopup="dialog"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-template"/></svg><span class="btn-label" id="templates-label">Plantillas</span></button>
+    <button class="btn btn-primary" id="new-note" aria-keyshortcuts="N"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="btn-label" id="new-note-label">Nueva lista</span></button>
   </div>
 </header>
 
@@ -449,14 +488,14 @@
         <h3 id="rm-soon-title">🔜 Próximamente</h3>
         <ul>
           <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
-          <li id="rm-soon-2">Buscador y filtro rápido de listas, tareas y etiquetas.</li>
+          <li id="rm-soon-2">Vista ampliada para leer y editar notas largas.</li>
         </ul>
       </div>
       <div class="roadmap-col">
         <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
         <ul>
           <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
-          <li id="rm-ideas-2">Plantillas opcionales, atajos de teclado y vista ampliada.</li>
+          <li id="rm-ideas-2">Sincronización entre dispositivos e integraciones futuras.</li>
         </ul>
       </div>
     </div>
@@ -500,6 +539,7 @@
   const I18N = {
     es: {
       appName: "Checklist Gato",
+      docTitle: "Checklist Gato — Listas, notas y tareas privadas",
       viewGroup: "Vista del tablero",
       viewGrid: "Vista cuadrícula",
       viewMap: "Vista mapa",
@@ -511,6 +551,21 @@
       exportBtn: "Exportar",
       importBtn: "Importar",
       newNoteBtn: "Nueva lista",
+      searchPlaceholder: "Buscar listas, tareas o etiquetas",
+      searchAria: "Buscar listas, tareas o etiquetas",
+      noResults: "Sin resultados",
+      noResultsHint: "Probá con otra palabra o borrá la búsqueda para ver todo.",
+      templatesBtn: "Plantillas",
+      templatesTitle: "Plantillas",
+      templatesIntro: "Elegí una plantilla para crear una lista con elementos de ejemplo. Después podés editarla o borrarla.",
+      templates: [
+        { title: "Compras", items: ["Leche", "Pan", "Huevos", "Frutas y verduras"] },
+        { title: "Estudios", items: ["Repasar apuntes", "Resolver ejercicios", "Preparar examen"] },
+        { title: "Proyectos", items: ["Definir objetivo", "Dividir en tareas", "Asignar fechas"] },
+        { title: "Hábitos", items: ["Beber agua", "Caminar 30 minutos", "Leer 10 páginas"] },
+        { title: "Viajes", items: ["Documentos", "Cargador y cables", "Ropa", "Reservas confirmadas"] },
+        { title: "Organización personal", items: ["Revisar agenda", "Ordenar escritorio", "Planificar la semana"] }
+      ],
       supportTitle: "Apoyar el proyecto",
       supportText: "¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.",
       kofiSub: "Invitame un cafecito",
@@ -538,10 +593,13 @@
       rmDev2: "Tercera vista de tablero: Calendario por fecha.",
       rmSoonTitle: "🔜 Próximamente",
       rmSoon1: "Optimización de rendimiento para tableros con cientos o miles de listas.",
-      rmSoon2: "Buscador y filtro rápido de listas, tareas y etiquetas.",
+      rmSoon2: "Vista ampliada para leer y editar notas largas.",
       rmIdeasTitle: "💡 Ideas a futuro",
       rmIdeas1: "Visor «Mapa estelar» (modo universo de nodos y conexiones).",
-      rmIdeas2: "Plantillas opcionales, atajos de teclado y vista ampliada.",
+      rmIdeas2: "Sincronización entre dispositivos e integraciones futuras.",
+      shortcutsTitle: "Atajos de teclado",
+      shortcutsMsg: "N — nueva lista\nG — vista cuadrícula\nM — vista mapa\n/ — buscar\n? — esta ayuda",
+      listProgressAria: (done, total) => `${done} de ${total} elementos completados`,
       quotaTitle: "Almacenamiento lleno",
       quotaMsg: "La memoria local del navegador alcanzó su límite y no se pudieron guardar los últimos cambios.\nPodés descargar una copia de seguridad ahora para no perder tus datos.",
       quotaExportBtn: "Descargar respaldo",
@@ -610,6 +668,7 @@
     },
     en: {
       appName: "Checklist Cat",
+      docTitle: "Checklist Cat — Private lists, notes and tasks",
       viewGroup: "Board view",
       viewGrid: "Grid view",
       viewMap: "Map view",
@@ -621,6 +680,21 @@
       exportBtn: "Export",
       importBtn: "Import",
       newNoteBtn: "New list",
+      searchPlaceholder: "Search lists, tasks or tags",
+      searchAria: "Search lists, tasks or tags",
+      noResults: "No results",
+      noResultsHint: "Try another word or clear the search to see everything.",
+      templatesBtn: "Templates",
+      templatesTitle: "Templates",
+      templatesIntro: "Choose a template to create a list with sample items. You can edit or delete it afterwards.",
+      templates: [
+        { title: "Shopping", items: ["Milk", "Bread", "Eggs", "Fruit and vegetables"] },
+        { title: "Study", items: ["Review notes", "Solve exercises", "Prepare for the exam"] },
+        { title: "Projects", items: ["Define the goal", "Break it into tasks", "Set dates"] },
+        { title: "Habits", items: ["Drink water", "Walk for 30 minutes", "Read 10 pages"] },
+        { title: "Travel", items: ["Documents", "Charger and cables", "Clothes", "Confirmed bookings"] },
+        { title: "Personal organization", items: ["Check the calendar", "Tidy the desk", "Plan the week"] }
+      ],
       supportTitle: "Support the project",
       supportText: "Did you like the project? If you'd like to contribute voluntarily, you can buy me a coffee or mate. It's completely optional and helps me keep improving the app.",
       kofiSub: "Buy me a coffee",
@@ -648,10 +722,13 @@
       rmDev2: "Third board view: Calendar by date.",
       rmSoonTitle: "🔜 Coming soon",
       rmSoon1: "Performance optimization for boards with hundreds or thousands of lists.",
-      rmSoon2: "Quick search and filter for lists, tasks, and tags.",
+      rmSoon2: "Expanded view for reading and editing long notes.",
       rmIdeasTitle: "💡 Future ideas",
       rmIdeas1: "Star Map viewer (universe mode for nodes and connections).",
-      rmIdeas2: "Optional templates, keyboard shortcuts, and expanded note view.",
+      rmIdeas2: "Device sync and future integrations.",
+      shortcutsTitle: "Keyboard shortcuts",
+      shortcutsMsg: "N — new list\nG — grid view\nM — map view\n/ — search\n? — this help",
+      listProgressAria: (done, total) => `${done} of ${total} items completed`,
       quotaTitle: "Storage full",
       quotaMsg: "Browser local storage reached its limit and recent changes could not be saved.\nYou can download a backup copy now so you don't lose your data.",
       quotaExportBtn: "Download backup",
@@ -727,6 +804,7 @@
   let popFocusKey = null;        // selector a enfocar tras render()
   const VIEW_KEY = "checklist-view";
   let viewMode = "grid";
+  let query = "";                 // filtro activo del buscador
   try { viewMode = localStorage.getItem(VIEW_KEY) === "map" ? "map" : "grid"; } catch (e) {}
 
   function uid() {
@@ -942,12 +1020,13 @@
     lang = nextLang === "en" ? "en" : "es";
     if (!persist && lang === "es" && document.documentElement.lang === "es") return;
     document.documentElement.lang = lang;
-    document.title = tr("appName");
+    document.title = tr("docTitle");
     const setTxt = (id, key) => { const n = document.getElementById(id); if (n) n.textContent = tr(key); };
     setTxt("app-title", "appName");
     setTxt("export-label", "exportBtn");
     setTxt("import-label", "importBtn");
     setTxt("new-note-label", "newNoteBtn");
+    setTxt("templates-label", "templatesBtn");
     setTxt("support-title", "supportTitle");
     setTxt("support-text", "supportText");
     setTxt("kofi-sub", "kofiSub");
@@ -977,6 +1056,11 @@
 
     const vg = document.getElementById("view-group");
     if (vg) vg.setAttribute("aria-label", tr("viewGroup"));
+    const sb = document.getElementById("search");
+    if (sb) {
+      sb.setAttribute("placeholder", tr("searchPlaceholder"));
+      sb.setAttribute("aria-label", tr("searchAria"));
+    }
     const vGrid = document.getElementById("view-grid");
     if (vGrid) vGrid.setAttribute("aria-label", tr("viewGrid"));
     const vMap = document.getElementById("view-map");
@@ -1632,18 +1716,43 @@
   }
 
   // ---------- Render ----------
+  // ---------- Buscador ----------
+  function normalizeSearch(s) {
+    return String(s == null ? "" : s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  function noteMatches(note, q) {
+    if (!q) return true;
+    const hay = [note.title || "", ...(note.tags || []), ...(note.items || []).map(i => i.text || "")];
+    return hay.some(t => normalizeSearch(t).includes(q));
+  }
+  function visibleNotes() {
+    const q = normalizeSearch(query.trim());
+    return q ? notes.filter(n => noteMatches(n, q)) : notes;
+  }
+  function clearSearch() {
+    query = "";
+    const s = document.getElementById("search");
+    if (s) s.value = "";
+  }
+
   function render(focusId) {
     const root = document.getElementById("notes");
     computeTagCounts();
+    const visible = visibleNotes();
     if (notes.length === 0) {
       root.replaceChildren(el("p", { className: "empty" }, [
         el("strong", { textContent: tr("emptyStrong") }),
         document.createTextNode(tr("emptyHint"))
       ]));
+    } else if (visible.length === 0) {
+      root.replaceChildren(el("p", { className: "empty" }, [
+        el("strong", { textContent: tr("noResults") }),
+        document.createTextNode(tr("noResultsHint"))
+      ]));
     } else {
-      root.replaceChildren(...notes.map(renderNote));
+      root.replaceChildren(...visible.map(renderNote));
     }
-    if (viewMode === "map" && notes.some(n => !n.pos)) { initMapPositions(); save(); }
+    if (viewMode === "map" && visible.some(n => !n.pos)) { initMapPositions(); save(); }
     root.classList.toggle("map-mode", viewMode === "map");
     if (viewMode === "map") {
       root.querySelectorAll(".note").forEach(sec => {
@@ -1666,6 +1775,35 @@
       popFocusKey = null;
       if (t) t.focus();
     }
+  }
+
+  // Barra de progreso discreta de una lista (null si no tiene elementos).
+  function renderProgress(note) {
+    if (!note.items.length) return null;
+    const total = note.items.length;
+    const done = note.items.filter(i => i.done).length;
+    const pct = Math.round(done / total * 100);
+    const track = el("div", {
+      className: "note-progress-track", role: "progressbar",
+      "aria-valuemin": "0", "aria-valuemax": String(total), "aria-valuenow": String(done),
+      "aria-label": tr("listProgressAria")(done, total)
+    }, [el("div", { className: "note-progress-fill" })]);
+    track.firstChild.style.width = pct + "%";
+    return el("div", { className: "note-progress" }, [
+      track,
+      el("span", { className: "note-progress-text", textContent: done + "/" + total, "aria-hidden": "true" })
+    ]);
+  }
+
+  // Reemplaza/inserta la barra sin re-renderizar la tarjeta (conserva el foco).
+  function syncProgress(note, section) {
+    if (!section) return;
+    const fresh = renderProgress(note);
+    const cur = section.querySelector(".note-progress");
+    if (cur) { if (fresh) cur.replaceWith(fresh); else cur.remove(); return; }
+    if (!fresh) return;
+    const anchor = section.querySelector(".item") || section.querySelector(".add-form");
+    if (anchor) anchor.before(fresh);
   }
 
   function renderNote(note) {
@@ -1729,6 +1867,7 @@
 
     const pending = note.items.filter(i => !i.done);
     const done = note.items.filter(i => i.done);
+    const progress = renderProgress(note);
 
     const addInput = el("input", {
       id: "add-" + note.id, type: "text", className: "add-input",
@@ -1748,6 +1887,7 @@
       note.items.push(item);
       addInput.value = "";
       add.parentNode.insertBefore(renderItem(note, item), add);
+      syncProgress(note, section);
       touch(note);
       save(); scheduleLinks(); growItems();
     }
@@ -1767,6 +1907,7 @@
       el("div", { className: "note-head" }, [grip, title, styleBtn, connectBtn, delNote]),
       tags,
       ...(chips ? [chips] : []),
+      ...(progress ? [progress] : []),
       ...pending.map(item => renderItem(note, item)),
       add
     ];
@@ -1816,6 +1957,7 @@
     const fila = textareaEl.closest(".item");
     if (fila) {
       fila.after(renderItem(note, nuevo));
+      syncProgress(note, fila.closest(".note"));
       const t = fila.nextElementSibling?.querySelector(".item-text");
       if (t) { t.focus(); t.setSelectionRange(0, 0); }
     }
@@ -2055,13 +2197,57 @@
   document.getElementById("view-grid").addEventListener("click", () => setView("grid", true));
   document.getElementById("view-map").addEventListener("click", () => setView("map", true));
 
-  document.getElementById("new-note").addEventListener("click", () => {
+  const searchInput = document.getElementById("search");
+  searchInput.addEventListener("input", () => { query = searchInput.value; render(); });
+  searchInput.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (query) { clearSearch(); render(); }
+    else searchInput.blur();
+  });
+
+  function createNote() {
+    clearSearch();
     const note = normalizeNote({ id: uid(), title: "", items: [], showDone: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
     if (viewMode === "map") { const k = notes.length; note.pos = { x: 24 + (k % 6) * 28, y: 24 + (k % 6) * 28 }; }
     notes.unshift(note);
     save();
     render("title-" + note.id);
-  });
+  }
+
+  async function openTemplates() {
+    const list = (I18N[lang] && I18N[lang].templates) || I18N.es.templates;
+    const buttons = list.map((t, i) => ({ label: t.title, value: String(i) }));
+    buttons.push({ label: tr("cancelBtn"), value: "" });
+    const choice = await openDialog({ title: tr("templatesTitle"), message: tr("templatesIntro"), buttons });
+    if (choice == null || choice === "") return;
+    const tpl = list[Number(choice)];
+    if (!tpl) return;
+    clearSearch();
+    const note = normalizeNote({
+      id: uid(), title: tpl.title,
+      items: tpl.items.map(text => ({ id: uid(), text, done: false })),
+      showDone: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+    });
+    if (viewMode === "map") { const k = notes.length; note.pos = { x: 24 + (k % 6) * 28, y: 24 + (k % 6) * 28 }; }
+    notes.unshift(note);
+    save();
+    render("title-" + note.id);
+  }
+  document.getElementById("templates").addEventListener("click", openTemplates);
+
+  // Atajos: se ignoran al escribir, con modificadores o con un diálogo/popover abierto.
+  function isTypingTarget(t) {
+    if (!t) return false;
+    const tag = (t.tagName || "").toLowerCase();
+    return tag === "input" || tag === "textarea" || tag === "select" || t.isContentEditable === true;
+  }
+  function showShortcuts() {
+    openDialog({ title: tr("shortcutsTitle"), message: tr("shortcutsMsg"), buttons: [{ label: tr("closeBtn"), value: "ok", primary: true }] });
+  }
+
+  document.getElementById("new-note").addEventListener("click", createNote);
 
   document.addEventListener("click", e => {
     if (openPopId == null) return;
@@ -2070,9 +2256,20 @@
   });
 
   document.addEventListener("keydown", e => {
-    if (e.key !== "Escape") return;
-    if (connectingSource != null) exitConnectMode();
-    else if (openPopId != null) closePop();
+    if (e.key === "Escape") {
+      if (connectingSource != null) exitConnectMode();
+      else if (openPopId != null) closePop();
+      return;
+    }
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (isTypingTarget(e.target) || openPopId != null) return;
+    if (document.querySelector(".dialog-scrim")) return;
+
+    if (e.key === "?") { e.preventDefault(); showShortcuts(); }
+    else if (e.key === "n" || e.key === "N") { e.preventDefault(); createNote(); }
+    else if (e.key === "g" || e.key === "G") { e.preventDefault(); setView("grid", true); }
+    else if (e.key === "m" || e.key === "M") { e.preventDefault(); setView("map", true); }
+    else if (e.key === "/") { e.preventDefault(); document.getElementById("search")?.focus(); }
   });
 
   const prexBtn = document.getElementById("copy-prex");

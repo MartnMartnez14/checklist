@@ -107,7 +107,12 @@
   function setImportFile(obj) {
     var inp = cd.getElementById("import-file");
     var dt = new cw.DataTransfer();
-    dt.items.add(new cw.File([JSON.stringify(obj)], "data.json", { type: "application/json" }));
+    var json = JSON.stringify(obj);
+    var file = new cw.File([json], "data.json", { type: "application/json" });
+    // File.text() depende de IO real y puede quedar fuera del tiempo virtual del
+    // headless; se resuelve de forma determinista sin alterar el flujo de importación.
+    try { Object.defineProperty(file, "text", { value: function () { return Promise.resolve(json); } }); } catch (e) {}
+    dt.items.add(file);
     inp.files = dt.files;
     inp.dispatchEvent(new cw.Event("change", { bubbles: true }));
   }
@@ -497,6 +502,204 @@
     }
   }
 
+  // Metadatos de descubrimiento (SEO / OpenGraph / manifest PWA).
+  async function t_seo_meta() {
+    await boot([]);
+    var head = cd.head;
+    function metaContent(selector) {
+      var m = head.querySelector(selector);
+      return m ? (m.getAttribute("content") || "") : "";
+    }
+
+    var desc = metaContent('meta[name="description"]');
+    assert(desc.length >= 60 && desc.length <= 320, "description ausente o longitud=" + desc.length);
+
+    var canonical = head.querySelector('link[rel="canonical"]');
+    assert(canonical && canonical.href === "https://checklistgato.com/", "canonical incorrecto: " + (canonical ? canonical.href : "null"));
+
+    var ogTitle = metaContent('meta[property="og:title"]');
+    var ogDesc = metaContent('meta[property="og:description"]');
+    var ogUrl = metaContent('meta[property="og:url"]');
+    var ogImage = metaContent('meta[property="og:image"]');
+    var ogType = metaContent('meta[property="og:type"]');
+    assert(/Checklist Gato/.test(ogTitle), "og:title incorrecto: " + ogTitle);
+    assert(ogDesc.length > 0, "falta og:description");
+    assert(ogUrl === "https://checklistgato.com/", "og:url incorrecto: " + ogUrl);
+    assert(ogType === "website", "og:type incorrecto: " + ogType);
+    assert(/^https:\/\/checklistgato\.com\/.+\.png$/.test(ogImage), "og:image debe ser URL absoluta: " + ogImage);
+    var ogImageW = metaContent('meta[property="og:image:width"]');
+    var ogImageH = metaContent('meta[property="og:image:height"]');
+    assert(ogImageW === "512" && ogImageH === "512", "dimensiones og:image inesperadas: " + ogImageW + "x" + ogImageH);
+
+    var twCard = metaContent('meta[name="twitter:card"]');
+    var twImage = metaContent('meta[name="twitter:image"]');
+    assert(twCard === "summary", "twitter:card incorrecto: " + twCard);
+    assert(twImage === ogImage, "twitter:image debe coincidir con og:image");
+
+    var link = head.querySelector('link[rel="manifest"]');
+    assert(link, "falta link rel=manifest");
+    var res = await fetch("../manifest.json", { cache: "no-store" });
+    assert(res.ok, "no se pudo leer manifest.json: " + res.status);
+    var mf = await res.json();
+    assert(mf.lang === "es", "manifest.lang incorrecto: " + mf.lang);
+    assert(mf.name && /Checklist Gato/.test(mf.name), "manifest.name incorrecto: " + mf.name);
+    assert(mf.description && mf.description.length > 40, "manifest.description ausente o corta");
+    assert(mf.start_url === "./index.html" && mf.display === "standalone", "start_url/display del manifest cambiaron");
+    assert(Array.isArray(mf.categories) && mf.categories.length >= 1, "manifest.categories ausente");
+  }
+
+  // Progreso discreto por lista (CAT-14): barra + contador completados/total.
+  async function t_list_stats() {
+    var a = note("s1", "Con items", ["uno", "dos", "tres"]);
+    a.items[0].done = true;
+    var b = note("s2", "Vacia", []);
+    await boot([a, b]);
+    var card = cd.querySelector('.note[data-id="s1"]');
+    assert(card, "falta la tarjeta s1");
+    var bar = card.querySelector(".note-progress-track");
+    assert(bar, "falta .note-progress-track");
+    assert(bar.getAttribute("role") === "progressbar", "role incorrecto: " + bar.getAttribute("role"));
+    assert(bar.getAttribute("aria-valuenow") === "1", "aria-valuenow=" + bar.getAttribute("aria-valuenow"));
+    assert(bar.getAttribute("aria-valuemax") === "3", "aria-valuemax=" + bar.getAttribute("aria-valuemax"));
+    var txt = card.querySelector(".note-progress-text");
+    assert(txt && txt.textContent === "1/3", "texto de progreso=" + (txt ? txt.textContent : "null"));
+    var fill = card.querySelector(".note-progress-fill");
+    assert(fill && fill.style.width === "33%", "ancho de barra=" + (fill ? fill.style.width : "null"));
+    var card2 = cd.querySelector('.note[data-id="s2"]');
+    assert(card2 && !card2.querySelector(".note-progress"), "una lista vacía no debería mostrar progreso");
+
+    // Añadir con el formulario rápido debe crear/actualizar la barra sin re-render.
+    var add2 = cd.getElementById("add-s2");
+    assert(add2, "falta el input de añadir de s2");
+    add2.value = "primera";
+    add2.closest("form").dispatchEvent(new cw.Event("submit", { bubbles: true, cancelable: true }));
+    await sleep(40);
+    var txt2 = card2.querySelector(".note-progress-text");
+    assert(txt2 && txt2.textContent === "0/1", "la barra no se creó al añadir: " + (txt2 ? txt2.textContent : "null"));
+    assert(stored().find(function (n) { return n.id === "s2"; }).items.length === 1, "el ítem no se guardó");
+  }
+
+  // Atajos de teclado (CAT-14): N, G, M, ? con guardas al escribir.
+  async function t_shortcuts() {
+    await boot([]);
+    assert(cd.getElementById("view-grid").getAttribute("aria-keyshortcuts") === "G", "falta aria-keyshortcuts G");
+    assert(cd.getElementById("view-map").getAttribute("aria-keyshortcuts") === "M", "falta aria-keyshortcuts M");
+    assert(cd.getElementById("new-note").getAttribute("aria-keyshortcuts") === "N", "falta aria-keyshortcuts N");
+
+    cd.body.focus();
+    cd.body.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "m", bubbles: true }));
+    await sleep(40);
+    assert(cd.getElementById("notes").classList.contains("map-mode"), "M no cambió a vista mapa");
+    assert(cd.getElementById("view-map").getAttribute("aria-pressed") === "true", "aria-pressed de mapa incorrecto");
+
+    cd.body.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "g", bubbles: true }));
+    await sleep(40);
+    assert(!cd.getElementById("notes").classList.contains("map-mode"), "G no volvió a cuadrícula");
+
+    cd.body.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "n", bubbles: true }));
+    await sleep(40);
+    assert(stored().length === 1, "N no creó una lista: " + stored().length);
+    var active = cd.activeElement;
+    assert(active && /^title-/.test(active.id || ""), "el foco no pasó al título: " + (active && active.id));
+
+    // Con el cursor en el título, N debe escribir, no crear otra lista.
+    active.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "n", bubbles: true }));
+    await sleep(40);
+    assert(stored().length === 1, "el atajo N se disparó mientras se escribía: " + stored().length);
+
+    // ? abre la ayuda; Escape la cierra.
+    active.blur();
+    cd.body.focus();
+    cd.body.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "?", shiftKey: true, bubbles: true }));
+    await sleep(40);
+    var scrim = cd.querySelector(".dialog-scrim");
+    assert(scrim, "? no abrió el diálogo de ayuda");
+    assert(/Atajos|shortcuts/i.test(scrim.textContent), "texto de ayuda inesperado");
+    cd.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await sleep(40);
+    assert(!cd.querySelector(".dialog-scrim"), "Escape no cerró la ayuda");
+  }
+
+  // Buscador global (CAT-12): título, tareas y etiquetas; sin acentos; no muta datos.
+  async function t_search() {
+    var n1 = note("q1", "Compras", ["Leche", "Pan"], { tags: ["hogar"] });
+    var n2 = note("q2", "Proyecto", ["Diseñar pantalla"], { tags: ["trabajo"] });
+    var n3 = note("q3", "Vacaciones", ["Reservar hotel"], { tags: ["viaje"] });
+    await boot([n1, n2, n3]);
+    var input = cd.getElementById("search");
+    assert(input, "falta #search");
+    function type(v) { input.value = v; input.dispatchEvent(new cw.Event("input", { bubbles: true })); }
+
+    type("leche");
+    await sleep(30);
+    var cards = cd.querySelectorAll(".note");
+    assert(cards.length === 1 && cards[0].dataset.id === "q1", "filtro por tarea=" + cards.length);
+
+    type("DISENAR");
+    await sleep(30);
+    cards = cd.querySelectorAll(".note");
+    assert(cards.length === 1 && cards[0].dataset.id === "q2", "filtro sin tilde=" + cards.length);
+
+    type("trabajo");
+    await sleep(30);
+    cards = cd.querySelectorAll(".note");
+    assert(cards.length === 1 && cards[0].dataset.id === "q2", "filtro por etiqueta=" + cards.length);
+
+    type("zzz");
+    await sleep(30);
+    assert(cd.querySelectorAll(".note").length === 0, "sin resultados debería ocultar tarjetas");
+    var empty = cd.querySelector("#notes .empty");
+    assert(empty && /Sin resultados/i.test(empty.textContent), "falta mensaje de sin resultados");
+
+    input.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await sleep(30);
+    assert(cd.querySelectorAll(".note").length === 3, "Escape no limpió el filtro=" + cd.querySelectorAll(".note").length);
+    assert(input.value === "", "el input no se limpió");
+
+    cd.body.focus();
+    cd.body.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "/", bubbles: true }));
+    await sleep(20);
+    assert(cd.activeElement === input, "/ no enfocó el buscador");
+    assert(stored().length === 3, "el filtro alteró los datos guardados");
+  }
+
+  // Plantillas (CAT-14): diálogo, creación con ítems pendientes y traducción EN.
+  async function t_templates() {
+    await boot([]);
+    var btn = cd.getElementById("templates");
+    assert(btn, "falta #templates");
+    btn.click();
+    await sleep(30);
+    var dlg = cd.querySelector(".dialog-scrim");
+    assert(dlg, "no se abrió el diálogo de plantillas");
+    assert(/Plantillas/i.test(dlg.textContent), "título del diálogo incorrecto");
+    var btns = dlg.querySelectorAll(".dialog-actions .btn");
+    assert(btns.length === 7, "botones del diálogo=" + btns.length + " (6 plantillas + cancelar)");
+    assert(/Compras/.test(btns[0].textContent), "primera plantilla=" + btns[0].textContent);
+    btns[0].click();
+    await sleep(80);
+    assert(!cd.querySelector(".dialog-scrim"), "el diálogo no se cerró");
+    var ns = stored();
+    assert(ns.length === 1, "no se creó la lista=" + ns.length);
+    assert(ns[0].title === "Compras", "título=" + ns[0].title);
+    assert(ns[0].items.length === 4, "items=" + ns[0].items.length);
+    assert(ns[0].items.every(function (i) { return !i.done; }), "los ítems deben estar pendientes");
+    var active = cd.activeElement;
+    assert(active && /^title-/.test(active.id || ""), "el foco no pasó al título");
+
+    cd.getElementById("lang-toggle").click();
+    await sleep(50);
+    cd.getElementById("templates").click();
+    await sleep(30);
+    var dlg2 = cd.querySelector(".dialog-scrim");
+    assert(dlg2 && /Templates/i.test(dlg2.textContent), "plantillas no traducidas");
+    var first = dlg2.querySelector(".dialog-actions .btn");
+    assert(/Shopping/.test(first.textContent), "primera plantilla EN=" + first.textContent);
+    dlg2.querySelector(".dialog-actions .btn:last-child").click();
+    await sleep(40);
+    assert(stored().length === 1, "Cancelar creó una lista");
+  }
+
   // [BUG] dos listas distintas con contenido idéntico en el mismo archivo.
   async function t_probe_merge_distinct_same_content() {
     await boot([]);
@@ -543,7 +746,12 @@
     ["replace", t_replace],
     ["created-at", t_created_at],
     ["legacy-no-date", t_legacy_no_date],
-    ["footer", t_footer]
+    ["footer", t_footer],
+    ["seo-meta", t_seo_meta],
+    ["list-stats", t_list_stats],
+    ["shortcuts", t_shortcuts],
+    ["search-filter", t_search],
+    ["templates", t_templates]
   ];
 
   var watchdog = setTimeout(function () {
@@ -551,7 +759,7 @@
       log("HARNESS", "FAIL", "timeout: los tests no terminaron a tiempo");
       document.title = "DONE";
     }
-  }, 13500);
+  }, 28000);
 
   (async function () {
     for (var i = 0; i < tests.length; i++) {
