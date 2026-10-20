@@ -53,7 +53,8 @@
       items: (texts || []).map(function (t, i) { return { id: id + "-i" + i, text: t, done: false }; }),
       showDone: true,
       tags: [], links: [], color: null, opacity: 18, bgId: null, pos: null,
-      createdAt: null, updatedAt: null
+      createdAt: null, updatedAt: null,
+      pinned: false, pinnedAt: null
     };
     if (extra) Object.keys(extra).forEach(function (k) { n[k] = extra[k]; });
     return n;
@@ -724,8 +725,224 @@
     assert(ns[0].color === 3, "no se aplicó el color más nuevo (color=" + ns[0].color + "); se descartó la versión con updatedAt más reciente");
   }
 
-  // ---------------------------------------------------------------- runner
+  // Contenido de plantillas ES/EN (CAT-24): arrays exactos e intactos en Compras/Proyectos.
+  async function t_template_content() {
+    var es = [
+      ["Compras", ["Leche", "Pan", "Huevos", "Frutas y verduras"]],
+      ["Estudios", ["Repasar apuntes", "Resolver ejercicios", "Preparar examen", "Pomodoro: 25 min de estudio + 10 min de descanso (repetir)", "Explicar el tema al espejo, simple, como si fuera un niño de 10 años"]],
+      ["Proyectos", ["Definir objetivo", "Dividir en tareas", "Asignar fechas"]],
+      ["Hábitos", ["Beber 8 vasos de agua al día", "Comer 5 porciones de frutas y verduras al día", "Meditar", "Agradecer lo bueno de mi vida en 1 minuto", "Caminar 30 minutos", "Leer 10 páginas"]],
+      ["Viajes", ["Documentos", "Cargador y cables (laptop, celular)", "Ropa", "Reservas confirmadas", "Revisar que todo quede en orden en el hogar antes de salir"]],
+      ["Organización personal", ["Ver mails y llamadas perdidas", "Revisar agenda o calendario virtual", "Ordenar escritorio", "Planificar la semana"]]
+    ];
+    var en = [
+      ["Shopping", ["Milk", "Bread", "Eggs", "Fruit and vegetables"]],
+      ["Study", ["Review notes", "Solve exercises", "Prepare for the exam", "Pomodoro: 25 min study + 10 min break (repeat)", "Explain the topic aloud, simply, as if to a 10-year-old"]],
+      ["Projects", ["Define the goal", "Break it into tasks", "Set dates"]],
+      ["Habits", ["Drink 8 glasses of water a day", "Eat 5 servings of fruit and vegetables a day", "Meditate", "Spend 1 minute being grateful for the good things in my life", "Walk for 30 minutes", "Read 10 pages"]],
+      ["Travel", ["Documents", "Charger and cables (laptop, phone)", "Clothes", "Confirmed bookings", "Check that everything is in order at home before leaving"]],
+      ["Personal organization", ["Check emails and missed calls", "Review agenda or online calendar", "Tidy the desk", "Plan the week"]]
+    ];
 
+    async function checkAll(list) {
+      for (var i = 0; i < list.length; i++) {
+        var btn = cd.getElementById("templates");
+        assert(btn, "falta #templates");
+        btn.click();
+        await sleep(30);
+        var dlg = cd.querySelector(".dialog-scrim");
+        assert(dlg, "no se abrió el diálogo de plantillas");
+        var all = [].slice.call(dlg.querySelectorAll(".dialog-actions .btn"));
+        var target = all[i];
+        assert(target && target.textContent.trim() === list[i][0], "botón " + i + "=" + (target && target.textContent));
+        target.click();
+        await sleep(70);
+        var n = firstNote();
+        assert(n && n.title === list[i][0], "título=" + (n && n.title) + " esperado=" + list[i][0]);
+        assert(JSON.stringify(itemTexts(n)) === JSON.stringify(list[i][1]),
+          "ítems " + list[i][0] + "=" + JSON.stringify(itemTexts(n)));
+      }
+    }
+
+    await boot([]);
+    var lt = cd.getElementById("lang-toggle");
+    assert(lt, "falta #lang-toggle");
+    if (lt.textContent.trim() !== "ES") { lt.click(); await sleep(60); }
+    await checkAll(es);
+
+    cd.getElementById("lang-toggle").click();
+    await sleep(60);
+    assert(cd.getElementById("lang-toggle").textContent.trim() === "EN", "no se cambió a EN");
+    await checkAll(en);
+  }
+
+  // Editor ampliado (etapa 5.4): abrir, guardar, bloquear vacío y cancelar con Escape.
+  async function t_item_editor() {
+    await boot([note("n1", "Lista", ["Texto corto", "Otro"])]);
+    var row = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"]');
+    assert(row, "no encontré la fila");
+    var expand = row.querySelector(".item-expand");
+    assert(expand, "falta el botón .item-expand");
+    expand.click();
+    await sleep(40);
+
+    var dlg = cd.querySelector(".dialog");
+    assert(dlg && dlg.classList.contains("editor-dialog"), "no se abrió el editor ampliado");
+    var ta = dlg.querySelector(".editor-text");
+    assert(ta, "falta .editor-text");
+    assert(ta.value === "Texto corto", "valor precargado=" + JSON.stringify(ta.value));
+
+    ta.value = "  Texto editado  ";
+    ta.dispatchEvent(new cw.Event("input", { bubbles: true }));
+    await sleep(20);
+    var saveBtn = dlg.querySelector(".dialog-actions .btn-primary");
+    assert(saveBtn && !saveBtn.disabled, "Guardar debería estar habilitado");
+    saveBtn.click();
+    await sleep(90);
+
+    assert(!cd.querySelector(".dialog"), "el modal no se cerró al guardar");
+    assert(firstNote().items[0].text === "Texto editado",
+      "no se guardó con trim: " + JSON.stringify(firstNote().items[0].text));
+    var live = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-text');
+    assert(live && live.value === "Texto editado", "la fila no se actualizó: " + (live && live.value));
+
+    // Texto vacío: Guardar deshabilitado.
+    row = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"]');
+    row.querySelector(".item-expand").click();
+    await sleep(40);
+    var ta2 = cd.querySelector(".dialog .editor-text");
+    assert(ta2, "no se reabrió el editor");
+    ta2.value = "   ";
+    ta2.dispatchEvent(new cw.Event("input", { bubbles: true }));
+    await sleep(20);
+    var save2 = cd.querySelector(".dialog .dialog-actions .btn-primary");
+    assert(save2 && save2.disabled, "Guardar debería estar deshabilitado con texto vacío");
+
+    // Escape cancela sin tocar el modelo.
+    ta2.value = "No guardar";
+    ta2.dispatchEvent(new cw.Event("input", { bubbles: true }));
+    await sleep(20);
+    ta2.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await sleep(90);
+    assert(!cd.querySelector(".dialog"), "Escape no cerró el editor");
+    assert(firstNote().items[0].text === "Texto editado", "Escape modificó el texto: " + firstNote().items[0].text);
+    var live2 = cd.querySelector('.note[data-id="n1"] .item[data-item-id="n1-i0"] .item-text');
+    assert(live2 && live2.value === "Texto editado", "la fila cambió tras cancelar");
+  }
+
+  // CAT-22: límite de 3 listas fijadas.
+  async function t_pin_limit() {
+    await boot([note("n1", "Uno", []), note("n2", "Dos", []), note("n3", "Tres", []), note("n4", "Cuatro", [])]);
+    // El idioma persiste entre boots: normalizar a ES para leer los textos del diálogo.
+    var lt = cd.getElementById("lang-toggle");
+    if (lt && lt.textContent.trim() !== "ES") { lt.click(); await sleep(60); }
+    async function pin(id) {
+      var btn = cd.getElementById("pin-" + id);
+      assert(btn, "falta #pin-" + id);
+      btn.click();
+      await sleep(50);
+    }
+    await pin("n1"); await pin("n2"); await pin("n3");
+    var ns = stored();
+    var pinned = ns.filter(function (n) { return n.pinned === true; });
+    assert(pinned.length === 3, "fijadas tras 3 clicks=" + pinned.length);
+
+    var before = cd.getElementById("pin-n4");
+    before.click();
+    var dlg = await waitFor(function () {
+      var d = cd.querySelector(".dialog-scrim");
+      return d && /3/.test(d.textContent) ? d : null;
+    }, 2000);
+    assert(dlg, "no apareció el diálogo de límite");
+    assert(/fijad/i.test(dlg.textContent), "el diálogo no menciona listas fijadas: " + dlg.textContent);
+    var n4 = stored().filter(function (n) { return n.id === "n4"; })[0];
+    assert(n4 && n4.pinned === false, "la 4.ª lista se fijó igual: " + JSON.stringify(n4 && n4.pinned));
+    var close = [].slice.call(dlg.querySelectorAll(".btn")).find(function (b) { return /Cerrar|Close/i.test(b.textContent); });
+    assert(close, "el diálogo no tiene botón Cerrar");
+    close.click();
+    await sleep(60);
+    assert(!cd.querySelector(".dialog-scrim"), "el diálogo no se cerró");
+    assert(stored().filter(function (n) { return n.pinned === true; }).length === 3, "el límite desfijó una lista existente");
+  }
+
+  // CAT-22: las fijadas van primero y persisten tras remount.
+  async function t_pin_order() {
+    await boot([note("n1", "Uno", []), note("n2", "Dos", []), note("n3", "Tres", []), note("n4", "Cuatro", [])]);
+    cd.getElementById("pin-n2").click();
+    await sleep(60);
+    cd.getElementById("pin-n1").click();
+    await sleep(60);
+
+    function order() {
+      return [].slice.call(cd.querySelectorAll("#notes .note")).map(function (s) { return s.dataset.id; });
+    }
+    var idsNow = order();
+    assert(idsNow[0] === "n2" && idsNow[1] === "n1", "orden=" + JSON.stringify(idsNow));
+    var sec2 = cd.querySelector('.note[data-id="n2"]');
+    var sec1 = cd.querySelector('.note[data-id="n1"]');
+    assert(sec2.classList.contains("pinned") && sec1.classList.contains("pinned"), "falta la clase pinned");
+    assert(cd.getElementById("pin-n2").getAttribute("aria-pressed") === "true", "aria-pressed de n2=" + cd.getElementById("pin-n2").getAttribute("aria-pressed"));
+
+    await remount();
+    var idsAfter = order();
+    assert(idsAfter[0] === "n2" && idsAfter[1] === "n1", "orden tras remount=" + JSON.stringify(idsAfter));
+    var sec2b = cd.querySelector('.note[data-id="n2"]');
+    assert(sec2b && sec2b.classList.contains("pinned"), "n2 perdió pinned tras remount");
+    assert(cd.getElementById("pin-n2").getAttribute("aria-pressed") === "true", "aria-pressed no persistió");
+    var s = stored().filter(function (n) { return n.id === "n2"; })[0];
+    assert(s && s.pinned === true && typeof s.pinnedAt === "number", "estado guardado=" + JSON.stringify(s && [s.pinned, s.pinnedAt]));
+  }
+
+  // CAT-22: importar en modo reemplazo respeta el máximo de 3 fijadas.
+  async function t_pin_import() {
+    await boot([]);
+    var lt = cd.getElementById("lang-toggle");
+    if (lt && lt.textContent.trim() !== "ES") { lt.click(); await sleep(60); }
+    await importAndChoose(v2([
+      note("p1", "Uno", [], { pinned: true, pinnedAt: 1 }),
+      note("p2", "Dos", [], { pinned: true, pinnedAt: 2 }),
+      note("p3", "Tres", [], { pinned: true, pinnedAt: 3 }),
+      note("p4", "Cuatro", [], { pinned: true, pinnedAt: 4 })
+    ]), "Reemplazar");
+    await sleep(160);
+    var pinned = stored().filter(function (n) { return n.pinned === true; }).map(function (n) { return n.id; }).sort();
+    assert(pinned.length === 3, "fijadas importadas=" + pinned.length + " (" + pinned.join(",") + ")");
+    assert(pinned.join(",") === "p2,p3,p4", "se conservaron ids incorrectos: " + pinned.join(","));
+    assert(stored().length === 4, "se perdieron listas: " + stored().length);
+  }
+
+  // CAT-22: el límite cuenta notas, no ids, aunque un JSON traiga ids duplicados.
+  async function t_pin_import_duplicate() {
+    await boot([]);
+    var lt = cd.getElementById("lang-toggle");
+    if (lt && lt.textContent.trim() !== "ES") { lt.click(); await sleep(60); }
+    await importAndChoose(v2([
+      note("dup", "Uno", [], { pinned: true, pinnedAt: 1 }),
+      note("dup", "Dos", [], { pinned: true, pinnedAt: 2 }),
+      note("dup", "Tres", [], { pinned: true, pinnedAt: 3 }),
+      note("dup", "Cuatro", [], { pinned: true, pinnedAt: 4 })
+    ]), "Reemplazar");
+    await sleep(160);
+    var pinned = stored().filter(function (n) { return n.pinned === true; });
+    assert(pinned.length === 3, "con ids duplicados quedaron " + pinned.length + " fijadas");
+    assert(stored().length === 4, "se perdieron listas: " + stored().length);
+  }
+
+  // CAT-22: estética holográfica (clase + borde animado).
+  async function t_pin_holo() {
+    await boot([note("h1", "Holo", ["uno"], { pinned: true, pinnedAt: 1 })]);
+    var sec = cd.querySelector('.note[data-id="h1"]');
+    assert(sec, "falta la nota h1");
+    assert(sec.classList.contains("pinned"), "falta la clase pinned");
+    assert(cd.getElementById("pin-h1").getAttribute("aria-pressed") === "true", "aria-pressed incorrecto");
+    var ps = cw.getComputedStyle(sec, "::after");
+    var bg = ps.backgroundImage || "";
+    var anim = ps.animationName || "";
+    assert(bg.indexOf("gradient") >= 0 || anim === "holo-shift",
+      "sin borde holográfico: bg=" + bg + " anim=" + anim);
+  }
+
+  // ---------------------------------------------------------------- runner
   var tests = [
     ["merge-metadata-newer", t_probe_merge_metadata_newer],
     ["merge-distinct-same-content", t_probe_merge_distinct_same_content],
@@ -751,7 +968,14 @@
     ["list-stats", t_list_stats],
     ["shortcuts", t_shortcuts],
     ["search-filter", t_search],
-    ["templates", t_templates]
+    ["templates", t_templates],
+    ["template-content", t_template_content],
+    ["item-editor", t_item_editor],
+    ["pin-limit", t_pin_limit],
+    ["pin-order", t_pin_order],
+    ["pin-import", t_pin_import],
+    ["pin-import-duplicate", t_pin_import_duplicate],
+    ["pin-holo", t_pin_holo]
   ];
 
   var watchdog = setTimeout(function () {

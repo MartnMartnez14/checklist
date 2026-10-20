@@ -43,7 +43,9 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
   - **Progreso por lista:** Barra discreta y contador `completados/total` en cada tarjeta con elementos.
   - **Atajos de teclado:** `N` nueva lista, `G` vista cuadrícula, `M` vista mapa, `/` buscar y `?` para ver la ayuda (se desactivan mientras escribís).
   - **Buscador global:** Filtrá al instante por título, tarea o etiqueta, sin importar mayúsculas ni acentos (`Escape` limpia el filtro).
-  - **Plantillas rápidas:** Creá listas de Compras, Estudios, Proyectos, Hábitos, Viajes u Organización personal con ítems de ejemplo editables.
+  - **Plantillas rápidas:** Creá listas de Compras, Estudios, Proyectos, Hábitos, Viajes u Organización personal con ítems de ejemplo editables (incluye Pomodoro, hábitos saludables y checklist de viaje).
+  - **Editor ampliado:** Abrí cualquier ítem largo en un modal cómodo para leerlo y editarlo sin perder el contexto.
+  - **Listas fijadas:** Fijá hasta 3 listas para que queden siempre primero; las fijadas lucen un borde holográfico tipo carta legendaria (con versión estática si reducís el movimiento).
 - **Dos modos de visualización:**
   - **Vista Cuadrícula:** Tablero organizado automáticamente en columnas adaptables.
   - **Vista Mapa:** Lienzo libre donde podés arrastrar y ubicar cada lista donde quieras (con ratón, pantalla táctil o flechas del teclado).
@@ -63,7 +65,7 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
 ## 🛠️ Detalles técnicos (Para desarrolladores y auditores)
 
 ### Arquitectura de almacenamiento local
-- **`localStorage` (`checklist-notas-v1`, `checklist-theme`, `checklist-view`):** Guarda la estructura JSON de las notas, ítems, colores, posiciones en el mapa, etiquetas, conexiones y preferencias de vista/tema.
+- **`localStorage` (`checklist-notas-v1`, `checklist-theme`, `checklist-view`):** Guarda la estructura JSON de las notas, ítems, colores, posiciones en el mapa, etiquetas, conexiones, listas fijadas (`pinned`/`pinnedAt`) y preferencias de vista/tema.
 - **`IndexedDB` (base `checklist-media`, almacén `images`):** Guarda los binarios (`Blob`) de las imágenes y GIFs de fondo con deduplicación por hash **SHA-256** (`crypto.subtle.digest`) y recolector de basura automático (`gcImages`) que limpia imágenes huérfanas cuando ya ninguna nota las utiliza.
 - **Seguridad contra XSS:** Toda la construcción del DOM se realiza con funciones declarativas (`el()`, `svgEl()`) y `textContent`. No se utiliza `innerHTML` con datos del usuario en ningún punto de la aplicación.
 

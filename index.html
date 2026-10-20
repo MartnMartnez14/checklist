@@ -178,6 +178,59 @@
   }
   .note:hover { box-shadow: var(--shadow-2); }
   .note.pop-open { z-index: 5; }
+
+  /* --- Lista fijada (CAT-22): borde holográfico tipo carta legendaria --- */
+  .note.pinned {
+    box-shadow:
+      0 0 0 1px hsl(265 75% 65% / .20),
+      0 0 16px -6px hsl(210 90% 60% / .38),
+      var(--shadow-1);
+  }
+  /* Borde arcoíris: solo el anillo de 2px (máscara content-box). */
+  .note.pinned::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(115deg, #ff5f6d, #ffc371, #47e5bc, #4facfe, #b16cea, #ff5f6d);
+    background-size: 300% 300%;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 3;
+    opacity: .8;
+    animation: holo-shift 8s linear infinite;
+  }
+  @keyframes holo-shift {
+    from { background-position: 0% 50%; }
+    to { background-position: 300% 50%; }
+  }
+  /* Superficie muy tenue, solo sin imagen de fondo (legibilidad primero). */
+  .note.pinned:not(.has-bg) {
+    background-image:
+      linear-gradient(115deg, hsl(350 100% 68% / .05), hsl(190 90% 60% / .05), hsl(265 85% 68% / .06), hsl(350 100% 68% / .05)),
+      linear-gradient(var(--tint, transparent), var(--tint, transparent));
+    background-size: 300% 300%, auto;
+    animation: holo-surface 14s linear infinite;
+  }
+  @keyframes holo-surface {
+    from { background-position: 0% 50%, 0 0; }
+    to { background-position: 300% 50%, 0 0; }
+  }
+  .note.pinned .note-pin { color: var(--accent); opacity: 1; }
+  .note-pin:hover { color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) {
+    .note.pinned::after { animation: none; background-position: 50% 50%; }
+    .note.pinned:not(.has-bg) { animation: none; background-position: 0% 50%, 0 0; }
+  }
+  @supports not ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+    .note.pinned { outline: 2px solid #b16cea; outline-offset: 1px; }
+    .note.pinned::after { display: none; }
+  }
+
   .note.has-bg {
     background-image: linear-gradient(var(--scrim), var(--scrim)), var(--bg-img, none);
     background-size: cover; background-position: center;
@@ -221,6 +274,8 @@
   .item.done .item-text { color: var(--muted); text-decoration: line-through; }
   .item-grip { cursor: grab; touch-action: none; }
   .item-grip:hover { color: var(--accent); }
+  .item .item-expand { opacity: 0; }
+  @media (pointer: coarse) { .item .item-expand { opacity: .5; } }
   .item.dragging { box-shadow: var(--shadow-2); border-radius: var(--radius-sm); background: var(--hover); }
   .add-form { margin: 0; }
   .add-input {
@@ -328,6 +383,17 @@
   .dialog p:last-of-type { margin-bottom: 0; }
   .dialog-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; margin-top: 14px; }
   .btn.btn-danger { color: var(--danger); }
+  /* Editor ampliado de un elemento (texto largo). */
+  .dialog.editor-dialog { max-width: 640px; }
+  .editor-text {
+    width: 100%; min-height: 240px; max-height: 55vh; resize: vertical;
+    font: inherit; line-height: 1.45; padding: 8px 10px;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--line); border-radius: var(--radius-sm);
+    outline: none; overflow: auto;
+  }
+  .editor-text:focus { border-color: var(--accent); }
+  @media (max-width: 600px) { .editor-text { min-height: 200px; } }
 
   .visually-hidden {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -395,6 +461,8 @@
   <symbol id="i-github" viewBox="0 0 24 24"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
   <symbol id="i-template" viewBox="0 0 24 24"><path d="M4 6h10M4 12h10M4 18h6M18 14v6M15 17h6"/></symbol>
+  <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M15 20h5v-5M9 20H4v-5"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 5.5 3 2.5v2H7v-2l3-2.5z"/><path d="M12 13v8"/></symbol>
 </svg>
 <header>
   <div class="brand">
@@ -488,14 +556,14 @@
         <h3 id="rm-soon-title">🔜 Próximamente</h3>
         <ul>
           <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
-          <li id="rm-soon-2">Vista ampliada para leer y editar notas largas.</li>
+          <li id="rm-soon-2">Corrección del arrastre táctil en Android.</li>
         </ul>
       </div>
       <div class="roadmap-col">
         <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
         <ul>
           <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
-          <li id="rm-ideas-2">Sincronización entre dispositivos e integraciones futuras.</li>
+          <li id="rm-ideas-2">Asistente del gato e integraciones futuras.</li>
         </ul>
       </div>
     </div>
@@ -560,11 +628,11 @@
       templatesIntro: "Elegí una plantilla para crear una lista con elementos de ejemplo. Después podés editarla o borrarla.",
       templates: [
         { title: "Compras", items: ["Leche", "Pan", "Huevos", "Frutas y verduras"] },
-        { title: "Estudios", items: ["Repasar apuntes", "Resolver ejercicios", "Preparar examen"] },
+        { title: "Estudios", items: ["Repasar apuntes", "Resolver ejercicios", "Preparar examen", "Pomodoro: 25 min de estudio + 10 min de descanso (repetir)", "Explicar el tema al espejo, simple, como si fuera un niño de 10 años"] },
         { title: "Proyectos", items: ["Definir objetivo", "Dividir en tareas", "Asignar fechas"] },
-        { title: "Hábitos", items: ["Beber agua", "Caminar 30 minutos", "Leer 10 páginas"] },
-        { title: "Viajes", items: ["Documentos", "Cargador y cables", "Ropa", "Reservas confirmadas"] },
-        { title: "Organización personal", items: ["Revisar agenda", "Ordenar escritorio", "Planificar la semana"] }
+        { title: "Hábitos", items: ["Beber 8 vasos de agua al día", "Comer 5 porciones de frutas y verduras al día", "Meditar", "Agradecer lo bueno de mi vida en 1 minuto", "Caminar 30 minutos", "Leer 10 páginas"] },
+        { title: "Viajes", items: ["Documentos", "Cargador y cables (laptop, celular)", "Ropa", "Reservas confirmadas", "Revisar que todo quede en orden en el hogar antes de salir"] },
+        { title: "Organización personal", items: ["Ver mails y llamadas perdidas", "Revisar agenda o calendario virtual", "Ordenar escritorio", "Planificar la semana"] }
       ],
       supportTitle: "Apoyar el proyecto",
       supportText: "¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.",
@@ -593,10 +661,10 @@
       rmDev2: "Tercera vista de tablero: Calendario por fecha.",
       rmSoonTitle: "🔜 Próximamente",
       rmSoon1: "Optimización de rendimiento para tableros con cientos o miles de listas.",
-      rmSoon2: "Vista ampliada para leer y editar notas largas.",
+      rmSoon2: "Corrección del arrastre táctil en Android.",
       rmIdeasTitle: "💡 Ideas a futuro",
       rmIdeas1: "Visor «Mapa estelar» (modo universo de nodos y conexiones).",
-      rmIdeas2: "Sincronización entre dispositivos e integraciones futuras.",
+      rmIdeas2: "Asistente del gato e integraciones futuras.",
       shortcutsTitle: "Atajos de teclado",
       shortcutsMsg: "N — nueva lista\nG — vista cuadrícula\nM — vista mapa\n/ — buscar\n? — esta ayuda",
       listProgressAria: (done, total) => `${done} de ${total} elementos completados`,
@@ -613,6 +681,12 @@
       untitledList: "Lista sin título",
       noteTitleAria: "Título de la lista",
       styleBtnAria: "Estilo y fondo de la lista",
+      pinBtnAria: "Fijar lista",
+      unpinBtnAria: "Dejar de fijar lista",
+      pinLimitTitle: "Límite de listas fijadas",
+      pinLimitMsg: "Podés fijar hasta 3 listas. Desfijá una para fijar otra.",
+      pinnedAnnounce: "Lista fijada",
+      unpinnedAnnounce: "Lista desfijada",
       connectBtnAria: "Conectar con otra lista",
       moveListAria: "Mover lista",
       delListTitle: "Eliminar lista",
@@ -626,6 +700,10 @@
       checkItemAria: "Marcar como completado",
       itemTextAria: "Texto del elemento",
       delItemTitle: "Eliminar elemento",
+      editItemTitle: "Editar elemento",
+      editItemAria: "Abrir editor ampliado del elemento",
+      saveBtn: "Guardar",
+      itemUpdated: "Elemento actualizado",
       popAria: "Estilo y conexiones",
       popColor: "Color",
       popColorGroup: "Color de la lista",
@@ -689,11 +767,11 @@
       templatesIntro: "Choose a template to create a list with sample items. You can edit or delete it afterwards.",
       templates: [
         { title: "Shopping", items: ["Milk", "Bread", "Eggs", "Fruit and vegetables"] },
-        { title: "Study", items: ["Review notes", "Solve exercises", "Prepare for the exam"] },
+        { title: "Study", items: ["Review notes", "Solve exercises", "Prepare for the exam", "Pomodoro: 25 min study + 10 min break (repeat)", "Explain the topic aloud, simply, as if to a 10-year-old"] },
         { title: "Projects", items: ["Define the goal", "Break it into tasks", "Set dates"] },
-        { title: "Habits", items: ["Drink water", "Walk for 30 minutes", "Read 10 pages"] },
-        { title: "Travel", items: ["Documents", "Charger and cables", "Clothes", "Confirmed bookings"] },
-        { title: "Personal organization", items: ["Check the calendar", "Tidy the desk", "Plan the week"] }
+        { title: "Habits", items: ["Drink 8 glasses of water a day", "Eat 5 servings of fruit and vegetables a day", "Meditate", "Spend 1 minute being grateful for the good things in my life", "Walk for 30 minutes", "Read 10 pages"] },
+        { title: "Travel", items: ["Documents", "Charger and cables (laptop, phone)", "Clothes", "Confirmed bookings", "Check that everything is in order at home before leaving"] },
+        { title: "Personal organization", items: ["Check emails and missed calls", "Review agenda or online calendar", "Tidy the desk", "Plan the week"] }
       ],
       supportTitle: "Support the project",
       supportText: "Did you like the project? If you'd like to contribute voluntarily, you can buy me a coffee or mate. It's completely optional and helps me keep improving the app.",
@@ -722,10 +800,10 @@
       rmDev2: "Third board view: Calendar by date.",
       rmSoonTitle: "🔜 Coming soon",
       rmSoon1: "Performance optimization for boards with hundreds or thousands of lists.",
-      rmSoon2: "Expanded view for reading and editing long notes.",
+      rmSoon2: "Android touch drag fix.",
       rmIdeasTitle: "💡 Future ideas",
       rmIdeas1: "Star Map viewer (universe mode for nodes and connections).",
-      rmIdeas2: "Device sync and future integrations.",
+      rmIdeas2: "Cat assistant and future integrations.",
       shortcutsTitle: "Keyboard shortcuts",
       shortcutsMsg: "N — new list\nG — grid view\nM — map view\n/ — search\n? — this help",
       listProgressAria: (done, total) => `${done} of ${total} items completed`,
@@ -742,6 +820,12 @@
       untitledList: "Untitled list",
       noteTitleAria: "List title",
       styleBtnAria: "List style and background",
+      pinBtnAria: "Pin list",
+      unpinBtnAria: "Unpin list",
+      pinLimitTitle: "Pinned list limit",
+      pinLimitMsg: "You can pin up to 3 lists. Unpin one to pin another.",
+      pinnedAnnounce: "List pinned",
+      unpinnedAnnounce: "List unpinned",
       connectBtnAria: "Connect with another list",
       moveListAria: "Move list",
       delListTitle: "Delete list",
@@ -755,6 +839,10 @@
       checkItemAria: "Mark as completed",
       itemTextAria: "Item text",
       delItemTitle: "Delete item",
+      editItemTitle: "Edit item",
+      editItemAria: "Open expanded item editor",
+      saveBtn: "Save",
+      itemUpdated: "Item updated",
       popAria: "Style and connections",
       popColor: "Color",
       popColorGroup: "List color",
@@ -860,7 +948,32 @@
     n.pos = (n.pos && Number.isFinite(n.pos.x) && Number.isFinite(n.pos.y)) ? { x: Math.max(0, n.pos.x), y: Math.max(0, n.pos.y) } : null;
     n.createdAt = (typeof n.createdAt === "string" && n.createdAt) ? n.createdAt : null;
     n.updatedAt = (typeof n.updatedAt === "string" && n.updatedAt) ? n.updatedAt : null;
+    n.pinned = n.pinned === true;
+    n.pinnedAt = n.pinned ? (Number.isFinite(n.pinnedAt) ? n.pinnedAt : 0) : null;
     return n;
+  }
+
+  // CAT-22: máximo de listas fijadas. Conserva primero las locales (priorityIds)
+  // y luego las de pinnedAt más reciente; el resto se desfija.
+  const PIN_LIMIT = 3;
+  function enforcePinLimit(list, priorityIds) {
+    const pri = priorityIds instanceof Set ? priorityIds : new Set(priorityIds || []);
+    const pinned = list.filter(n => n.pinned === true);
+    if (pinned.length <= PIN_LIMIT) return list;
+    const keep = new Set(pinned.slice().sort((a, b) => {
+      const pa = pri.has(a.id) ? 1 : 0, pb = pri.has(b.id) ? 1 : 0;
+      if (pa !== pb) return pb - pa;
+      const ta = Number.isFinite(a.pinnedAt) ? a.pinnedAt : 0;
+      const tb = Number.isFinite(b.pinnedAt) ? b.pinnedAt : 0;
+      if (ta !== tb) return tb - ta;
+      return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+    }).slice(0, PIN_LIMIT));
+    // Comparar por referencia, no por id: un JSON importado podría traer ids
+    // duplicados y el límite debe contar notas, no identificadores.
+    pinned.forEach(n => {
+      if (!keep.has(n)) { n.pinned = false; n.pinnedAt = null; }
+    });
+    return list;
   }
 
   function load() {
@@ -949,7 +1062,9 @@
   }
 
   // Diálogo modal mínimo: resuelve con el `value` del botón, o null al cancelar.
-  function openDialog({ title, message, buttons }) {
+  // Extras opcionales: `content` (nodo o array) entre el mensaje y las acciones,
+  // y `focus` (elemento o función) para el foco inicial.
+  function openDialog({ title, message, buttons, content, focus }) {
     return new Promise(resolve => {
       const prevFocus = document.activeElement;
       const scrim = el("div", { className: "dialog-scrim" });
@@ -959,8 +1074,13 @@
       box.setAttribute("aria-labelledby", titleId);
       box.append(el("h2", { id: titleId, textContent: title }));
 
-      const lines = String(message == null ? "" : message).split("\n");
-      for (const line of lines) box.append(el("p", { textContent: line }));
+      const msg = message == null ? "" : String(message);
+      if (msg) for (const line of msg.split("\n")) box.append(el("p", { textContent: line }));
+
+      if (content) {
+        const nodes = Array.isArray(content) ? content : [content];
+        for (const node of nodes) if (node) box.append(node);
+      }
 
       const actions = el("div", { className: "dialog-actions" });
       const btnEls = [];
@@ -980,20 +1100,34 @@
       box.append(actions);
       scrim.append(box);
 
+      // Orden DOM: campos del contenido (textarea/input) y luego botones.
+      const focusables = () => [...box.querySelectorAll("button, textarea, input, select, [tabindex]")]
+        .filter(x => !x.disabled && x.tabIndex >= 0);
+
       const onKey = e => {
         if (e.key === "Escape") { e.preventDefault(); finish(null); return; }
-        if (e.key === "Tab" && btnEls.length) {
+        if (e.key === "Tab") {
+          const list = focusables();
+          if (!list.length) return;
           e.preventDefault();
-          const idx = btnEls.indexOf(document.activeElement);
-          const n = btnEls.length;
-          btnEls[e.shiftKey ? (idx - 1 + n) % n : (idx + 1) % n].focus();
+          const idx = list.indexOf(document.activeElement);
+          const n = list.length;
+          const next = idx < 0 ? 0 : (e.shiftKey ? (idx - 1 + n) % n : (idx + 1) % n);
+          list[next].focus();
         }
       };
       scrim.addEventListener("mousedown", e => { if (e.target === scrim) finish(null); });
       document.addEventListener("keydown", onKey, true);
 
       document.body.append(scrim);
-      if (btnEls[0]) btnEls[0].focus();
+      if (typeof focus === "function") {
+        const target = focus();
+        if (target && typeof target.focus === "function") target.focus();
+      } else if (focus && typeof focus.focus === "function") {
+        focus.focus();
+      } else if (btnEls[0]) {
+        btnEls[0].focus();
+      }
     });
   }
 
@@ -1727,7 +1861,17 @@
   }
   function visibleNotes() {
     const q = normalizeSearch(query.trim());
-    return q ? notes.filter(n => noteMatches(n, q)) : notes;
+    const base = q ? notes.filter(n => noteMatches(n, q)) : notes.slice();
+    const pinned = base.filter(n => n.pinned);
+    if (!pinned.length) return base;
+    // Fijadas primero, por pinnedAt ascendente (la fijada antes va antes).
+    pinned.sort((a, b) => {
+      const ta = Number.isFinite(a.pinnedAt) ? a.pinnedAt : 0;
+      const tb = Number.isFinite(b.pinnedAt) ? b.pinnedAt : 0;
+      if (ta !== tb) return ta - tb;
+      return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+    });
+    return pinned.concat(base.filter(n => !n.pinned));
   }
   function clearSearch() {
     query = "";
@@ -1823,6 +1967,38 @@
       onclick: e => { e.stopPropagation(); openPop(note); }
     }, [icon("i-palette")]);
 
+    const pinBtn = el("button", {
+      id: "pin-" + note.id, type: "button",
+      className: "icon-btn note-pin",
+      "aria-pressed": String(note.pinned === true),
+      "aria-label": tr(note.pinned ? "unpinBtnAria" : "pinBtnAria"),
+      title: tr(note.pinned ? "unpinBtnAria" : "pinBtnAria"),
+      onclick: async e => {
+        e.stopPropagation();
+        if (note.pinned) {
+          note.pinned = false;
+          note.pinnedAt = null;
+          touch(note); save();
+          render("pin-" + note.id);
+          announce(tr("unpinnedAnnounce"));
+          return;
+        }
+        if (notes.filter(n => n.pinned).length >= PIN_LIMIT) {
+          await openDialog({
+            title: tr("pinLimitTitle"),
+            message: tr("pinLimitMsg"),
+            buttons: [{ label: tr("closeBtn"), value: null, primary: true }]
+          });
+          return;
+        }
+        note.pinned = true;
+        note.pinnedAt = Date.now();
+        touch(note); save();
+        render("pin-" + note.id);
+        announce(tr("pinnedAnnounce"));
+      }
+    }, [icon("i-pin")]);
+
     const connectBtn = el("button", {
       id: "connect-" + note.id, type: "button",
       className: "icon-btn note-connect",
@@ -1904,7 +2080,7 @@
       : null;
 
     const children = [
-      el("div", { className: "note-head" }, [grip, title, styleBtn, connectBtn, delNote]),
+      el("div", { className: "note-head" }, [grip, title, pinBtn, styleBtn, connectBtn, delNote]),
       tags,
       ...(chips ? [chips] : []),
       ...(progress ? [progress] : []),
@@ -1935,7 +2111,7 @@
     }
 
     const section = el("section", {
-      className: "note" + (openPopId === note.id ? " pop-open" : ""),
+      className: "note" + (note.pinned ? " pinned" : "") + (openPopId === note.id ? " pop-open" : ""),
       "data-id": note.id,
       "aria-label": note.title || tr("untitledList")
     }, children);
@@ -1963,6 +2139,50 @@
     }
     touch(note);
     save(); scheduleLinks(); growItems();
+  }
+
+  // Editor ampliado: permite leer y editar el texto largo de un elemento.
+  function openItemEditor(note, item) {
+    const ta = el("textarea", {
+      className: "editor-text", rows: 10, "aria-label": tr("itemTextAria")
+    });
+    ta.value = item.text;
+
+    const done = openDialog({
+      title: tr("editItemTitle"),
+      content: [ta],
+      focus: () => { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); },
+      buttons: [
+        { label: tr("saveBtn"), value: "save", primary: true },
+        { label: tr("cancelBtn"), value: null }
+      ]
+    });
+
+    const dlg = document.querySelector(".dialog-scrim .dialog");
+    if (dlg) dlg.classList.add("editor-dialog");
+    const saveBtn = dlg ? dlg.querySelector(".dialog-actions .btn") : null;
+    const syncSave = () => { if (saveBtn) saveBtn.disabled = !ta.value.trim(); };
+    ta.addEventListener("input", syncSave);
+    syncSave();
+
+    done.then(value => {
+      if (value !== "save") return;
+      const text = ta.value.trim();
+      if (!text) return; // nunca guardar un elemento vacío
+      item.text = text;
+      touch(note);
+      save();
+      const live = document.querySelector(
+        '.note[data-id="' + CSS.escape(note.id) + '"] [data-item-id="' + CSS.escape(item.id) + '"] .item-text'
+      );
+      if (live) {
+        live.value = text;
+        live.style.height = "auto";
+        live.style.height = live.scrollHeight + "px";
+      }
+      growItems();
+      announce(tr("itemUpdated"));
+    });
   }
 
   function renderItem(note, item) {
@@ -2001,6 +2221,12 @@
     });
     text.value = item.text;
 
+    const expand = el("button", {
+      type: "button", className: "icon-btn item-expand",
+      title: tr("editItemAria"), "aria-label": tr("editItemAria"),
+      onclick: e => { e.stopPropagation(); openItemEditor(note, item); }
+    }, [icon("i-expand")]);
+
     const del = el("button", {
       className: "icon-btn", title: tr("delItemTitle"), "aria-label": tr("delItemTitle"),
       onclick: () => { note.items = note.items.filter(i => i !== item); touch(note); save(); render(); }
@@ -2010,7 +2236,7 @@
       className: "item" + (item.done ? " done" : ""),
       "data-item-id": item.id,
       "data-done": String(item.done)
-    }, [grip, cb, text, del]);
+    }, [grip, cb, text, expand, del]);
     return row;
   }
 
@@ -2387,7 +2613,9 @@
       opacity: n.opacity ?? 18,
       bgId: n.bgId ?? null,
       links: [...(n.links || [])].sort(),
-      pos: n.pos ? [Math.round(n.pos.x), Math.round(n.pos.y)] : null
+      pos: n.pos ? [Math.round(n.pos.x), Math.round(n.pos.y)] : null,
+      pinned: !!n.pinned,
+      pinnedAt: n.pinnedAt ?? null
     });
   }
 
@@ -2506,7 +2734,7 @@
       }
 
       if (choice === "replace") {
-        notes = incoming;
+        notes = enforcePinLimit(incoming, new Set());
         save(); render();
         gcImages();
         announce(tr("importedReplaceAnnounce"));
@@ -2514,7 +2742,7 @@
       }
 
       const { next, stats } = mergeNotes(notes, incoming);
-      notes = next;
+      notes = enforcePinLimit(next, new Set(notes.filter(n => n.pinned).map(n => n.id)));
       save(); render();
       gcImages();
       announce(tr("importedMergeAnnounce"));
