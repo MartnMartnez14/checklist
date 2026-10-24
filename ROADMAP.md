@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** Primera versión pública operativa (v1.0)  
+**Estado:** Actualización 2026-10-24 integrada para distribución desde `main` mediante GitHub Pages; 44 pruebas locales aprobadas.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -33,7 +33,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 
 ## 2. DIAGNÓSTICO Y AUDITORÍA TÉCNICA DEL ESTADO ACTUAL (BASE v1.0)
 
-### 2.1 Lo que ya existe y funciona (Verificado con `PASS=25 FAIL=0`)
+### 2.1 Estado local comprobado (`PASS=44 FAIL=0 NOVERIFY=0`)
 - **Arquitectura cero-dependencias:** HTML5, CSS moderno (variables CSS, `color-mix`, `conic-gradient`) y JavaScript vanilla en `index.html`.
 - **Gestión de listas y elementos:**
   - Creación, edición y borrado de listas y elementos.
@@ -58,7 +58,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
   - Exportación en JSON incluyendo notas e imágenes codificadas en Base64.
   - Importación con validación estructural, descarga automática de copia de seguridad previa y dos modos: **Fusionar (idempotente)** y **Reemplazar**.
 - **PWA e infraestructura:**
-  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v11`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
+  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v13`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
   - Dominio personalizado `https://checklistgato.com` (DNS en Hostinger apuntando a GitHub Pages con `CNAME` y HTTPS activo).
   - **Descubrimiento y metadatos:** `description`, `canonical`, OpenGraph (título, descripción, URL e imagen absoluta), Twitter Card y `manifest.json` enriquecido (`lang`, `description`, `categories`), listos para compartir el enlace con vista previa.
 - **Seguridad XSS:**
@@ -87,8 +87,8 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
-| **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (20/20 tests PASS; `mergeNotes` refinado con metadatos y enlaces locales) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (Operativo en producción con `checklist-v9`) |
+| **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (`mergeNotes` refinado con metadatos y enlaces locales) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v13`; distribución desde `main`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
 | **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
 | **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
@@ -97,20 +97,21 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 | **CAT-08** | Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`) | **P2** | Media | **Hecho (Etapa 4 / Backlog Paso 4)** |
 | **CAT-09** | Optimización y rendimiento a gran escala (100 a 10.000 listas) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2)** |
 | **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Pendiente (Etapa 5)** |
-| **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho (Etapa 8 / Backlog Paso 2; tags Git según lanzamientos)** |
+| **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho** (README y CHANGELOG; tags Git pendientes de lanzamientos autorizados) |
 | **CAT-12** | Buscador / filtro rápido de listas, notas y etiquetas | **P3** | Baja-Media | **Hecho (Paso 8)** |
 | **CAT-13** | Visor "Mapa estelar" (3.ª vista modo universo) | **P3** | Alta | **Idea (Etapa 3.3 / 10.E)** |
 | **CAT-14** | Plantillas, atajos de teclado y estadísticas discretas | **P3/P4** | Baja-Media | **Hecho: atajos, progreso, plantillas y editor ampliado (Pasos 7-8 y Etapa 5.4)** |
 | **CAT-15** | Distribución en Google Play / Sincronización Cloud / IA | **P4** | Alta | **Idea futura (Etapas 7.1 y 10.F/G)** |
 | **CAT-16** | Sello Open Source + enlace al repositorio (footer + ícono en header) | **P2** | Baja | **Hecho (Etapa 11 / Backlog Paso 1)** |
 | **CAT-17** | Etiquetas visibles en botones «Importar» / «Exportar» en móvil | **P2** | Baja | **Hecho (Etapa 5 / Backlog Paso 3)** |
-| **CAT-18** | Tercera vista: **Calendario** (junto a Cuadrícula y Mapa) | **P3** | Media-Alta | **Idea (Etapa 10.H / Backlog Paso 5)** |
+| **CAT-18** | Tercera vista: **Calendario** (junto a Cuadrícula y Mapa) | **P3** | Media-Alta | **Pendiente de diseño (Etapa 10.H / Backlog Paso 5)** |
 | **CAT-19** | Metadatos SEO / OpenGraph y manifest PWA enriquecido | **P3** | Baja | **Hecho (Etapa 9 / Backlog Paso 6)** |
-| **CAT-20** | Contraseña / PIN manual por lista (contenido oculto hasta desbloquear) | **P3/P4** | Media (bloqueo visual) / Alta (cifrado real) | **Idea (Etapa 10.I)** |
-| **CAT-21** | Arrastre táctil robusto en Android (zoom/pellizco, puntero trabado) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2.7 / 7.2)** |
+| **CAT-20** | Contraseña / PIN manual por lista (contenido oculto hasta desbloquear) | **P3/P4** | Media (bloqueo visual) / Alta (cifrado real) | **Fase 1 hecha localmente; fase 2 idea (Etapa 10.I)** |
+| **CAT-21** | Arrastre táctil robusto en Android (zoom/pellizco, puntero trabado) | **P1/P2** | Media-Alta | **Endurecimiento local implementado; validación Android real pendiente (Etapa 2.7 / 7.2)** |
 | **CAT-22** | Fijar hasta 3 listas + estética «carta legendaria» holográfica | **P3** | Media | **Hecho (Etapa 5.6)** |
-| **CAT-23** | El Gato asistente: FAQ local + IA opcional | **P4** | Media → Alta | **Idea (Etapa 10.J)** |
+| **CAT-23** | El Gato asistente: FAQ local + IA opcional | **P4** | Media → Alta | **Fase 1 hecha localmente; IA futura (Etapa 10.J)** |
 | **CAT-24** | Actualización de plantillas ES/EN (Estudios, Hábitos, Viajes, Organización) | **P2** | Baja | **Hecho (Etapa 5.7 / 10.C)** |
+| **CAT-25** | Orden automático del mapa por conexiones + Deshacer | **P2/P3** | Media | **Hecho localmente (Etapa 2.6)** |
 
 ---
 
@@ -119,9 +120,9 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 ### ETAPA 1 — Consolidación y Estabilidad (Prioridad: CRÍTICA — P0/P1)
 Garantizar que Checklist Gato sea impecable realizando las funciones que ya ofrece.
 - **1.1 Protección de almacenamiento:** Capturar errores de cuota (`QuotaExceededError`) en `localStorage` e `IndexedDB`, ofreciendo al usuario exportar un respaldo inmediato si la memoria del navegador se llena.
-- **1.2 Confirmaciones seguras:** Migrar todos los avisos destructivos (borrar lista, borrar elementos completados, borrar conexión) al modal accesible `openDialog`.
+- **1.2 Confirmaciones seguras:** ✅ Hecho localmente. Borrar lista, completados y conexión usa `openDialog`, Cancelar inicialmente enfocado, Escape y cierre desde el fondo sin cambios; foco recuperado tras confirmar. Test `delete-dialogs`.
 - **1.3 Refinamiento de Fusión (`mergeNotes`):** Preservar enlaces entrantes hacia notas locales existentes y contemplar cambios de estilo/color en notas sin `updatedAt`.
-- **1.4 Ampliación de tests (`tests/harness.html`):** Añadir casos de prueba para estos escenarios sin romper los 20 tests existentes.
+- **1.4 Ampliación de tests (`tests/harness.html`):** Suite local de 44 casos: base anterior, PIN visual, importación/fusión, ordenamiento/Deshacer, cancelaciones de arrastre y viewport visual. Las comprobaciones automatizadas no equivalen a una auditoría con lector de pantalla ni a pruebas en dispositivos físicos.
 
 ---
 
@@ -133,10 +134,11 @@ Permitir que una persona construya desde una simple checklist hasta un espacio e
 - **2.4 Escalabilidad del grafo de conexiones:** Evitar la explosión cuadrática $\frac{K(K-1)}{2}$ de flechas SVG cuando decenas o cientos de listas comparten una misma etiqueta (ej. conectando en cadena/estrella o limitando aristas visibles por tag).
 - **2.5 Evolución del almacenamiento:** Evaluar migración opcional del estado principal de `localStorage` (~5 MB) a `IndexedDB` solo cuando el volumen lo justifique y **siempre con procedimiento automático de respaldo, validación y recuperación previa**.
 - **2.6 Pulido del Modo Mapa y Conexiones:**
-  - Decidir entre scroll de página o *pan/zoom* del lienzo.
-  - Permitir anchos de tarjeta configurables y valorar un auto-layout opcional al entrar en modo Mapa.
-  - Evaluar la convivencia entre relaciones libres (grafo actual) y jerarquías opcionales (Proyecto → Subproyecto → Tareas).
-- **2.7 Robustez del arrastre táctil (CAT-21):** Corregir el bloqueo del asa en Android al hacer zoom o alejar la pantalla. Pasos previstos: ignorar un segundo puntero, cancelar el arrastre ante `pointercancel`/`lostpointercapture`, limpiar el estado en `blur`/`visibilitychange` y normalizar el desplazamiento con `visualViewport.scale`. Validar con test de regresión y prueba manual en dispositivo real.
+  - ✅ **CAT-25 Ordenar mapa:** grupos por enlaces manuales y etiquetas, recorrido desde la lista con más vecinos y desempate por orden del tablero. Unión de etiquetas compartida sin materializar todas las parejas para el agrupador. El dibujo existente del grafo no se optimizó en este bloque.
+  - Tarjetas con sus dimensiones reales, separación mínima de 40 px y 64 px entre grupos; listas aisladas al final, sin alterar contenido, enlaces ni fijado. Ancho legible y scroll, sin zoom de encuadre.
+  - Deshacer durante la sesión hasta cambiar listas, tamaños o posiciones; botones desactivados durante búsquedas y arrastres. No se ejecuta al editar.
+  - Anchos configurables, pan/zoom y jerarquías continúan pendientes de evaluación.
+- **2.7 Robustez del arrastre táctil (CAT-21):** Endurecimiento implementado localmente: segundo puntero no sustituye al activo; limpieza y persistencia de la última posición/orden ante `pointercancel`, `lostpointercapture`, `blur`, ocultación y cambio de escala de `visualViewport`. Coordenadas CSS sin división automática por escala. Aplicado a listas e ítems. Tests sintéticos aprobados; problema original pendiente de reproducción y validación en Android real.
 
 ---
 
@@ -149,7 +151,7 @@ Agregar un mecanismo sencillo, privado y directo para que los usuarios compartan
   > «Checklist Gato es un proyecto independiente que continúa creciendo. Si encontraste un error, tenés alguna sugerencia o simplemente querés compartir tu experiencia, podés escribirme.  
   > Leo los comentarios y los tengo en cuenta para futuras mejoras. ¡Gracias por ayudar a que Checklist Gato siga evolucionando! 🐾»
 - **3.4 Privacidad:** Sin formularios externos, sin trackers ni recolección de datos personales.
-- **3.5 Registro interno de gestión de feedback:**
+- **3.5 Registro interno de gestión de feedback:** ✅ Creado en `INCIDENCIAS.md`; Android continúa pendiente de reproducción local.
   Mantener una tabla sencilla de seguimiento de incidencias y sugerencias:
   - Campos: `ID | Fecha | Tipo | Descripción | Prioridad | Estado | Resolución`
   - Flujo de estados: `Pendiente → En evaluación → En desarrollo → Resuelto → Descartado`.
@@ -174,7 +176,7 @@ Perfeccionar la identidad visual sin recargar la aplicación.
 - **5.2 Fondos de listas:** Mejorar la vista previa de imagen/color, evaluar gradientes suaves opcionales y facilitar el restablecimiento al estilo original sin afectar la lectura ni el rendimiento.
 - **5.3 Microinteracciones discretas:** Pequeñas animaciones al completar tareas, crear listas o cambiar de vista, respetando estrictamente `@media (prefers-reduced-motion: reduce)`.
 - **5.4 Editor ampliado (CAT-14):** ✅ **Hecho.** Modal accesible para leer y editar un ítem largo, con textarea amplio, Guardar/Cancelar, foco atrapado y Escape. Tests `item-editor`.
-- **5.5 Claridad de acciones en móvil (CAT-17):** Mostrar etiquetas legibles en los botones «Importar» / «Exportar» en pantallas pequeñas. Hoy la regla `@media (max-width:560px){.btn .btn-label{display:none;}}` oculta el texto y deja solo las flechas (`↓` / `↑`), lo que confunde a quien entra por primera vez. Ajustar el `header` (micro-etiquetas o `flex-wrap` compacto) para que su función sea evidente sin adivinar.
+- **5.5 Claridad de acciones en móvil (CAT-17):** ✅ Hecho. Etiquetas visibles de Importar, Exportar y Nueva lista, con espaciado compacto del header y comprobación a 375 px.
 - **5.6 Listas fijadas y estilo «carta legendaria» (CAT-22):** ✅ **Hecho.** Hasta 3 listas fijadas por tablero, orden persistente (primero las fijadas), botón accesible con `aria-pressed`, validación al importar/fusionar y borde holográfico animado con `conic`/`linear-gradient`, respetando `prefers-reduced-motion` y con fallback sin máscaras CSS. Tests `pin-limit`, `pin-order`, `pin-import`, `pin-import-duplicate` y `pin-holo`.
 - **5.7 Contenido de plantillas ES/EN (CAT-24):** ✅ **Hecho.** Estudios incorpora Pomodoro 25/10 y la explicación al espejo; Hábitos suma agua, frutas/verduras, meditación y gratitud; Viajes detalla cargador laptop/celular y revisión del hogar; Organización suma mails/llamadas y agenda/calendario virtual. Test `template-content` con paridad ES/EN.
 
@@ -234,17 +236,14 @@ Consolidar la ventaja competitiva de ser una herramienta 100% local y privada.
   - Ver y organizar listas o tareas por fecha (aprovechando `createdAt` o una fecha asignada), manteniendo la esencia simple de un checklist.
   - Requiere un boceto previo: no debe sobrecargar la interfaz ni desvirtuar la idea de lista de chequeo.
   - Variante complementaria a evaluar: un «modo expansión» que muestre las listas de forma ampliada.
-- **I. Contraseña / PIN manual por lista (P3/P4, CAT-20):**
-  - **Objetivo:** poder marcar una lista concreta como protegida; sin el PIN no se muestra su contenido. El resto del tablero sigue funcionando con normalidad.
-  - **Fase 1 — Bloqueo visual (Media):** candado discreto en la tarjeta, PIN corto (4–8 caracteres o dígitos) definido manualmente, estado de bloqueo persistido y pantalla de desbloqueo. **Debe quedar explícito en la UI que esta fase no es cifrado:** solo oculta el contenido en la interfaz; cualquiera con acceso a DevTools, `localStorage` o un export podría leerlo. No vender seguridad que no existe.
-  - **Fase 2 — Cifrado real (Alta, sin dependencias):** cifrar el contenido en reposo con **AES-GCM** y clave derivada del PIN mediante **PBKDF2** con alto número de iteraciones y `salt`/IV aleatorios (Web Crypto nativo). Nunca guardar el PIN ni la clave: solo `salt`, IV y un verificador/canary. La clave derivada vive únicamente en memoria; la lista se vuelve a bloquear al recargar o tras inactividad.
-  - **Alcance del cifrado:** como mínimo título, ítems y etiquetas. Deben quedar fuera del texto plano también los `aria-label`, placeholders y anuncios de lector de pantalla mientras la lista esté bloqueada.
-  - **Implicaciones funcionales:** el buscador no puede indexar listas bloqueadas; las conexiones manuales y por etiquetas deben tratar el bloqueo como metadato sin filtrar contenido; exportar/importar debe preservar el bloqueo cifrado y advertir que sin PIN no hay recuperación; la fusión no debe mezclar contenido cifrado con plano. **Olvidar el PIN implica perder ese contenido**, salvo que exista un respaldo exportado previamente sin bloquear.
-  - **Límites honestos:** un PIN corto es débil frente a fuerza bruta local; el cifrado eleva el costo, pero no lo elimina. Esta función no sustituye cuentas, sincronización ni una bóveda de contraseñas. Debe evaluarse si el valor real justifica la complejidad y el riesgo de pérdida de datos.
-  - **UX y accesibilidad:** diálogo accesible con foco atrapado, mensajes claros sin pistas del contenido, opción «Bloquear ahora» y confirmación al establecer el PIN (con advertencia de irrecuperabilidad). No bloquear ninguna lista por defecto.
-  - **Tests previstos:** contenido oculto sin PIN; PIN incorrecto y correcto; persistencia tras recarga; ausencia de texto plano sensible en `localStorage`; export/import conservando el bloqueo; buscador que omite listas bloqueadas; restauración del foco y anuncios accesibles.
+- **I. Contraseña / PIN manual por lista (CAT-20):**
+  - **Fase 1 — PIN visual:** ✅ Hecho localmente. PIN de 4–8 dígitos con repetición; verificador SHA-256 y sal aleatoria mediante Web Crypto. No se guarda el PIN; el contenido permanece en texto plano.
+  - La tarjeta bloqueada muestra un nombre genérico y oculta título, ítems, etiquetas, fondo y sus textos accesibles. Conserva relaciones y posición. Búsquedas omiten su contenido; desbloqueo solo en memoria, con «Bloquear ahora» y bloqueo al recargar.
+  - Aviso explícito de que no cifra y de que almacenamiento y respaldos contienen texto. «Quitar PIN» verifica el PIN; «Olvidé el PIN» ofrece recuperación confirmada sin PIN. No hay pérdida de contenido por olvidarlo en esta fase.
+  - Campo opcional `visualLock: {version:1, salt, verifier}` en notas del esquema 2. Importaciones protegidas quedan bloqueadas; validación de metadatos antes de importar y comparación en la firma de fusión. Versiones antiguas pueden ignorarlo y mostrar el texto.
+  - **Fase 2 — Cifrado real (Alta):** idea futura, fuera de este bloque. Requiere evaluar AES-GCM/PBKDF2, exportación cifrada, resolución de conflictos y recuperación. Los límites y riesgos de perder datos sin clave pertenecen a esa futura fase, no al PIN visual.
 - **J. El Gato asistente (P4, CAT-23):**
-  - **Fase 1 — Gato local (Media):** modal de chat offline, sin IA real ni dependencias, con respuestas por reglas/FAQ sobre el uso de la app (exportar, mapa, etiquetas, privacidad), en ES/EN. No lee ni envía el contenido de las notas.
+  - **Fase 1 — Gato local:** ✅ Hecho localmente. Botón en el pie y diálogo de preguntas guiadas, ocho temas en ES/EN, una respuesta visible por vez. Offline, sin IA, sin campo de chat, sin leer notas ni persistir conversaciones. Test `cat-help`.
   - **Fase 2 — IA opcional (Alta):** desactivada por defecto y con consentimiento explícito. Evaluar clave propia del usuario (advirtiendo que queda en `localStorage`) o proxy serverless con límites de costo/abuso; nunca enviar notas salvo que el usuario lo pida expresamente.
   - **Fase 3 — Conversación contextual (Muy alta):** memoria y acciones sobre listas, solo con permiso explícito.
   - **Privacidad:** la IA en la nube es una excepción *opt-in* a la promesa «100% local, sin servidores ni cuentas», no el comportamiento por defecto. Documentarlo en README y en la UI.
@@ -266,16 +265,16 @@ Dejar explícito que el proyecto es abierto, auditable y pensado para durar, par
 Se incorporará en la interfaz (como panel desplegable discreto en el pie de página, accesible y adaptado a modo claro y oscuro) con tres categorías claras:
 
 ### 🛠️ En desarrollo
-- Tercera vista de tablero: **Calendario** por fecha.
+- PIN visual y orden automático del mapa disponibles localmente.
 - Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.
 
 ### 🔜 Próximamente
 - Optimización de rendimiento para tableros con gran cantidad de listas y conexiones.
-- Corrección del arrastre táctil en Android al hacer zoom o alejar.
+- Validación en Android real de los cambios de arrastre y zoom.
 
 ### 💡 Ideas a futuro *(en evaluación)*
 - **Visor «Mapa estelar» (modo universo):** vista panorámica de nodos y conexiones.
-- Asistente del gato e integraciones futuras.
+- Calendario e IA opcional, sujetos a evaluación.
 
 ---
 
@@ -301,7 +300,7 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - **Fecha y hora de creación** visible en cada nota (respetando notas antiguas sin fecha).
 - Pie de página **«Apoyar el proyecto»** (Ko-fi, PayPal, Starlink como enlace de referido y cuenta Prex con botón de copiado rápido).
 - Modo **Mapa** con arrastre robusto en móvil y teclado, y bordes coloreados por conexión (sólido o multicolor).
-- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 32 pruebas de regresión en verde.
+- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 44 pruebas de regresión en verde en la revisión local actual.
 - Atajos de teclado (`N`, `G`, `M`, `/`, `?`), progreso discreto por lista y buscador global insensible a acentos.
 - Plantillas rápidas bilingües (Compras, Estudios, Proyectos, Hábitos, Viajes y Organización personal) con contenido actualizado (Pomodoro, hábitos saludables, equipaje y organización).
 - **Editor ampliado por ítem:** modal accesible para leer y editar textos largos, con foco atrapado y Escape.
@@ -371,13 +370,13 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 
 | Orden | ID | Tarea | Dificultad | Prioridad | Estado |
 |---|---|---|---|---|---|
-| **9.1** | **CAT-21** | Arrastre táctil Android con zoom/pellizco | Media-Alta | **P1** | **Pendiente** |
+| **9.1** | **CAT-21** | Arrastre táctil Android con zoom/pellizco | Media-Alta | **P1** | **Cambios locales implementados; prueba Android real pendiente** |
 | **9.2** | **CAT-24** | Plantillas ES/EN actualizadas | Baja | P2 | **Hecho** |
 | **9.3** | **CAT-22** | Fijar hasta 3 listas + estilo holográfico | Media | P3 | **Hecho** |
-| **9.4** | **CAT-23 Fase 1** | Gato local por reglas/FAQ, offline | Media | P3/P4 | **Pendiente** |
+| **9.4** | **CAT-23 Fase 1** | Gato local por preguntas guiadas, offline | Media | P3/P4 | **Implementado (actualización 2026-10-24)** |
 | **9.5** | **CAT-23 Fase 2** | IA opcional con consentimiento | Alta | P4 | **Idea** |
 | **9.6** | **CAT-18** | Tercera vista Calendario | Media-Alta | P3 | **Pendiente** |
-| **9.7** | **CAT-20 Fase 1** | PIN visual por lista | Media | P3 | **Pendiente** |
+| **9.7** | **CAT-20 Fase 1** | PIN visual por lista | Media | P3 | **Hecho localmente; sin cifrado** |
 | **9.8** | **CAT-09** | Rendimiento a gran escala | Media-Alta | P1/P2 | **Pendiente** |
 | **9.9** | **CAT-20 Fase 2** | Cifrado real AES-GCM/PBKDF2 | Alta | P4 | **Idea** |
 | **9.10** | **CAT-13** | Visor «Mapa estelar» | Alta | P3 | **Idea** |
@@ -388,3 +387,30 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - **Etapa 5.4:** editor ampliado por ítem con modal accesible, Guardar/Cancelar, Escape y foco atrapado.
 - **CAT-22:** fijado de hasta 3 listas, orden persistente, límite al importar/fusionar y borde holográfico con fallback y `prefers-reduced-motion`.
 - **Validación:** `bash tests/run.sh` → `PASS=32 FAIL=0 NOVERIFY=0`.
+
+
+### Revisión local — 2026-10-24 (sin publicar)
+- Confirmaciones accesibles de borrado de listas, conexiones y completados.
+- Ayuda del gato mediante preguntas guiadas ES/EN, offline y sin acceso a notas.
+- Registro `INCIDENCIAS.md` e historial `CHANGELOG.md`; documentación sincronizada.
+- Caché local `checklist-v12`; los identificadores y resultados anteriores en el historial corresponden a sus respectivas iteraciones.
+- Suite actual: `PASS=34 FAIL=0 NOVERIFY=0`. Commit y publicación requieren autorización posterior.
+
+### Worktree PIN y mapa — 2026-10-24 (sin publicar)
+- Base de siete archivos copiada del checkout original y comprobada idéntica; 34 pruebas de base aprobadas antes de implementar.
+- CAT-20 Fase 1: PIN visual y recuperación confirmada, sin cifrado.
+- CAT-25: Ordenar mapa y Deshacer; diálogos ajustados al viewport visual y cabeceras legibles en mapa táctil.
+- CAT-21: robustez local añadida; incidencia sigue abierta hasta reproducir y validar en Android físico.
+- Caché actual del worktree: `checklist-v13`; suite actual: `PASS=44 FAIL=0 NOVERIFY=0`.
+- Sin commits ni publicación.
+
+### Integración dev offline — 2026-10-24 (sin publicar)
+- Ambos bloques locales consolidados en la carpeta de desarrollo, rama `codex/dev-offline`.
+- Siete archivos respaldados fuera del repositorio; versiones copiadas comprobadas por SHA-256. El worktree `pin-mapa` sigue adjunto como referencia.
+- Verificación desde dev: `PASS=44 FAIL=0 NOVERIFY=0 chrome_rc=0`; diff sin errores.
+- `main` conserva su referencia. No se hicieron commits, push ni despliegue. Android físico pendiente.
+
+### Publicación autorizada — 2026-10-24
+- Versión dev integrada para publicar desde `main` en GitHub Pages, dominio `https://checklistgato.com/`, raíz del repositorio y HTTPS obligatorio.
+- Verificación previa: 44 pruebas aprobadas y diff sin errores; caché `checklist-v13`. La finalización del despliegue y los archivos públicos se verifican después del push.
+- Los registros de etapas anteriores describen su estado en ese momento. CAT-21 continúa pendiente de validación física en Android.

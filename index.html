@@ -163,7 +163,11 @@
   .note.dragging,.note.dragging *{cursor:grabbing;}
   .note-grip{display:none;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:none;color:var(--muted);border-radius:50%;cursor:grab;touch-action:none;opacity:.5;flex:none;}
   .note-grip:hover,.note-grip:focus-visible{background:var(--hover);color:var(--accent);opacity:1;}
-  @media (pointer:coarse){.note-grip{width:44px;height:44px;}}
+  @media (pointer:coarse){
+    .note-grip{width:44px;height:44px;}
+    .map-mode .note-head{flex-wrap:wrap;}
+    .map-mode .note-title{flex-basis:calc(100% - 60px);}
+  }
   main.connecting .note-grip{pointer-events:none;opacity:.35;}
   .empty { color: var(--muted); grid-column: 1 / -1; text-align: center; margin: 72px auto; max-width: 420px; line-height: 1.5; }
   .empty strong { display: block; color: var(--text); font-size: 17px; margin-bottom: 6px; }
@@ -376,8 +380,17 @@
   .dialog {
     background: var(--card); color: var(--text); border: 1px solid var(--line);
     border-radius: var(--radius-lg); box-shadow: var(--shadow-pop);
-    max-width: 420px; width: 100%; padding: 18px;
+    max-width: 420px; width: 100%; padding: 18px; max-height: calc(100dvh - 32px); overflow-y: auto;
   }
+  .cat-help-questions { display: grid; gap: 8px; margin-bottom: 14px; }
+  .cat-help-questions .btn { white-space: normal; text-align: left; min-height: 36px; }
+  .visual-lock-controls { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+  .visual-lock-controls .btn { white-space:normal; min-height:36px; }
+  .locked-note h2 { font-size:16px; margin:8px 0; }
+  .locked-note p { font-size:13px; color:var(--muted); }
+  .pin-field { display:block; width:100%; margin:6px 0 12px; padding:8px; font:inherit; }
+  .pin-error { color:var(--danger) !important; }
+  [hidden] { display:none !important; }
   .dialog h2 { font-size: 16px; margin: 0 0 8px; }
   .dialog p { margin: 0 0 10px; color: var(--muted); font-size: 14px; line-height: 1.45; white-space: pre-line; }
   .dialog p:last-of-type { margin-bottom: 0; }
@@ -462,6 +475,7 @@
   <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></symbol>
   <symbol id="i-template" viewBox="0 0 24 24"><path d="M4 6h10M4 12h10M4 18h6M18 14v6M15 17h6"/></symbol>
   <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M15 20h5v-5M9 20H4v-5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 5.5 3 2.5v2H7v-2l3-2.5z"/><path d="M12 13v8"/></symbol>
 </svg>
 <header>
@@ -491,6 +505,8 @@
     <label class="btn btn-secondary" for="import-file"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-up"/></svg><span class="btn-label" id="import-label">Importar</span></label>
     <input type="file" id="import-file" accept="application/json" hidden>
     <button class="btn btn-secondary" id="templates" type="button" aria-haspopup="dialog"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-template"/></svg><span class="btn-label" id="templates-label">Plantillas</span></button>
+    <button class="btn" type="button" id="arrange-map" hidden>Ordenar mapa</button>
+    <button class="btn" type="button" id="undo-map" hidden>Deshacer orden</button>
     <button class="btn btn-primary" id="new-note" aria-keyshortcuts="N"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="btn-label" id="new-note-label">Nueva lista</span></button>
   </div>
 </header>
@@ -542,6 +558,7 @@
       </div>
     </div>
   </div>
+  <button type="button" class="btn" id="cat-help" aria-haspopup="dialog">🐾 Ayuda del gato</button>
   <details class="roadmap-details" id="roadmap-details">
     <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
     <div class="roadmap-grid">
@@ -549,21 +566,21 @@
         <h3 id="rm-dev-title">🛠️ En desarrollo</h3>
         <ul>
           <li id="rm-dev-1">Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.</li>
-          <li id="rm-dev-2">Tercera vista de tablero: Calendario por fecha.</li>
+          <li id="rm-dev-2">PIN visual y orden automático del mapa disponibles localmente.</li>
         </ul>
       </div>
       <div class="roadmap-col">
         <h3 id="rm-soon-title">🔜 Próximamente</h3>
         <ul>
           <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
-          <li id="rm-soon-2">Corrección del arrastre táctil en Android.</li>
+          <li id="rm-soon-2">Validar en Android real las mejoras de arrastre y zoom.</li>
         </ul>
       </div>
       <div class="roadmap-col">
         <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
         <ul>
           <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
-          <li id="rm-ideas-2">Asistente del gato e integraciones futuras.</li>
+          <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
         </ul>
       </div>
     </div>
@@ -607,6 +624,30 @@
   const I18N = {
     es: {
       appName: "Checklist Gato",
+      lockTitle: "PIN visual",
+      lockWarning: "Solo oculta el contenido en la interfaz. No cifra tus datos. El almacenamiento y los respaldos contienen el texto.",
+      setPin: "Ocultar con PIN",
+      lockNow: "Bloquear ahora",
+      unlock: "Desbloquear",
+      removePin: "Quitar PIN",
+      forgotPin: "Olvidé el PIN",
+      forgotWarning: "Este bloqueo es visual y se puede retirar sin el PIN. El contenido volverá a mostrarse. ¿Querés quitarlo?",
+      pinLabel: "PIN (4–8 dígitos)",
+      pinRepeat: "Repetir PIN",
+      pinInvalid: "Ingresá de 4 a 8 dígitos y repetí el mismo PIN.",
+      pinWrong: "PIN incorrecto.",
+      pinUnavailable: "El PIN requiere Web Crypto en HTTPS o localhost.",
+      lockedTitle: "Lista oculta",
+      lockedHint: "Bloqueo visual, sin cifrado.",
+      arrangeMap: "Ordenar mapa",
+      undoMap: "Deshacer orden",
+      arrangeHint: "Agrupa listas conectadas y separa tarjetas. Limpiá la búsqueda para ordenar todo el tablero.",
+      arranged: "Mapa ordenado. Podés deshacer el orden durante esta sesión.",
+      arrangeUndone: "Posiciones anteriores restauradas.",
+      catHelpTitle: "🐾 Ayuda del gato",
+      catHelpTopics: [["¿Cómo creo una lista?", "Tocá Nueva lista y escribí su título y tareas. Enter divide una tarea; Shift + Enter agrega un salto de línea."], ["¿Cómo uso las vistas y conexiones?", "Cuadrícula ordena las tarjetas automáticamente. Mapa permite moverlas con el asa o sus flechas del teclado. Tocá la cadena de una lista y después otra para conectarlas. En Mapa, Ordenar mapa agrupa conexiones y separa tarjetas; Deshacer orden recupera las posiciones previas mientras no cambies las listas. Limpiá la búsqueda para ordenar. Podés desplazarte para ver el resto del tablero."], ["¿Para qué sirven las etiquetas?", "Escribí etiquetas separadas por comas. Las listas con una etiqueta compartida se conectan automáticamente. También podés buscar por etiqueta."], ["¿Cómo uso las plantillas?", "Tocá Plantillas y elegí una opción. Se crea una lista de ejemplo que podés editar libremente."], ["¿Cómo fijo una lista?", "Tocá la chincheta de la tarjeta. Podés fijar hasta tres listas para mantenerlas primero. Volvé a tocarla para desfijar."], ["¿Cómo respaldo o traslado mis datos?", "Exportar descarga un JSON con tus listas y fondos. En el otro dispositivo usá Importar: Fusionar combina datos; Reemplazar sustituye el tablero. Antes de importar se descarga un respaldo del estado actual. Guardá copias periódicas en un lugar seguro."], ["¿Dónde se guardan mis datos?", "Tus notas y fondos se guardan en este navegador, sin cuentas ni sincronización automática. Borrar los datos del sitio puede eliminarlos. El candado permite ocultar una lista con un PIN visual, sin cifrarla. Los respaldos contienen el texto y Olvidé el PIN permite retirar el bloqueo con confirmación. Se bloquea al recargar. Esta ayuda usa respuestas fijas: no lee tus notas ni utiliza IA."], ["¿Funciona sin internet?", "Sí, después de una primera carga con conexión y de que el navegador prepare la caché. Podés instalar la app desde el navegador. Los enlaces externos necesitan internet y los datos siguen siendo propios de cada navegador."]],
+      deleteBtn: "Eliminar",
+      deleteTitle: "Confirmar eliminación",
       docTitle: "Checklist Gato — Listas, notas y tareas privadas",
       viewGroup: "Vista del tablero",
       viewGrid: "Vista cuadrícula",
@@ -658,13 +699,13 @@
       roadmapSummary: "🐾 Próximos pasos (Hoja de ruta)",
       rmDevTitle: "🛠️ En desarrollo",
       rmDev1: "Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.",
-      rmDev2: "Tercera vista de tablero: Calendario por fecha.",
+      rmDev2: "PIN visual y orden automático del mapa disponibles localmente.",
       rmSoonTitle: "🔜 Próximamente",
       rmSoon1: "Optimización de rendimiento para tableros con cientos o miles de listas.",
-      rmSoon2: "Corrección del arrastre táctil en Android.",
+      rmSoon2: "Validar en Android real las mejoras de arrastre y zoom.",
       rmIdeasTitle: "💡 Ideas a futuro",
       rmIdeas1: "Visor «Mapa estelar» (modo universo de nodos y conexiones).",
-      rmIdeas2: "Asistente del gato e integraciones futuras.",
+      rmIdeas2: "Calendario e IA opcional, sujetos a evaluación.",
       shortcutsTitle: "Atajos de teclado",
       shortcutsMsg: "N — nueva lista\nG — vista cuadrícula\nM — vista mapa\n/ — buscar\n? — esta ayuda",
       listProgressAria: (done, total) => `${done} de ${total} elementos completados`,
@@ -746,6 +787,30 @@
     },
     en: {
       appName: "Checklist Cat",
+      lockTitle: "Visual PIN",
+      lockWarning: "Only hides content in the interface. It does not encrypt your data. Storage and backups contain the text.",
+      setPin: "Hide with PIN",
+      lockNow: "Lock now",
+      unlock: "Unlock",
+      removePin: "Remove PIN",
+      forgotPin: "Forgot PIN",
+      forgotWarning: "This visual lock can be removed without the PIN. The content will become visible again. Remove it?",
+      pinLabel: "PIN (4–8 digits)",
+      pinRepeat: "Repeat PIN",
+      pinInvalid: "Enter 4 to 8 digits and repeat the same PIN.",
+      pinWrong: "Incorrect PIN.",
+      pinUnavailable: "PIN requires Web Crypto over HTTPS or localhost.",
+      lockedTitle: "Hidden list",
+      lockedHint: "Visual lock, no encryption.",
+      arrangeMap: "Arrange map",
+      undoMap: "Undo arrangement",
+      arrangeHint: "Groups connected lists and separates cards. Clear search to arrange the entire board.",
+      arranged: "Map arranged. You can undo the arrangement during this session.",
+      arrangeUndone: "Previous positions restored.",
+      catHelpTitle: "🐾 Cat help",
+      catHelpTopics: [["How do I create a list?", "Choose New list and enter a title and tasks. Enter splits a task; Shift + Enter adds a line break."], ["How do views and connections work?", "Grid arranges cards automatically. Map lets you move them using the handle or its keyboard arrows. Choose the chain button on one list, then another list to connect them. In Map, Arrange map groups connections and separates cards; Undo arrangement restores previous positions until you change the lists. Clear search before arranging. Scroll to see the rest of the board."], ["What are tags for?", "Enter comma-separated tags. Lists sharing a tag connect automatically. You can also search by tag."], ["How do I use templates?", "Choose Templates and select an option. This creates an example list that you can freely edit."], ["How do I pin a list?", "Choose the pin button on a card. You can pin up to three lists to keep them first. Choose it again to unpin."], ["How do I back up or transfer data?", "Export downloads a JSON file with your lists and backgrounds. On the other device choose Import: Merge combines data; Replace replaces the board. A backup of the current board is downloaded before importing. Keep regular copies somewhere safe."], ["Where is my data stored?", "Your notes and backgrounds stay in this browser, without accounts or automatic sync. Clearing site data can erase them. The lock hides a list with a visual PIN, without encryption. Backups contain the text and Forgot PIN lets you remove the lock after confirmation. Lists lock again on reload. This help uses fixed answers: it does not read your notes or use AI."], ["Does it work offline?", "Yes, after an initial online visit and once the browser has prepared its cache. You can install the app from your browser. External links need internet, and each browser keeps its own data."]],
+      deleteBtn: "Delete",
+      deleteTitle: "Confirm deletion",
       docTitle: "Checklist Cat — Private lists, notes and tasks",
       viewGroup: "Board view",
       viewGrid: "Grid view",
@@ -797,13 +862,13 @@
       roadmapSummary: "🐾 What's next (Roadmap)",
       rmDevTitle: "🛠️ In development",
       rmDev1: "Continuous stability, safe confirmations, and local storage protection.",
-      rmDev2: "Third board view: Calendar by date.",
+      rmDev2: "Visual PIN and automatic map arrangement available locally.",
       rmSoonTitle: "🔜 Coming soon",
       rmSoon1: "Performance optimization for boards with hundreds or thousands of lists.",
-      rmSoon2: "Android touch drag fix.",
+      rmSoon2: "Validate drag and zoom improvements on a real Android device.",
       rmIdeasTitle: "💡 Future ideas",
       rmIdeas1: "Star Map viewer (universe mode for nodes and connections).",
-      rmIdeas2: "Cat assistant and future integrations.",
+      rmIdeas2: "Calendar and optional AI, subject to evaluation.",
       shortcutsTitle: "Keyboard shortcuts",
       shortcutsMsg: "N — new list\nG — grid view\nM — map view\n/ — search\n? — this help",
       listProgressAria: (done, total) => `${done} of ${total} items completed`,
@@ -887,6 +952,14 @@
   function tr(key) { return (I18N[lang] && I18N[lang][key]) || I18N.es[key]; }
 
   let notes = load();
+  let unlockedVisual = new WeakSet();
+  let layoutUndo = null;
+  function validVisualLock(lock) {
+    return !!lock && lock.version === 1 && /^[a-f0-9]{32}$/.test(lock.salt) && /^[a-f0-9]{64}$/.test(lock.verifier);
+  }
+  function isVisuallyLocked(note) { return !!note.visualLock && !unlockedVisual.has(note); }
+  function displayNoteTitle(note) { return isVisuallyLocked(note) ? tr("lockedTitle") : (note.title || tr("untitled")); }
+
   let connectingSource = null;   // id de la nota origen en modo conexión
   let openPopId = null;          // id de la nota con popover abierto
   let popFocusKey = null;        // selector a enfocar tras render()
@@ -930,6 +1003,8 @@
   function normalizeNote(n) {
     if (!n || typeof n !== "object") n = {};
     n.id = typeof n.id === "string" && n.id ? n.id : uid();
+    if (validVisualLock(n.visualLock)) n.visualLock = { version:1, salt:n.visualLock.salt, verifier:n.visualLock.verifier };
+    else delete n.visualLock;
     n.title = typeof n.title === "string" ? n.title : "";
     n.items = Array.isArray(n.items) ? n.items.map(it => {
       it = it && typeof it === "object" ? it : {};
@@ -1002,7 +1077,8 @@
     finally { quotaWarnOpen = false; }
   }
 
-  function save() {
+  function save(preserveLayout = false) {
+    if (!preserveLayout) invalidateLayoutUndo();
     try {
       localStorage.setItem(KEY, JSON.stringify(notes));
     } catch (err) {
@@ -1082,9 +1158,26 @@
         for (const node of nodes) if (node) box.append(node);
       }
 
+      // El viewport visual cambia con pellizco, teclado y mapas más anchos
+      // que la pantalla. El diálogo debe permanecer dentro del área visible.
+      const viewport = window.visualViewport;
+      const positionDialog = () => {
+        if (!viewport) return;
+        Object.assign(scrim.style, { left:viewport.offsetLeft + "px", top:viewport.offsetTop + "px",
+          width:viewport.width + "px", height:viewport.height + "px", right:"auto", bottom:"auto" });
+        box.style.maxHeight = "100%";
+      };
+      viewport?.addEventListener("resize", positionDialog);
+      viewport?.addEventListener("scroll", positionDialog);
+      positionDialog();
       const actions = el("div", { className: "dialog-actions" });
       const btnEls = [];
+      let finished = false;
       const finish = value => {
+        if (finished) return;
+        finished = true;
+        viewport?.removeEventListener("resize", positionDialog);
+        viewport?.removeEventListener("scroll", positionDialog);
         document.removeEventListener("keydown", onKey, true);
         scrim.remove();
         if (prevFocus && typeof prevFocus.focus === "function") { try { prevFocus.focus(); } catch (e) {} }
@@ -1093,7 +1186,15 @@
       for (const b of buttons || []) {
         const cls = "btn" + (b.primary ? " btn-primary" : "") + (b.danger ? " btn-danger" : "");
         const btn = el("button", { type: "button", className: cls, textContent: b.label });
-        btn.addEventListener("click", () => finish(b.value));
+        btn.addEventListener("click", async () => {
+          if (btn.disabled || finished) return;
+          if (b.validate) {
+            btn.disabled = true;
+            try { if (!await b.validate()) return; }
+            finally { btn.disabled = false; }
+          }
+          if (!finished) finish(b.value);
+        });
         actions.append(btn);
         btnEls.push(btn);
       }
@@ -1131,6 +1232,112 @@
     });
   }
 
+  async function pinVerifier(salt, pin) {
+    const bytes = new TextEncoder().encode(salt + ":" + pin);
+    const digest = await crypto.subtle.digest("SHA-256", bytes);
+    return [...new Uint8Array(digest)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function pinDialog(note, creating = false) {
+    if (!crypto.subtle) {
+      await openDialog({ title:tr("lockTitle"), message:tr("pinUnavailable"), buttons:[{label:tr("closeBtn"),value:null}] });
+      return null;
+    }
+    const field = el("input", { id:"visual-pin", type:"password", inputMode:"numeric", autoComplete:"off", maxLength:8, className:"pin-field" });
+    const repeat = el("input", { id:"visual-pin-repeat", type:"password", inputMode:"numeric", autoComplete:"off", maxLength:8, className:"pin-field" });
+    const error = el("p", { id:"visual-pin-error", className:"pin-error", role:"alert" });
+    field.setAttribute("aria-describedby", error.id);
+    const content = [el("label", { htmlFor:field.id, textContent:tr("pinLabel") }), field];
+    if (creating) content.push(el("label", {htmlFor:repeat.id,textContent:tr("pinRepeat")}), repeat);
+    content.push(error);
+    for (const input of [field,repeat]) input.addEventListener("keydown", e => {
+      if (e.key === "Enter") {e.preventDefault(); input.closest(".dialog")?.querySelector(".dialog-actions button:last-child")?.click();}
+    });
+    let lock = null;
+    const result = await openDialog({ title:tr("lockTitle"), message:tr("lockWarning"), content, focus:field,
+      buttons:[{label:tr("cancelBtn"),value:null}, {label:tr(creating ? "setPin" : "unlock"),value:true,
+        validate: async () => {
+          if (!/^\d{4,8}$/.test(field.value) || (creating && field.value !== repeat.value)) {
+            error.textContent = tr("pinInvalid"); field.focus(); return false;
+          }
+          try {
+            const salt = creating ? [...crypto.getRandomValues(new Uint8Array(16))].map(b => b.toString(16).padStart(2,"0")).join("") : note.visualLock.salt;
+            const verifier = await pinVerifier(salt, field.value);
+            if (!creating && verifier !== note.visualLock.verifier) {
+              error.textContent = tr("pinWrong"); field.value = ""; field.focus(); return false;
+            }
+            lock = {version:1,salt,verifier};
+            return true;
+          } catch (_) { error.textContent = tr("pinUnavailable"); return false; }
+        }
+      }]
+    });
+    field.value = ""; repeat.value = "";
+    return result ? lock : null;
+  }
+
+  async function setVisualPin(note) {
+    const lock = await pinDialog(note, true);
+    if (!lock || !notes.includes(note)) return;
+    note.visualLock = lock; unlockedVisual.delete(note); openPopId = null;
+    touch(note); save(); render("unlock-" + note.id);
+  }
+  async function unlockVisualNote(note) {
+    if (!await pinDialog(note) || !notes.includes(note)) return;
+    unlockedVisual.add(note); invalidateLayoutUndo(); render("visual-lock-" + note.id);
+  }
+  async function removeVisualPin(note, recovery = false) {
+    if (recovery) {
+      if (!await confirmDeletion(tr("forgotWarning"))) return;
+    } else if (!await pinDialog(note)) return;
+    if (!notes.includes(note)) return;
+    delete note.visualLock; unlockedVisual.delete(note);
+    touch(note); save(); render("visual-lock-" + note.id);
+  }
+
+  function renderLockedNote(note) {
+    const section = el("section", { className:"note locked-note" + (note.pinned ? " pinned" : ""), "data-id":note.id, "aria-label":tr("lockedTitle") });
+    const grip = el("button", {type:"button",className:"note-grip", "aria-label":tr("moveListAria"),disabled:viewMode !== "map",
+      onpointerdown:e => onGripDown(e,note,section), onkeydown:e => onGripKey(e,note,section)}, [icon("i-grip")]);
+    section.append(grip, el("h2", {textContent:tr("lockedTitle")}), el("p", {textContent:tr("lockedHint")}),
+      el("div", {className:"visual-lock-controls"}, [
+        el("button", {type:"button",className:"btn",id:"unlock-"+note.id,textContent:tr("unlock"),onclick:()=>unlockVisualNote(note)}),
+        el("button", {type:"button",className:"btn",textContent:tr("removePin"),onclick:()=>removeVisualPin(note)}),
+        el("button", {type:"button",className:"btn",textContent:tr("forgotPin"),onclick:()=>removeVisualPin(note,true)})
+      ]));
+    return section;
+  }
+
+  function confirmDeletion(message) {
+    return openDialog({ title: tr("deleteTitle"), message,
+      buttons: [
+        { label: tr("cancelBtn"), value: false },
+        { label: tr("deleteBtn"), value: true, danger: true }
+      ]
+    });
+  }
+
+  function openCatHelp() {
+    const questions = el("div", { className: "cat-help-questions" });
+    const answer = el("p", { id: "cat-help-answer", "aria-live": "polite", "aria-atomic": "true" });
+    const buttons = [];
+    tr("catHelpTopics").forEach(([question, response]) => {
+      const button = el("button", { type: "button", className: "btn",
+        textContent: question, "aria-expanded": "false", "aria-controls": answer.id,
+        onclick: () => {
+          buttons.forEach(b => b.setAttribute("aria-expanded", String(b === button)));
+          answer.textContent = response;
+        }
+      });
+      buttons.push(button);
+      questions.append(button);
+    });
+    return openDialog({ title: tr("catHelpTitle"), content: [questions, answer],
+      buttons: [{ label: tr("closeBtn"), value: null }], focus: () => buttons[0]
+    });
+  }
+  document.getElementById("cat-help").addEventListener("click", openCatHelp);
+
   // ---------- Tema (claro / oscuro) ----------
   const THEME_KEY = "checklist-theme";
   function applyTheme(t, persist) {
@@ -1156,6 +1363,9 @@
     document.documentElement.lang = lang;
     document.title = tr("docTitle");
     const setTxt = (id, key) => { const n = document.getElementById(id); if (n) n.textContent = tr(key); };
+    setTxt("arrange-map", "arrangeMap");
+    setTxt("undo-map", "undoMap");
+    setTxt("cat-help", "catHelpTitle");
     setTxt("app-title", "appName");
     setTxt("export-label", "exportBtn");
     setTxt("import-label", "importBtn");
@@ -1340,14 +1550,14 @@
   // ---------- Fondo por nota ----------
   async function applyBackground(section, note) {
     const thumb = section.querySelector(".bg-thumb");
-    if (!note.bgId) {
+    if (!note.bgId || isVisuallyLocked(note)) {
       section.classList.remove("has-bg");
       section.style.removeProperty("--bg-img");
       if (thumb) thumb.style.backgroundImage = "";
       return;
     }
     const url = await getImageURL(note.bgId);
-    if (!url) { section.classList.remove("has-bg"); return; }
+    if (!url || isVisuallyLocked(note) || !section.isConnected) { section.classList.remove("has-bg"); return; }
     section.style.setProperty("--bg-img", `url("${url}")`);
     section.classList.add("has-bg");
     if (thumb) thumb.style.backgroundImage = `url("${url}")`;
@@ -1538,14 +1748,14 @@
     svg.replaceChildren(defs, ...groups.map(e => e.g));
   }
 
-  function deleteLink(srcId, tid) {
+  async function deleteLink(srcId, tid) {
     const src = notes.find(n => n.id === srcId);
     if (!src) return;
-    if (!confirm(tr("deleteLinkConfirm"))) return;
+    if (!await confirmDeletion(tr("deleteLinkConfirm"))) return;
     src.links = src.links.filter(x => x !== tid);
     touch(src);
     save();
-    render();
+    render("connect-" + srcId);
   }
 
   function updateConnectClasses() {
@@ -1652,7 +1862,7 @@
       maxR = Math.max(maxR, n.pos.x + sec.offsetWidth);
       maxB = Math.max(maxB, n.pos.y + sec.offsetHeight);
     });
-    const w = Math.max(main.clientWidth, maxR + 40);
+    const w = Math.max(document.documentElement.clientWidth, maxR + 40);
     const h = Math.max(window.innerHeight - board.offsetTop, maxB + 40);
     main.style.setProperty("--canvas-w", w + "px");
     main.style.setProperty("--canvas-h", h + "px");
@@ -1661,6 +1871,7 @@
   }
 
   function setView(mode, persist) {
+    finishActiveDrags();
     const next = mode === "map" ? "map" : "grid";
     if (next === "map" && viewMode !== "map") { initMapPositions(); save(); }
     viewMode = next;
@@ -1670,6 +1881,98 @@
     if (mp) mp.setAttribute("aria-pressed", String(viewMode === "map"));
     render();
     announce(viewMode === "map" ? tr("viewMapAnnounce") : tr("viewGridAnnounce"));
+  }
+
+  // El agrupador recorre un grafo bipartito listas/etiquetas: no materializa
+  // el clique de cada etiqueta. El grado deduplica vecinos manuales y de tags.
+  function mapGroups() {
+    const byId = new Map(notes.map(n => [n.id, n]));
+    const rank = new Map(notes.map((n,i) => [n.id,i]));
+    const manual = new Map(notes.map(n => [n.id,new Set()]));
+    const tags = new Map();
+    notes.forEach(n => {
+      n.links.forEach(id => { if (id !== n.id && byId.has(id)) {manual.get(n.id).add(id); manual.get(id).add(n.id);} });
+      n.tags.forEach(tag => { if (!tags.has(tag)) tags.set(tag,[]); tags.get(tag).push(n.id); });
+    });
+    // Reutilizar la unión para listas con las mismas etiquetas, en vez de
+    // crear una arista por cada pareja. Las relaciones repetidas cuentan una vez.
+    const neighborhoods = new Map();
+    const degree = n => {
+      const key=JSON.stringify(n.tags.slice().sort());
+      if (!neighborhoods.has(key)) {
+        const neighbors=new Set();
+        n.tags.forEach(tag=>tags.get(tag).forEach(id=>neighbors.add(id)));
+        neighborhoods.set(key,neighbors);
+      }
+      const neighbors=neighborhoods.get(key);
+      return neighbors.size - (neighbors.has(n.id) ? 1 : 0) + [...manual.get(n.id)].filter(id=>!neighbors.has(id)).length;
+    };
+    const order = notes.slice().sort((a,b) => degree(b)-degree(a) || rank.get(a.id)-rank.get(b.id));
+    const visited = new Set(), usedTags = new Set(), groups = [], isolated = [];
+    for (const root of order) {
+      if (visited.has(root.id)) continue;
+      const queue = [root.id], group = []; visited.add(root.id);
+      const enqueue = id => { if (!visited.has(id)) {visited.add(id); queue.push(id);} };
+      for (let i=0;i<queue.length;i++) {
+        const id=queue[i], n=byId.get(id); group.push(n);
+        [...manual.get(id)].sort((a,b)=>rank.get(a)-rank.get(b)).forEach(enqueue);
+        n.tags.forEach(tag => {
+          if (usedTags.has(tag)) return;
+          usedTags.add(tag); tags.get(tag).forEach(enqueue);
+        });
+      }
+      if (group.length > 1) groups.push(group); else isolated.push(...group);
+    }
+    isolated.sort((a,b)=>rank.get(a.id)-rank.get(b.id));
+    if (isolated.length) groups.push(isolated);
+    return groups;
+  }
+
+  function mapSizeSignature() {
+    return [...document.querySelectorAll(".note")].map(sec => [sec.dataset.id,sec.offsetWidth,sec.offsetHeight].join(":")).join("|");
+  }
+  function invalidateLayoutUndo() { layoutUndo = null; updateMapControls(); }
+  function validateLayoutUndo() {
+    if (layoutUndo && layoutUndo.sizes !== mapSizeSignature()) invalidateLayoutUndo();
+  }
+  function updateMapControls() {
+    const arrange = document.getElementById("arrange-map"), undo = document.getElementById("undo-map");
+    if (!arrange || !undo) return;
+    arrange.hidden = undo.hidden = viewMode !== "map";
+    const busy = !!(drag || itemDrag || query.trim());
+    arrange.disabled = busy || !notes.length;
+    arrange.title = tr("arrangeHint");
+    undo.disabled = busy || !layoutUndo;
+  }
+  function arrangeMap() {
+    if (viewMode !== "map" || drag || itemDrag || query.trim() || !notes.length) return;
+    openPopId = null; render(); growItems();
+    const before = notes.map(n => ({id:n.id,pos:n.pos ? {...n.pos} : null}));
+    const sizes = new Map([...document.querySelectorAll(".note")].map(sec => [sec.dataset.id,{w:sec.offsetWidth,h:sec.offsetHeight}]));
+    const limit = Math.max(300, document.documentElement.clientWidth - 48);
+    let y = 24;
+    for (const group of mapGroups()) {
+      let x=24, rowHeight=0;
+      for (const n of group) {
+        const size=sizes.get(n.id);
+        if (x>24 && x+size.w>limit) {x=24; y+=rowHeight+40; rowHeight=0;}
+        n.pos={x,y}; touch(n);
+        x+=size.w+40; rowHeight=Math.max(rowHeight,size.h);
+      }
+      y+=rowHeight+64;
+    }
+    save(true); render();
+    layoutUndo={positions:before,sizes:mapSizeSignature()};
+    updateMapControls(); document.getElementById("arrange-map").focus();
+    announce(tr("arranged"));
+  }
+  function undoMapArrangement() {
+    validateLayoutUndo();
+    if (!layoutUndo || viewMode !== "map" || drag || itemDrag || query.trim()) return;
+    const previous=layoutUndo.positions; layoutUndo=null;
+    const positions=new Map(previous.map(p=>[p.id,p.pos]));
+    notes.forEach(n=>{n.pos=positions.get(n.id); touch(n);});
+    save(); render("arrange-map"); announce(tr("arrangeUndone"));
   }
 
   // Aplica la posición al nodo VIVO de la nota: el render puede haber reemplazado
@@ -1693,10 +1996,11 @@
     document.removeEventListener("pointermove", onDragMove);
     document.removeEventListener("pointerup", onDragEnd);
     document.removeEventListener("pointercancel", onDragEnd);
+    document.removeEventListener("lostpointercapture", onDragEnd, true);
   }
 
   function onGripDown(e, note, sec) {
-    if (viewMode !== "map" || connectingSource != null) return;
+    if (viewMode !== "map" || connectingSource != null || drag || itemDrag || (e.isPrimary === false && !!e.pointerType) || e.button !== 0) return;
     e.preventDefault(); e.stopPropagation();
     try { sec.setPointerCapture(e.pointerId); } catch (err) {}
     drag = { note, sec, pid: e.pointerId, sx: e.clientX, sy: e.clientY, ox: note.pos.x, oy: note.pos.y, moved: false };
@@ -1705,6 +2009,8 @@
     document.addEventListener("pointermove", onDragMove);
     document.addEventListener("pointerup", onDragEnd);
     document.addEventListener("pointercancel", onDragEnd);
+    document.addEventListener("lostpointercapture", onDragEnd, true);
+    invalidateLayoutUndo(); updateMapControls();
   }
   function onDragMove(e) {
     if (!drag || e.pointerId !== drag.pid) return;
@@ -1720,7 +2026,9 @@
       save(); layoutCanvas(); scheduleLinks();
       announce(tr("listMovedTo")(Math.round(drag.note.pos.x), Math.round(drag.note.pos.y)));
     }
-    drag = null;
+    const ended = drag; drag = null;
+    try { if (ended.sec.hasPointerCapture(ended.pid)) ended.sec.releasePointerCapture(ended.pid); } catch (_) {}
+    updateMapControls();
   }
   function onGripKey(e, note, sec) {
     const step = e.shiftKey ? 32 : 8;
@@ -1736,6 +2044,7 @@
   // Reubica la fila en vivo comparando la Y del puntero con los puntos medios de
   // las filas del MISMO grupo (pendientes/completados).
   function onItemGripDown(e, note, item, row) {
+    if (drag || itemDrag || (e.isPrimary === false && !!e.pointerType) || e.button !== 0) return;
     e.preventDefault(); e.stopPropagation();
     try { row.setPointerCapture(e.pointerId); } catch (err) {}
     itemDrag = { note, item, row, pid: e.pointerId, sy: e.clientY, moved: false, isDone: item.done };
@@ -1744,12 +2053,15 @@
     document.addEventListener("pointermove", onItemDragMove);
     document.addEventListener("pointerup", onItemDragEnd);
     document.addEventListener("pointercancel", onItemDragEnd);
+    document.addEventListener("lostpointercapture", onItemDragEnd, true);
+    invalidateLayoutUndo(); updateMapControls();
   }
 
   function detachItemDragListeners() {
     document.removeEventListener("pointermove", onItemDragMove);
     document.removeEventListener("pointerup", onItemDragEnd);
     document.removeEventListener("pointercancel", onItemDragEnd);
+    document.removeEventListener("lostpointercapture", onItemDragEnd, true);
   }
 
   function currentItemRow(note, item) {
@@ -1789,8 +2101,23 @@
     const { note, row, moved } = itemDrag;
     if (row && row.isConnected) row.classList.remove("dragging");
     if (moved) { commitItemOrder(note); touch(note); save(); announce(tr("itemMoved")); }
-    itemDrag = null;
+    const ended = itemDrag; itemDrag = null;
+    try { if (ended.row.hasPointerCapture(ended.pid)) ended.row.releasePointerCapture(ended.pid); } catch (_) {}
+    updateMapControls();
   }
+
+  function finishActiveDrags() {
+    if (drag) onDragEnd({pointerId:drag.pid});
+    if (itemDrag) onItemDragEnd({pointerId:itemDrag.pid});
+  }
+  window.addEventListener("blur", finishActiveDrags);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) finishActiveDrags(); });
+  let lastViewportScale = window.visualViewport?.scale || 1;
+  window.visualViewport?.addEventListener("resize", () => {
+    const scale = window.visualViewport.scale;
+    if (scale !== lastViewportScale) finishActiveDrags();
+    lastViewportScale = scale;
+  });
 
   // Reescribe el orden de note.items según el orden DOM de cada grupo.
   function commitItemOrder(note) {
@@ -1856,6 +2183,7 @@
   }
   function noteMatches(note, q) {
     if (!q) return true;
+    if (isVisuallyLocked(note)) return false;
     const hay = [note.title || "", ...(note.tags || []), ...(note.items || []).map(i => i.text || "")];
     return hay.some(t => normalizeSearch(t).includes(q));
   }
@@ -1914,6 +2242,8 @@
     observeNotes();
     updateStats();
     growItems();
+    validateLayoutUndo();
+    updateMapControls();
     if (popFocusKey) {
       const t = document.querySelector('[data-pop-key="' + popFocusKey + '"]');
       popFocusKey = null;
@@ -1951,6 +2281,7 @@
   }
 
   function renderNote(note) {
+    if (isVisuallyLocked(note)) return renderLockedNote(note);
     const title = el("textarea", {
       id: "title-" + note.id, rows: 1, className: "note-title",
       value: note.title, placeholder: tr("untitled"), "aria-label": tr("noteTitleAria"),
@@ -2018,15 +2349,15 @@
 
     const delNote = el("button", {
       className: "icon-btn", title: tr("delListTitle"), "aria-label": tr("delListTitle"),
-      onclick: () => {
-        if (!confirm(tr("deleteListConfirm")(note.title || tr("untitled")))) return;
+      onclick: async () => {
+        if (!await confirmDeletion(tr("deleteListConfirm")(note.title || tr("untitled")))) return;
         const bg = note.bgId;
         notes = notes.filter(n => n !== note);
         notes.forEach(n => { n.links = n.links.filter(id => id !== note.id); });
         if (openPopId === note.id) openPopId = null;
         save();
         revokeIfUnused(bg);
-        render();
+        render("new-note");
       }
     }, [icon("i-x")]);
 
@@ -2079,8 +2410,18 @@
       ? el("time", { className: "note-created", dateTime: note.createdAt, textContent: fmtDate(note.createdAt) })
       : null;
 
+    const lockControls = el("div", { className:"visual-lock-controls" }, [
+      el("button", {type:"button",className:"btn",id:"visual-lock-"+note.id,textContent:tr(note.visualLock ? "lockNow" : "setPin"),
+        onclick:() => {
+          if (!note.visualLock) return setVisualPin(note);
+          unlockedVisual.delete(note); openPopId = null; invalidateLayoutUndo(); render("unlock-"+note.id);
+        }
+      }, [icon("i-lock")]),
+      ...(note.visualLock ? [el("button", {type:"button",className:"btn",textContent:tr("removePin"),onclick:()=>removeVisualPin(note)})] : [])
+    ]);
     const children = [
       el("div", { className: "note-head" }, [grip, title, pinBtn, styleBtn, connectBtn, delNote]),
+      lockControls,
       tags,
       ...(chips ? [chips] : []),
       ...(progress ? [progress] : []),
@@ -2099,10 +2440,10 @@
         }),
         el("button", {
           className: "clear", textContent: tr("clearDone"),
-          onclick: () => {
-            if (!confirm(tr("clearDoneConfirm")(done.length))) return;
+          onclick: async () => {
+            if (!await confirmDeletion(tr("clearDoneConfirm")(done.length))) return;
             note.items = note.items.filter(i => !i.done);
-            touch(note); save(); render();
+            touch(note); save(); render("pin-" + note.id);
           }
         })
       ]);
@@ -2384,7 +2725,7 @@
     }
     note.links.forEach(id => {
       const t = notes.find(n => n.id === id);
-      const label = t ? (t.title || tr("untitled")) : tr("deletedList");
+      const label = t ? displayNoteTitle(t) : tr("deletedList");
       list.append(el("div", { className: "link-row" }, [
         el("span", { className: "link-label", textContent: label }),
         el("button", {
@@ -2408,7 +2749,7 @@
     document.querySelectorAll(".note").forEach(s => ro.observe(s));
   }
   if ("ResizeObserver" in window) {
-    ro = new ResizeObserver(() => scheduleLinks());
+    ro = new ResizeObserver(() => { validateLayoutUndo(); layoutCanvas(); scheduleLinks(); });
   }
   window.addEventListener("resize", () => { layoutCanvas(); growItems(); scheduleLinks(); });
   window.addEventListener("orientationchange", () => { layoutCanvas(); scheduleLinks(); });
@@ -2422,6 +2763,8 @@
   });
   document.getElementById("view-grid").addEventListener("click", () => setView("grid", true));
   document.getElementById("view-map").addEventListener("click", () => setView("map", true));
+  document.getElementById("arrange-map").addEventListener("click", arrangeMap);
+  document.getElementById("undo-map").addEventListener("click", undoMapArrangement);
 
   const searchInput = document.getElementById("search");
   searchInput.addEventListener("input", () => { query = searchInput.value; render(); });
@@ -2593,6 +2936,8 @@
 
   // Valida el archivo importado sin tocar el estado. Devuelve {ok, notes, images, isV1}.
   function parseImport(data) {
+    const candidates = Array.isArray(data) ? data : data && data.notes;
+    if (Array.isArray(candidates) && candidates.some(n => n && n.visualLock != null && !validVisualLock(n.visualLock))) return {ok:false};
     if (Array.isArray(data)) {
       const valid = data.every(n => n && typeof n === "object" && typeof n.id === "string" && Array.isArray(n.items));
       if (!valid) return { ok: false };
@@ -2606,6 +2951,7 @@
 
   function noteSignature(n) {
     return JSON.stringify({
+      visualLock: n.visualLock || null,
       title: n.title,
       tags: [...(n.tags || [])].sort(),
       items: (n.items || []).map(i => [i.text, !!i.done]),
@@ -2733,6 +3079,7 @@
         });
       }
 
+      unlockedVisual = new WeakSet();
       if (choice === "replace") {
         notes = enforcePinLimit(incoming, new Set());
         save(); render();

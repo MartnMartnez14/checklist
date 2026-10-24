@@ -942,6 +942,245 @@
       "sin borde holográfico: bg=" + bg + " anim=" + anim);
   }
 
+  async function t_delete_dialogs() {
+    for (var kind of ["list", "link", "done"]) {
+      var a = note("a", "Alpha", ["keep", "finished"], { links: ["b"] });
+      a.items[1].done = true;
+      await boot([a, note("b", "Beta", [])]);
+      cw.confirm = function () { throw new Error("native confirm used"); };
+      function trigger() {
+        if (kind === "list") return cd.querySelector('.note[data-id="a"] [aria-label="' + (cd.documentElement.lang === "en" ? "Delete list" : "Eliminar lista") + '"]');
+        if (kind === "done") return cd.querySelector('.note[data-id="a"] .clear');
+        return cd.querySelector('.edge-hit');
+      }
+      await sleep(100);
+      var before = storedRaw();
+      for (var cancel of ["button", "escape", "outside"]) {
+        if (kind === "link") assert(await waitFor(() => cd.querySelector(".edge-hit")), "edge did not render");
+        var target = trigger();
+        assert(target, "missing trigger " + kind);
+        if (target.focus) target.focus();
+        target.dispatchEvent(new cw.MouseEvent("click", { bubbles: true }));
+        var dialog = cd.querySelector('[role="dialog"]');
+        assert(dialog, "missing dialog " + kind);
+        var actions = dialog.querySelectorAll('.dialog-actions button');
+        assert(cd.activeElement === actions[0], "cancel not initially focused");
+        cd.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Tab", shiftKey: true, bubbles: true, cancelable: true }));
+        assert(cd.activeElement === actions[1], "focus not trapped");
+        if (cancel === "button") actions[0].click();
+        if (cancel === "escape") cd.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        if (cancel === "outside") cd.querySelector('.dialog-scrim').dispatchEvent(new cw.MouseEvent("mousedown", { bubbles: true }));
+        await sleep(10);
+        assert(!cd.querySelector('[role="dialog"]'), "dialog not closed");
+        assert(storedRaw() === before, "cancel modified data " + kind);
+        if (kind !== "link") assert(cd.activeElement === target, "cancel focus not restored");
+      }
+      if (kind === "link") assert(await waitFor(() => cd.querySelector(".edge-hit")), "edge did not render before delete");
+      trigger().dispatchEvent(new cw.MouseEvent("click", { bubbles: true }));
+      cd.querySelector('.dialog-actions .btn-danger').click();
+      await sleep(30);
+      if (kind === "list") assert(stored().length === 1 && cd.activeElement.id === "new-note", "list deletion/focus");
+      if (kind === "link") assert(firstNote().links.length === 0 && cd.activeElement.id === "connect-a", "link deletion/focus");
+      if (kind === "done") assert(firstNote().items.length === 1 && cd.activeElement.id === "pin-a", "completed deletion/focus");
+      await remount();
+      assert(storedRaw() !== before, "deletion did not persist");
+    }
+  }
+
+  async function t_cat_help() {
+    await boot([note("private", "Private text", ["Do not change"])]);
+    for (var language of ["es", "en"]) {
+      if (cd.documentElement.lang !== language) cd.getElementById("lang-toggle").click();
+      var before = storedRaw();
+      var opener = cd.getElementById("cat-help");
+      opener.focus(); opener.click();
+      var dialog = cd.querySelector('[role="dialog"]');
+      assert(dialog && !dialog.querySelector('input,textarea'), "help missing or chat input present");
+      var questions = dialog.querySelectorAll('.cat-help-questions button');
+      assert(questions.length === 8 && cd.activeElement === questions[0], "help questions/focus");
+      for (var q of questions) {
+        q.click();
+        assert(dialog.querySelectorAll('[aria-expanded="true"]').length === 1, "multiple expanded answers");
+        assert(cd.getElementById('cat-help-answer').textContent.length > 40, "empty answer");
+      }
+      assert(dialog.querySelector('h2').textContent.includes(language === "es" ? "Ayuda" : "help"), "help language");
+      cd.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      assert(cd.activeElement === opener && !cd.querySelector('[role="dialog"]'), "help escape/focus");
+      opener.click(); cd.querySelector('.dialog-actions button').click();
+      assert(cd.activeElement === opener, "close button focus");
+      assert(storedRaw() === before, "help changed notes");
+    }
+  }
+
+  function visualLockSeed() { return {"version": 1, "salt": "00000000000000000000000000000000", "verifier": "af88269895fea9e985d8e7587268ea2fd6d0a639cc0438c88a9b22d6ce96b3ba"}; }
+  function lockedSeed(id) {return note(id || "secret", "HIDDEN-TITLE", ["HIDDEN-TASK"], {tags:["hidden-tag"],visualLock:visualLockSeed(),pos:{x:24,y:24}});}
+  function resetLanguage() {if(cd.documentElement.lang !== "es") cd.getElementById("lang-toggle").click();}
+  async function submitPin(pin, repeat) {
+    var field=cd.getElementById("visual-pin"); assert(field,"PIN input missing"); field.value=pin;
+    if (repeat !== undefined) cd.getElementById("visual-pin-repeat").value=repeat;
+    cd.querySelector(".dialog-actions button:last-child").click(); await sleep(80);
+  }
+  async function unlockSeed(id) {
+    cd.getElementById("unlock-"+(id || "secret")).click(); await submitPin("1234");
+    assert(await waitFor(()=>!dialogs().length), "unlock did not close");
+  }
+  async function t_visual_pin_set() {
+    await boot([note("a","Personal",["Task"])]); resetLanguage();
+    cd.getElementById("visual-lock-a").click();
+    assert(cd.activeElement.id === "visual-pin", "PIN initial focus");
+    assert(dialogs()[0].textContent.includes("No cifra"), "missing warning");
+    await submitPin("123", "123"); assert(cd.getElementById("visual-pin-error").textContent, "short PIN accepted");
+    await submitPin("1234", "4567"); assert(!firstNote().visualLock, "mismatch changed data");
+    await submitPin("1234", "1234");
+    assert(await waitFor(()=>cd.querySelector('.locked-note')), "not locked after creation");
+    assert(firstNote().visualLock.verifier.length === 64 && firstNote().visualLock.salt.length === 32,"verifier format");
+    assert(!JSON.stringify(firstNote().visualLock).includes('"1234"'), "plain PIN stored");
+    cd.getElementById("unlock-a").click(); await submitPin("0000");
+    assert(cd.getElementById("visual-pin-error").textContent.includes("incorrecto"), "wrong PIN accepted");
+    await submitPin("1234"); assert(await waitFor(()=>cd.getElementById("visual-lock-a")), "correct PIN rejected");
+    cd.getElementById("visual-lock-a").click(); assert(cd.querySelector('.locked-note'), "lock now failed");
+    await remount(); assert(cd.querySelector('.locked-note'), "lock did not survive reload");
+  }
+  async function t_visual_pin_privacy() {
+    await boot([lockedSeed(),note("public","Public",[],{links:["secret"]})]); resetLanguage();
+    var card=cd.querySelector('[data-id="secret"]');
+    assert(!card.querySelector('textarea,input') && !card.classList.contains("has-bg"), "locked card exposes fields/background");
+    assert(!card.outerHTML.includes("HIDDEN") && !card.outerHTML.includes("hidden-tag"), "locked DOM leak");
+    var publicStyle=cd.querySelector('[data-id="public"] .note-style');
+    if(publicStyle) {publicStyle.click(); assert(!cd.body.textContent.includes("HIDDEN-TITLE"),"linked title leaked"); cd.dispatchEvent(new cw.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));}
+    var search=cd.getElementById("search"); search.value="HIDDEN"; search.dispatchEvent(new cw.Event("input",{bubbles:true}));
+    assert(!cd.querySelector('[data-id="secret"]'),"locked content found in search");
+    search.value=""; search.dispatchEvent(new cw.Event("input",{bubbles:true}));
+    await unlockSeed(); assert(cd.querySelector('[data-id="secret"] textarea').value === 'HIDDEN-TITLE',"unlock missing content");
+    await remount(); assert(cd.querySelector('.locked-note'),"unlocked session persisted");
+  }
+  async function t_visual_pin_recovery() {
+    await boot([lockedSeed()]); resetLanguage();
+    function forgot(){cd.querySelector('.locked-note .visual-lock-controls button:last-child').click();}
+    forgot(); cd.querySelector('.dialog-actions button:first-child').click(); await sleep(10);
+    assert(firstNote().visualLock && cd.querySelector('.locked-note'),"cancel recovery mutated data");
+    forgot(); cd.querySelector('.dialog-actions button:last-child').click(); await sleep(15);
+    assert(!firstNote().visualLock && firstNote().title === 'HIDDEN-TITLE',"recovery destroyed content");
+    await boot([lockedSeed()]); resetLanguage();
+    cd.querySelector('.locked-note .visual-lock-controls button:nth-child(2)').click();
+    await submitPin('1234'); assert(await waitFor(()=>!firstNote().visualLock),"PIN removal failed");
+  }
+  async function t_visual_pin_import_export() {
+    await boot([lockedSeed()]); resetLanguage(); await unlockSeed();
+    var exported=null, OriginalBlob=cw.Blob;
+    cw.Blob=function(parts,options){if(options && options.type==='application/json')exported=JSON.parse(parts.join(''));return new OriginalBlob(parts,options);};
+    cd.getElementById('export').click(); assert(await waitFor(()=>exported),"no export");
+    assert(exported.schema === 2 && exported.notes[0].visualLock.verifier === visualLockSeed().verifier,"export lost lock");
+    assert(exported.notes[0].title==='HIDDEN-TITLE',"visual export unexpectedly encrypted");
+    await importAndChoose(exported,'Reemplazar');
+    assert(cd.querySelector('.locked-note'),"replace retained unlocked session");
+    var incoming=lockedSeed(); delete incoming.visualLock;
+    await importAndChoose(v2([incoming]),'Fusionar'); await dismissDialogs();
+    assert(stored().length === 2 && stored().some(n=>n.visualLock),"ambiguous lock merge lost conflict");
+    await importAndChoose(v2([incoming]),'Fusionar'); await dismissDialogs();
+    assert(stored().length === 2,"lock conflict not idempotent");
+  }
+  async function t_visual_pin_invalid_import() {
+    await boot([note('a','Keep',[])]); var before=storedRaw(); var incoming=lockedSeed(); incoming.visualLock={version:1,salt:'bad',verifier:'bad'};
+    setImportFile(v2([incoming])); await sleep(60);
+    assert(storedRaw()===before && !dialogs().length && alerts.length,"invalid lock import accepted");
+  }
+  function mapPositions(){return stored().map(n=>[n.id,n.pos.x,n.pos.y]);}
+  function assertMapGaps() {
+    var rects=[...cd.querySelectorAll('.note')].map(n=>n.getBoundingClientRect());
+    for(var i=0;i<rects.length;i++)for(var j=i+1;j<rects.length;j++) {
+      var a=rects[i],b=rects[j];
+      var gap=Math.max(b.left-a.right,a.left-b.right,b.top-a.bottom,a.top-b.bottom);
+      assert(gap>=39,'cards overlap or gap too small: '+gap);
+    }
+  }
+  async function t_map_arrange() {
+    await boot([note('a','A',['line\n'.repeat(10)],{links:['b'],pos:{x:1,y:2},pinned:true,pinnedAt:1}),
+      note('b','B',[],{links:['a'],tags:['group'],pos:{x:1,y:2}}),note('c','C',[],{tags:['group'],pos:{x:1,y:2}}),
+      note('isolated','Isolated',[],{pos:{x:1,y:2}}),lockedSeed()]);
+    cd.getElementById('view-map').click(); await sleep(30);
+    var original=mapPositions(), content=stored().map(n=>[n.id,n.title,n.items,n.links,n.pinned]);
+    cd.getElementById('arrange-map').click(); await sleep(40); assertMapGaps();
+    assert(firstNote().id === "a" && stored().find(n=>n.id === "b").pos.y === 24 && stored().find(n=>n.id === "b").pos.x === 24,"most connected list not root");
+    var ordered=mapPositions(); assert(!cd.getElementById('undo-map').disabled,'undo unavailable');
+    assert(JSON.stringify(content)===JSON.stringify(stored().map(n=>[n.id,n.title,n.items,n.links,n.pinned])),'layout changed content');
+    assert(stored().find(n=>n.id==='isolated').pos.y > stored().find(n=>n.id==='c').pos.y,'isolated before connected group');
+    cd.getElementById('arrange-map').click(); await sleep(20); assert(JSON.stringify(mapPositions())===JSON.stringify(ordered),'layout not deterministic');
+    cd.getElementById('undo-map').click();
+    // The immediate previous arrangement is the same deterministic layout.
+    assert(JSON.stringify(mapPositions())===JSON.stringify(ordered),'undo of second arrangement');
+    await remount(); cd.getElementById('view-map').click(); await sleep(20);
+    assert(JSON.stringify(mapPositions())===JSON.stringify(ordered),'layout did not persist');
+    iframe.style.width='375px'; cw.dispatchEvent(new cw.Event('resize')); await sleep(30);
+    cd.getElementById('arrange-map').click(); await sleep(30); assertMapGaps();
+  }
+  async function t_map_undo_invalidation() {
+    await boot([note('a','A',[],{pos:{x:17,y:23}}),note('b','B',[],{pos:{x:31,y:49}})]);
+    cd.getElementById('view-map').click(); var before=mapPositions();
+    cd.getElementById('arrange-map').click(); cd.getElementById('undo-map').click();
+    assert(JSON.stringify(mapPositions())===JSON.stringify(before),'undo did not restore original');
+    cd.getElementById('arrange-map').click();
+    var search=cd.getElementById('search'); search.value='A'; search.dispatchEvent(new cw.Event('input',{bubbles:true}));
+    assert(cd.getElementById('arrange-map').disabled && cd.getElementById('undo-map').disabled,'search permits layout');
+    search.value=''; search.dispatchEvent(new cw.Event('input',{bubbles:true}));
+    cd.getElementById('arrange-map').click();
+    var title=cd.getElementById('title-a'); title.value='Edited'; title.dispatchEvent(new cw.Event('change',{bubbles:true}));
+    assert(cd.getElementById('undo-map').disabled,'edit retained undo');
+    cd.getElementById('arrange-map').click();
+    cd.querySelector('[data-id="a"]').style.width='410px'; await sleep(50);
+    assert(cd.getElementById('undo-map').disabled,'size change retained undo');
+  }
+  function pointer(target,type,id,x,y,extra) {
+    target.dispatchEvent(new cw.PointerEvent(type,Object.assign({pointerId:id,button:0,pointerType:'touch',isPrimary:true,bubbles:true,cancelable:true,clientX:x,clientY:y},extra||{})));
+  }
+  async function t_map_drag_lifecycle() {
+    await boot([note('a','A',[],{pos:{x:24,y:24}})]); cd.getElementById('view-map').click();
+    var grip=cd.querySelector('.note-grip');
+    for(var end of ['pointercancel','lostpointercapture','blur','visibility','zoom']) {
+      pointer(grip,'pointerdown',1,40,40); assert(cd.getElementById('arrange-map').disabled,'arrange active during drag');
+      pointer(grip,'pointerdown',2,40,40,{isPrimary:false}); pointer(cd,'pointermove',2,800,800);
+      assert(firstNote().pos.x<800,'secondary pointer took over');
+      pointer(cd,'pointermove',1,60,70);
+      if(end==='blur')cw.dispatchEvent(new cw.Event('blur'));
+      else if(end==='visibility') {Object.defineProperty(cd,'hidden',{configurable:true,value:true});cd.dispatchEvent(new cw.Event('visibilitychange'));delete cd.hidden;}
+      else if(end==='zoom') {
+        var scale=cw.visualViewport.scale;
+        Object.defineProperty(cw.visualViewport,'scale',{configurable:true,value:scale+0.5});cw.visualViewport.dispatchEvent(new cw.Event('resize'));delete cw.visualViewport.scale;
+      } else pointer(cd,end,1,60,70);
+      assert(!cd.querySelector('.dragging') && !cd.getElementById('arrange-map').disabled,'drag stuck after '+end);
+      var after=JSON.stringify(firstNote().pos); pointer(cd,'pointermove',1,900,900);
+      assert(JSON.stringify(firstNote().pos)===after,'stale listener after '+end);
+    }
+    pointer(grip,'pointerdown',3,40,40);pointer(cd,'pointermove',3,80,80);pointer(cd,'pointerup',3,80,80);
+    assert(!cd.querySelector('.dragging'),'restart stuck');
+  }
+  async function t_item_drag_lifecycle() {
+    await boot([note('a','A',['one','two','three'])]);
+    for(var end of ['pointercancel','lostpointercapture','blur']) {
+      var grips=cd.querySelectorAll('.item-grip'), rect=grips[2].getBoundingClientRect(), top=grips[0].getBoundingClientRect();
+      pointer(grips[2],'pointerdown',1,rect.x,rect.y);pointer(grips[0],'pointerdown',2,top.x,top.y,{isPrimary:false});
+      pointer(cd,'pointermove',1,top.x,top.y-10);
+      if(end==='blur')cw.dispatchEvent(new cw.Event('blur'));else pointer(cd,end,1,top.x,top.y);
+      assert(!cd.querySelector('.dragging'),'item drag stuck '+end);
+      var before=storedRaw();pointer(cd,'pointermove',1,100,900);assert(storedRaw()===before,'item stale listener');
+    }
+  }
+
+  async function t_pin_viewport() {
+    await boot([lockedSeed()]);
+    var viewport=cw.visualViewport;
+    assert(viewport,"visual viewport unavailable");
+    var props={width:340,height:320,offsetLeft:25,offsetTop:18};
+    Object.keys(props).forEach(k=>Object.defineProperty(viewport,k,{configurable:true,value:props[k]}));
+    try {
+      cd.getElementById('unlock-secret').focus(); cd.getElementById('unlock-secret').click();
+      var rect=cd.querySelector('.dialog').getBoundingClientRect();
+      assert(rect.left>=25 && rect.right<=365 && rect.top>=18 && rect.bottom<=338,'dialog outside visual viewport');
+      cd.dispatchEvent(new cw.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+      assert(cd.activeElement.id==='unlock-secret','PIN cancel focus');
+    } finally {Object.keys(props).forEach(k=>delete viewport[k]);}
+  }
+
   // ---------------------------------------------------------------- runner
   var tests = [
     ["merge-metadata-newer", t_probe_merge_metadata_newer],
@@ -975,7 +1214,19 @@
     ["pin-order", t_pin_order],
     ["pin-import", t_pin_import],
     ["pin-import-duplicate", t_pin_import_duplicate],
-    ["pin-holo", t_pin_holo]
+    ["pin-holo", t_pin_holo],
+    ["delete-dialogs", t_delete_dialogs],
+    ["cat-help", t_cat_help],
+    ["visual-pin-set", t_visual_pin_set],
+    ["visual-pin-privacy", t_visual_pin_privacy],
+    ["visual-pin-recovery", t_visual_pin_recovery],
+    ["visual-pin-import-export", t_visual_pin_import_export],
+    ["visual-pin-invalid-import", t_visual_pin_invalid_import],
+    ["map-arrange", t_map_arrange],
+    ["map-undo-invalidation", t_map_undo_invalidation],
+    ["map-drag-lifecycle", t_map_drag_lifecycle],
+    ["item-drag-lifecycle", t_item_drag_lifecycle],
+    ["pin-viewport", t_pin_viewport]
   ];
 
   var watchdog = setTimeout(function () {

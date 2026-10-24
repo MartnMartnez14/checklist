@@ -49,6 +49,8 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
 - **Dos modos de visualización:**
   - **Vista Cuadrícula:** Tablero organizado automáticamente en columnas adaptables.
   - **Vista Mapa:** Lienzo libre donde podés arrastrar y ubicar cada lista donde quieras (con ratón, pantalla táctil o flechas del teclado).
+  - **Ordenar mapa:** agrupa listas conectadas manualmente o por etiquetas, con al menos 40 px entre tarjetas y 64 px entre grupos. Conserva su tamaño legible; desplazate para recorrer todo el tablero. Se desactiva durante búsquedas y arrastres.
+  - **Deshacer orden:** restaura las posiciones anteriores durante la sesión; deja de estar disponible al editar listas, cambiar tamaños o mover tarjetas.
 - **Conexiones entre listas (Grafo estilo Obsidian):**
   - **Manuales:** Tocá el ícono de cadena en una lista y luego hacé clic en otra para unirlas con una flecha curva interactiva.
   - **Automáticas por etiquetas (`tags`):** Si dos o más listas comparten una etiqueta (ej. `proyecto`, `compras`), se conectan automáticamente con línea punteada del color de esa etiqueta.
@@ -57,6 +59,12 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
   - **Bilingüe Español / Inglés (`ES` / `EN`):** Alterná en un clic entre **Checklist Gato** y **Checklist Cat** desde la barra superior (sin tocar jamás el texto de tus notas).
   - **Modo claro y modo oscuro:** Con detección automática del sistema, botón de cambio instantáneo y logos dedicados (`cat-day.png` / `cat-night.png`).
   - **Estilo por lista:** Paleta de 10 colores con control deslizable de opacidad (0 % a 60 %) y soporte para subir imágenes o GIFs animados de fondo.
+- **PIN visual por lista:** botón con candado, PIN de 4–8 dígitos y repetición para confirmarlo. Oculta título, tareas, etiquetas y fondo en la interfaz, y omite el contenido bloqueado en búsquedas. El desbloqueo dura hasta recargar o tocar «Bloquear ahora».
+  - **No cifra los datos:** el contenido continúa en texto plano en el almacenamiento y los respaldos JSON. Solo se guarda un verificador SHA-256 con sal aleatoria, nunca el PIN. Requiere HTTPS o localhost con Web Crypto.
+  - **Recuperación:** «Olvidé el PIN» permite quitar el bloqueo con una confirmación explícita. Es una ayuda para ocultar casualmente, sin protección frente a alguien con acceso al navegador.
+  - Exportar/Importar conserva los metadatos del bloqueo; las importaciones comienzan bloqueadas. Las copias antiguas de la app pueden ignorar este campo opcional y mostrar el texto.
+- **Ayuda del gato:** preguntas guiadas en el pie, con ocho temas en ES/EN. Funciona offline, no usa IA ni lee las notas.
+- **Confirmaciones de borrado:** listas, conexiones y completados usan un diálogo con Cancelar como opción inicial y soporte de teclado.
 - **Accesibilidad:** Navegación completa por teclado, avisos para lectores de pantalla (`aria-live`) y respeto por la preferencia de movimiento reducido (`prefers-reduced-motion`).
 - **Enlace compartible:** Metadatos SEO/OpenGraph y Twitter Card con imagen, para que el enlace muestre una vista previa clara al compartirlo.
 
@@ -65,16 +73,18 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
 ## 🛠️ Detalles técnicos (Para desarrolladores y auditores)
 
 ### Arquitectura de almacenamiento local
-- **`localStorage` (`checklist-notas-v1`, `checklist-theme`, `checklist-view`):** Guarda la estructura JSON de las notas, ítems, colores, posiciones en el mapa, etiquetas, conexiones, listas fijadas (`pinned`/`pinnedAt`) y preferencias de vista/tema.
+- **`localStorage` (`checklist-notas-v1`, `checklist-theme`, `checklist-view`):** Guarda la estructura JSON de las notas, ítems, colores, posiciones en el mapa, etiquetas, conexiones, listas fijadas (`pinned`/`pinnedAt`), metadatos opcionales `visualLock` (`version`, `salt`, `verifier`) y preferencias de vista/tema.
 - **`IndexedDB` (base `checklist-media`, almacén `images`):** Guarda los binarios (`Blob`) de las imágenes y GIFs de fondo con deduplicación por hash **SHA-256** (`crypto.subtle.digest`) y recolector de basura automático (`gcImages`) que limpia imágenes huérfanas cuando ya ninguna nota las utiliza.
 - **Seguridad contra XSS:** Toda la construcción del DOM se realiza con funciones declarativas (`el()`, `svgEl()`) y `textContent`. No se utiliza `innerHTML` con datos del usuario en ningún punto de la aplicación.
 
 ### Estructura de archivos
 - `index.html` — Aplicación completa (HTML5, CSS moderno y JavaScript vanilla en un único archivo, cero dependencias externas).
-- `sw.js` — Service Worker para funcionamiento offline (estrategia *network-first* sin caché para el documento HTML y *cache-first* para iconos y recursos estáticos).
+- `sw.js` — Service Worker para funcionamiento offline (estrategia *network-first* con solicitud sin caché HTTP y respaldo offline del documento HTML y *cache-first* para iconos y recursos estáticos).
 - `manifest.json`, `icon-192.png`, `icon-512.png` — Manifiesto e íconos para instalación como PWA en Android, iOS y escritorio.
 - `cat-day.png` / `cat-night.png` — Ilustraciones del logo para modo claro y oscuro.
 - `CNAME` — Configuración de dominio personalizado (`checklistgato.com`) sobre GitHub Pages con HTTPS obligatorio.
+- `CHANGELOG.md` — Historial de cambios comprobados, sin versiones históricas atribuidas.
+- `INCIDENCIAS.md` — Seguimiento de errores y sugerencias sin datos personales.
 - `ROADMAP.md` — Hoja de ruta técnica, auditoría y planificación evolutiva del proyecto.
 - `tests/run.sh` y `tests/harness.html` — Suite automatizada de pruebas de regresión en Chrome headless.
 
@@ -95,7 +105,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal, ejecuta todos los casos de `tests/harness.html` y reporta el resumen final (`PASS=25 FAIL=0 NOVERIFY=0`).
+Requiere `google-chrome` y `python3`. Levanta un servidor temporal, ejecuta todos los casos de `tests/harness.html` y reporta el resumen final (`PASS=44 FAIL=0 NOVERIFY=0`). Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
 
 ---
 
