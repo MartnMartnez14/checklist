@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** Dev local 2026-10-25 con mejoras de estilo y documentación integradas; 48 pruebas aprobadas en Chrome con tiempo real y con movimiento reducido. La publicación anterior de `main` corresponde al 2026-10-24.
+**Estado:** Versión candidata 2026-10-25 desde dev para publicar en main y GitHub Pages; caché `checklist-v15`. Verificación de despliegue pendiente. Historial anterior conservado al final.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -33,7 +33,8 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 
 ## 2. DIAGNÓSTICO Y AUDITORÍA TÉCNICA DEL ESTADO ACTUAL (BASE v1.0)
 
-### 2.1 Estado local comprobado (`PASS=44 FAIL=0 NOVERIFY=0`)
+### 2.1 Estado funcional y validación
+Suite de 48 casos: aprobados en Chrome con tiempo real y movimiento reducido. El ejecutor con reloj virtual tiene esperas intermitentes documentadas en el cierre de integración; no equivale a validación Android física.
 - **Arquitectura cero-dependencias:** HTML5, CSS moderno (variables CSS, `color-mix`, `conic-gradient`) y JavaScript vanilla en `index.html`.
 - **Gestión de listas y elementos:**
   - Creación, edición y borrado de listas y elementos.
@@ -58,7 +59,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
   - Exportación en JSON incluyendo notas e imágenes codificadas en Base64.
   - Importación con validación estructural, descarga automática de copia de seguridad previa y dos modos: **Fusionar (idempotente)** y **Reemplazar**.
 - **PWA e infraestructura:**
-  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v13`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
+  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v15`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
   - Dominio personalizado `https://checklistgato.com` (DNS en Hostinger apuntando a GitHub Pages con `CNAME` y HTTPS activo).
   - **Descubrimiento y metadatos:** `description`, `canonical`, OpenGraph (título, descripción, URL e imagen absoluta), Twitter Card y `manifest.json` enriquecido (`lang`, `description`, `categories`), listos para compartir el enlace con vista previa.
 - **Seguridad XSS:**
@@ -88,7 +89,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
 | **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (`mergeNotes` refinado con metadatos y enlaces locales) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v13`; distribución desde `main`) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v15`; distribución desde `main`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
 | **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
 | **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
@@ -96,7 +97,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 | **CAT-07** | Sección pública «🐾 Próximos pasos» dentro de la app | **P2** | Baja | **Hecho (Sección 5 / Backlog Paso 4.C)** |
 | **CAT-08** | Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`) | **P2** | Media | **Hecho (Etapa 4 / Backlog Paso 4)** |
 | **CAT-09** | Optimización y rendimiento a gran escala (100 a 10.000 listas) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2)** |
-| **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Pendiente (Etapa 5)** |
+| **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Parcialmente implementado:** restablecer estilo, contraste y realce al completar; otras ideas pendientes |
 | **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho** (README y CHANGELOG; tags Git pendientes de lanzamientos autorizados) |
 | **CAT-12** | Buscador / filtro rápido de listas, notas y etiquetas | **P3** | Baja-Media | **Hecho (Paso 8)** |
 | **CAT-13** | Visor "Mapa estelar" (3.ª vista modo universo) | **P3** | Alta | **Idea (Etapa 3.3 / 10.E)** |
@@ -123,7 +124,7 @@ Garantizar que Checklist Gato sea impecable realizando las funciones que ya ofre
 - **1.1 Protección de almacenamiento:** Capturar errores de cuota (`QuotaExceededError`) en `localStorage` e `IndexedDB`, ofreciendo al usuario exportar un respaldo inmediato si la memoria del navegador se llena.
 - **1.2 Confirmaciones seguras:** ✅ Hecho localmente. Borrar lista, completados y conexión usa `openDialog`, Cancelar inicialmente enfocado, Escape y cierre desde el fondo sin cambios; foco recuperado tras confirmar. Test `delete-dialogs`.
 - **1.3 Refinamiento de Fusión (`mergeNotes`):** Preservar enlaces entrantes hacia notas locales existentes y contemplar cambios de estilo/color en notas sin `updatedAt`.
-- **1.4 Ampliación de tests (`tests/harness.html`):** Suite local de 44 casos: base anterior, PIN visual, importación/fusión, ordenamiento/Deshacer, cancelaciones de arrastre y viewport visual. Las comprobaciones automatizadas no equivalen a una auditoría con lector de pantalla ni a pruebas en dispositivos físicos.
+- **1.4 Ampliación de tests (`tests/harness.html`):** Suite de 48 casos: base anterior, PIN visual, importación/fusión, ordenamiento/Deshacer, cancelaciones de arrastre y viewport visual. Las comprobaciones automatizadas no equivalen a una auditoría con lector de pantalla ni a pruebas en dispositivos físicos.
 
 ---
 
@@ -179,9 +180,9 @@ Incorporar el inglés como segundo idioma oficial sin añadir librerías externa
 
 ### ETAPA 5 — Personalización y Experiencia Visual (Prioridad: MEDIA — P2/P3)
 Perfeccionar la identidad visual sin recargar la aplicación.
-- **5.1 Modo claro y oscuro:** Revisar continuamente contraste WCAG, legibilidad sobre tarjetas coloreadas, transiciones suaves y adaptación de los iconos del gato (`cat-day.png` / `cat-night.png`).
-- **5.2 Fondos de listas:** Mejorar la vista previa de imagen/color, evaluar gradientes suaves opcionales y facilitar el restablecimiento al estilo original sin afectar la lectura ni el rendimiento.
-- **5.3 Microinteracciones discretas:** Pequeñas animaciones al completar tareas, crear listas o cambiar de vista, respetando estrictamente `@media (prefers-reduced-motion: reduce)`.
+- **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles y capa de lectura sobre imágenes. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
+- **5.2 Fondos de listas:** Implementado Restablecer estilo con confirmación ES/EN: sin color ni imagen y opacidad 18 %, conservando datos y PIN. Mejoras de vista previa y gradientes siguen pendientes.
+- **5.3 Microinteracciones discretas:** Implementado realce de color de 260 ms solo al completar tareas, sin desplazamiento, desactivado con movimiento reducido. Animaciones al crear listas o cambiar de vista no implementadas.
 - **5.4 Editor ampliado (CAT-14):** ✅ **Hecho.** Modal accesible para leer y editar un ítem largo, con textarea amplio, Guardar/Cancelar, foco atrapado y Escape. Tests `item-editor`.
 - **5.5 Claridad de acciones en móvil (CAT-17):** ✅ Hecho. Etiquetas visibles de Importar, Exportar y Nueva lista, con espaciado compacto del header y comprobación a 375 px.
 - **5.6 Listas fijadas y estilo «carta legendaria» (CAT-22):** ✅ **Hecho.** Hasta 3 listas fijadas por tablero, orden persistente (primero las fijadas), botón accesible con `aria-pressed`, validación al importar/fusionar y borde holográfico animado con `conic`/`linear-gradient`, respetando `prefers-reduced-motion` y con fallback sin máscaras CSS. Tests `pin-limit`, `pin-order`, `pin-import`, `pin-import-duplicate` y `pin-holo`.
@@ -276,13 +277,13 @@ Dejar explícito que el proyecto es abierto, auditable y pensado para durar, par
 
 Se incorporará en la interfaz (como panel desplegable discreto en el pie de página, accesible y adaptado a modo claro y oscuro) con tres categorías claras:
 
-### 🛠️ En desarrollo
-- PIN visual y orden automático del mapa disponibles localmente.
-- Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.
+### ✅ Disponible
+- PIN visual, ayuda local y orden automático del mapa con Deshacer.
+- Restablecer estilo, mejor legibilidad y realce suave al completar tareas.
 
 ### 🔜 Próximamente
 - Optimización de rendimiento para tableros con gran cantidad de listas y conexiones.
-- Validación en Android real de los cambios de arrastre y zoom.
+- Controles de zoom del mapa (CAT-26) y validación de arrastre y zoom en Android real (CAT-21).
 
 ### 💡 Ideas a futuro *(en evaluación)*
 - **Visor «Mapa estelar» (modo universo):** vista panorámica de nodos y conexiones.
@@ -312,7 +313,7 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - **Fecha y hora de creación** visible en cada nota (respetando notas antiguas sin fecha).
 - Pie de página **«Apoyar el proyecto»** (Ko-fi, PayPal, Starlink como enlace de referido y cuenta Prex con botón de copiado rápido).
 - Modo **Mapa** con arrastre robusto en móvil y teclado, y bordes coloreados por conexión (sólido o multicolor).
-- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 44 pruebas de regresión en verde en la revisión local actual.
+- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 48 casos; ver resultados y límites de ejecución en el cierre de integración del 2026-10-25.
 - Atajos de teclado (`N`, `G`, `M`, `/`, `?`), progreso discreto por lista y buscador global insensible a acentos.
 - Plantillas rápidas bilingües (Compras, Estudios, Proyectos, Hábitos, Viajes y Organización personal) con contenido actualizado (Pomodoro, hábitos saludables, equipaje y organización).
 - **Editor ampliado por ítem:** modal accesible para leer y editar textos largos, con foco atrapado y Escape.
@@ -452,3 +453,13 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Limitación detectada: `bash tests/run.sh` en modo normal y reloj virtual produjo fallos intermitentes de espera (`style-shared-image` y `delete-dialogs`), aunque esos casos pasaron en tiempo real. No se considera estabilizado ese ejecutor; no se modificó para ocultar los fallos.
 - `git diff --check`, enlaces documentales locales y conservación de los archivos principales comprobados.
 - `main`, sus cambios locales, el remoto y los demás worktrees se conservan. Sin push ni publicación. CAT-21 y CAT-26 siguen pendientes de implementación/validación según su alcance; no se da por resuelto el zoom Android.
+
+### Preparación de publicación — 2026-10-25
+- Dev reúne documentación y mejoras de estilo; roadmap visible ES/EN sincronizado con funciones disponibles y pendientes reales.
+- Caché candidata `checklist-v15`. Publicación y comprobación del dominio pendientes al preparar este registro.
+- Cifrado real, controles de zoom y validación Android siguen pendientes. No se implementan otras funciones en esta publicación.
+
+- Ajuste de cierre: la tarjeta del correo de contacto desbordaba a 375 px con ciertas fuentes; se limita a su contenedor y se permite cortar el texto largo conservando el botón Copiar.
+- La candidata pasó 48 pruebas en Chrome con tiempo real normal y reducido. El reloj virtual volvió a agotar esperas de imágenes en ambos modos; no se atribuyen esos fallos a una validación física ni se ocultan.
+
+- Validación final de la candidata: 48/48 aprobadas con tiempo real normal y reducido; ES/EN a 375 px sin desborde; cancelar/restablecer con foco recuperado y persistencia tras editar/recargar offline con caché v15. Datos de prueba ficticios, sin usar notas personales.

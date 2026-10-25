@@ -1,6 +1,6 @@
 # Arquitectura y flujo de desarrollo de Checklist Gato
 
-Documento de referencia para comprender y mantener el proyecto. Revisado el 2026-10-24. Distingue el comportamiento actual de las decisiones pendientes del [roadmap](ROADMAP.md).
+Documento de referencia para comprender y mantener el proyecto. Revisado el 2026-10-25. Distingue el comportamiento actual de las decisiones pendientes del [roadmap](ROADMAP.md).
 
 ## 1. Arquitectura actual
 
@@ -155,3 +155,7 @@ Al cambiar almacenamiento, responsabilidades, flujo de datos o despliegue:
 - `pin-mapa` ya estaba incorporado en la base `649a366`; conserva su estado histórico y no se reaplica.
 - La integración incluye restablecer estilo, contraste de tarjetas y realce al completar tareas; caché `checklist-v14`. La validación conjunta se registra en el roadmap.
 - Los snapshots del 2026-10-24 describen estados anteriores. `main` permanece en su commit anterior, con sus modificaciones documentales locales intactas. Sin push ni publicación.
+
+### Publicación 2026-10-25
+
+La candidata usa caché `checklist-v15`, sin cambios de esquema de datos ni infraestructura. El proceso autorizado es dev → main por fast-forward → push → Pages → comprobación del dominio y documentación servida. Los resultados finales se registran en el roadmap; no confundir preparación con despliegue verificado. Los documentos locales anteriores de main se conservan mediante copia externa y stash identificado.

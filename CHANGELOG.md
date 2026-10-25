@@ -1,5 +1,12 @@
 # Historial de cambios
 
+## Publicación preparada — 2026-10-25
+
+- Restablecer estilo ES/EN con confirmación, contraste adaptativo y realce al completar tareas con movimiento reducido.
+- Roadmap visible actualizado en ambos idiomas; documentación de arquitectura, decisiones y CAT-26 sincronizada.
+- Corregido desborde móvil de la tarjeta de correo de contacto a 375 px.
+- Caché `checklist-v15`; despliegue pendiente de comprobación. No cambia el formato de datos; PIN visual y pendientes Android conservados.
+
 ## Actualización 2026-10-24
 
 - Publicación autorizada de los dos bloques integrados: confirmaciones accesibles, FAQ local ES/EN, PIN visual con recuperación y orden automático del mapa con Deshacer.

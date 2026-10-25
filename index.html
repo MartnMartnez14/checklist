@@ -439,6 +439,9 @@
   .support-note { margin: 12px 0 0; font-size: 11.5px; }
   .feedback-block { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--line); }
   .feedback-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .feedback-actions .support-card { max-width: 100%; }
+  .feedback-actions .support-card > span { min-width: 0; overflow-wrap: anywhere; }
+  .feedback-actions .support-copy { flex-shrink: 0; }
   .roadmap-details { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--muted); }
   .roadmap-summary { cursor: pointer; font-weight: 650; color: var(--text); font-size: 13.5px; padding: 4px 0; user-select: none; }
   .roadmap-summary:hover { color: var(--accent); }
@@ -580,17 +583,17 @@
     <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
     <div class="roadmap-grid">
       <div class="roadmap-col">
-        <h3 id="rm-dev-title">🛠️ En desarrollo</h3>
+        <h3 id="rm-dev-title">✅ Disponible</h3>
         <ul>
-          <li id="rm-dev-1">Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.</li>
-          <li id="rm-dev-2">PIN visual y orden automático del mapa disponibles localmente.</li>
+          <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
+          <li id="rm-dev-2">Restablecer estilo, mejor legibilidad y realce suave al completar tareas.</li>
         </ul>
       </div>
       <div class="roadmap-col">
         <h3 id="rm-soon-title">🔜 Próximamente</h3>
         <ul>
           <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
-          <li id="rm-soon-2">Validar en Android real las mejoras de arrastre y zoom.</li>
+          <li id="rm-soon-2">Controles de zoom del mapa y validación de arrastre y zoom en Android real.</li>
         </ul>
       </div>
       <div class="roadmap-col">
@@ -716,12 +719,12 @@
       copiedEmailAnnounceOk: "Correo de contacto copiado",
       copiedEmailAnnounceFail: "No se pudo copiar, el correo es mmartinez23bio@hotmail.com",
       roadmapSummary: "🐾 Próximos pasos (Hoja de ruta)",
-      rmDevTitle: "🛠️ En desarrollo",
-      rmDev1: "Estabilidad continua, confirmaciones seguras y protección del almacenamiento local.",
-      rmDev2: "PIN visual y orden automático del mapa disponibles localmente.",
+      rmDevTitle: "✅ Disponible",
+      rmDev1: "PIN visual, ayuda local y orden automático del mapa con Deshacer.",
+      rmDev2: "Restablecer estilo, mejor legibilidad y realce suave al completar tareas.",
       rmSoonTitle: "🔜 Próximamente",
       rmSoon1: "Optimización de rendimiento para tableros con cientos o miles de listas.",
-      rmSoon2: "Validar en Android real las mejoras de arrastre y zoom.",
+      rmSoon2: "Controles de zoom del mapa y validación de arrastre y zoom en Android real.",
       rmIdeasTitle: "💡 Ideas a futuro",
       rmIdeas1: "Visor «Mapa estelar» (modo universo de nodos y conexiones).",
       rmIdeas2: "Calendario e IA opcional, sujetos a evaluación.",
@@ -881,12 +884,12 @@
       copiedEmailAnnounceOk: "Contact email copied",
       copiedEmailAnnounceFail: "Could not copy, the email is mmartinez23bio@hotmail.com",
       roadmapSummary: "🐾 What's next (Roadmap)",
-      rmDevTitle: "🛠️ In development",
-      rmDev1: "Continuous stability, safe confirmations, and local storage protection.",
-      rmDev2: "Visual PIN and automatic map arrangement available locally.",
+      rmDevTitle: "✅ Available",
+      rmDev1: "Visual PIN, local help, and automatic map arrangement with Undo.",
+      rmDev2: "Reset style, improved readability, and subtle feedback when completing tasks.",
       rmSoonTitle: "🔜 Coming soon",
       rmSoon1: "Performance optimization for boards with hundreds or thousands of lists.",
-      rmSoon2: "Validate drag and zoom improvements on a real Android device.",
+      rmSoon2: "Map zoom controls and validation of drag and zoom on a real Android device.",
       rmIdeasTitle: "💡 Future ideas",
       rmIdeas1: "Star Map viewer (universe mode for nodes and connections).",
       rmIdeas2: "Calendar and optional AI, subject to evaluation.",

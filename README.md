@@ -110,7 +110,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal, ejecuta todos los casos de `tests/harness.html` y reporta el resumen final (`PASS=48 FAIL=0 NOVERIFY=0`). Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
+Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 48 casos de `tests/harness.html`. La suite aprobó en Chrome con tiempo real, tanto normal como con movimiento reducido (`PASS=48 FAIL=0 NOVERIFY=0`); el ejecutor con reloj virtual presenta esperas intermitentes en imágenes/conexiones, registradas en el roadmap. Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
 
 ---
 
@@ -123,3 +123,7 @@ Checklist Gato es un proyecto independiente, gratuito y de código abierto:
 ## 📄 Licencia
 
 Publicado bajo licencia [MIT](LICENSE).
+
+## Estado de la actualización 2026-10-25
+
+Versión candidata de dev para main/Pages con caché `checklist-v15`: estilo, contraste, realce de tareas y documentación sincronizada. El roadmap visible separa funciones disponibles, próximos pasos e ideas. El cierre del despliegue se registra en [ROADMAP.md](ROADMAP.md). El PIN sigue siendo visual, sin cifrado; zoom del mapa y Android físico siguen pendientes.
