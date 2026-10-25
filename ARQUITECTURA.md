@@ -147,3 +147,11 @@ Al cambiar almacenamiento, responsabilidades, flujo de datos o despliegue:
 | 2026-10-24 | Mantener PWA estática con datos locales | Simplicidad, privacidad y funcionamiento offline | Arquitectura actual; no agregar backend por defecto |
 | 2026-10-24 | Usar tareas en worktrees, integración en dev y publicación desde main | Separar trabajo, validación conjunta y entrega pública | Flujo habitual; la copia verificada anterior queda documentada como antecedente |
 | 2026-10-24 | Evolucionar de PIN visual a cifrado real sin recuperación | El ocultamiento actual no cumple el objetivo de proteger el contenido | Pendiente en CAT-20; no se modifica hoy la aplicación |
+
+
+### Integración local — 2026-10-25
+
+- La rama `codex/dev-offline` usa el worktree `875e` e incorpora la documentación pendiente y la rama `codex/estilo-legibilidad` mediante merge local.
+- `pin-mapa` ya estaba incorporado en la base `649a366`; conserva su estado histórico y no se reaplica.
+- La integración incluye restablecer estilo, contraste de tarjetas y realce al completar tareas; caché `checklist-v14`. La validación conjunta se registra en el roadmap.
+- Los snapshots del 2026-10-24 describen estados anteriores. `main` permanece en su commit anterior, con sus modificaciones documentales locales intactas. Sin push ni publicación.

@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** Actualización 2026-10-24 integrada para distribución desde `main` mediante GitHub Pages; 44 pruebas locales aprobadas.
+**Estado:** Dev local 2026-10-25 con mejoras de estilo y documentación integradas; 48 pruebas aprobadas en Chrome con tiempo real y con movimiento reducido. La publicación anterior de `main` corresponde al 2026-10-24.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -432,3 +432,23 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Creado `ARQUITECTURA.md`: componentes, datos, diagramas Mermaid y flujo habitual worktrees → dev → main → Pages → dominio. Distingue este flujo del antecedente de copia verificada usado hoy.
 - CAT-20: registrada la evolución a cifrado real sin recuperación, con borrado confirmado de listas bloqueadas y advertencia de pérdida de acceso al olvidar la contraseña.
 - Solo documentación local: sin cambios funcionales, nuevo commit ni publicación.
+
+### Worktree estilo y legibilidad — 2026-10-25 (sin integrar ni publicar)
+- Rama `codex/estilo-legibilidad`, desde `main` (`649a366`), en worktree independiente. Otros worktrees y cambios documentales de la carpeta principal conservados.
+- **5.2:** Restablecer estilo ES/EN al final del bloque de fondo: confirmación con Cancelar inicial; color nulo, opacidad 18 %, fondo nulo. Mantiene contenido, PIN, fijado, posiciones y conexiones; reutiliza el manejo de imágenes compartidas. Las demás ideas de vista previa y gradientes siguen pendientes.
+- **5.1:** Primer plano negro/blanco según superficie compuesta de tarjeta, iconos sin atenuación, foco y placeholders legibles; capa de lectura sobre imágenes al 96 %. Ajuste local, no certificación WCAG integral.
+- **5.3:** Realce de color de 260 ms solo al completar una tarea; sin movimiento ni cambio de tamaño, sin reproducción al cargar o redibujar, desactivado con movimiento reducido. Crear listas y cambiar de vista no reciben nuevas animaciones.
+- Corregida propagación de Escape y clics de diálogos para conservar el panel de estilo y recuperar foco al cancelar.
+- Base: 44 pruebas aprobadas. Cierre: `bash tests/run.sh` → `PASS=48 FAIL=0 NOVERIFY=0`; también 48 aprobadas en Chrome con `--force-prefers-reduced-motion`. `git diff --check` correcto.
+- Nuevas pruebas: `style-reset`, `style-shared-image`, `card-contrast`, `completion-feedback`. Cubren cancelación/botón/Escape/fondo, trampa de foco, ES/EN, 375 px, persistencia, PIN y PNG compartido. Contraste medido para textos e iconos en 60 superficies (10 colores × 3 opacidades × 2 temas), foco de edición y límites de imágenes negras/blancas bajo la capa de lectura.
+- Revisión visual en Chrome a 375 px, temas claro y oscuro. No se probaron lector de pantalla, Safari ni Android físico; el zoom Android/CAT-21 sigue abierto.
+- Caché del worktree: `checklist-v14`. Sin commit, integración a dev ni publicación.
+
+### Integración conjunta en dev — 2026-10-25
+- Destino: `codex/dev-offline`, worktree `875e`. Integra documentación de arquitectura, decisión futura de cifrado sin recuperación y CAT-26, más la rama `codex/estilo-legibilidad`.
+- `pin-mapa`: código ya presente en la base `649a366`; se conserva como referencia, sin reaplicar archivos antiguos. Sus diferencias documentales describen etapas anteriores.
+- Se conservaron las secciones históricas del cierre documental y del worktree de estilo; sus menciones a falta de commits o integración corresponden a esas etapas.
+- Caché integrada: `checklist-v14`. Validación conjunta: `PASS=48 FAIL=0 NOVERIFY=0` en Chrome con tiempo real; mismo resultado con el ejecutor headless y `--force-prefers-reduced-motion`.
+- Limitación detectada: `bash tests/run.sh` en modo normal y reloj virtual produjo fallos intermitentes de espera (`style-shared-image` y `delete-dialogs`), aunque esos casos pasaron en tiempo real. No se considera estabilizado ese ejecutor; no se modificó para ocultar los fallos.
+- `git diff --check`, enlaces documentales locales y conservación de los archivos principales comprobados.
+- `main`, sus cambios locales, el remoto y los demás worktrees se conservan. Sin push ni publicación. CAT-21 y CAT-26 siguen pendientes de implementación/validación según su alcance; no se da por resuelto el zoom Android.
