@@ -1,11 +1,12 @@
 # Historial de cambios
 
-## Publicación preparada — 2026-10-25
+## Publicación verificada — 2026-10-25
 
 - Restablecer estilo ES/EN con confirmación, contraste adaptativo y realce al completar tareas con movimiento reducido.
 - Roadmap visible actualizado en ambos idiomas; documentación de arquitectura, decisiones y CAT-26 sincronizada.
 - Corregido desborde móvil de la tarjeta de correo de contacto a 375 px.
-- Caché `checklist-v15`; despliegue pendiente de comprobación. No cambia el formato de datos; PIN visual y pendientes Android conservados.
+- 48 pruebas aprobadas en tiempo real normal y reducido; esperas intermitentes del ejecutor con reloj virtual registradas, sin validación Android física.
+- Caché `checklist-v15`; despliegue funcional `99f44a3` completado y archivos públicos comparados con el repositorio. Actualización desde v13 con datos ficticios conservados; recarga y edición offline públicas verificadas. No cambia el formato de datos; PIN visual y pendientes Android conservados.
 
 ## Actualización 2026-10-24
 

@@ -126,4 +126,4 @@ Publicado bajo licencia [MIT](LICENSE).
 
 ## Estado de la actualización 2026-10-25
 
-Versión candidata de dev para main/Pages con caché `checklist-v15`: estilo, contraste, realce de tareas y documentación sincronizada. El roadmap visible separa funciones disponibles, próximos pasos e ideas. El cierre del despliegue se registra en [ROADMAP.md](ROADMAP.md). El PIN sigue siendo visual, sin cifrado; zoom del mapa y Android físico siguen pendientes.
+Publicada y verificada en main/Pages y https://checklistgato.com/ con caché `checklist-v15`: estilo, contraste, realce de tareas y documentación sincronizada. El roadmap visible separa funciones disponibles, próximos pasos e ideas. El cierre del despliegue, la prueba offline y la actualización v13 → v15 están registrados en [ROADMAP.md](ROADMAP.md). El PIN sigue siendo visual, sin cifrado; zoom del mapa y Android físico siguen pendientes.

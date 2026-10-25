@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** Versión candidata 2026-10-25 desde dev para publicar en main y GitHub Pages; caché `checklist-v15`. Verificación de despliegue pendiente. Historial anterior conservado al final.
+**Estado:** Publicada y verificada el 2026-10-25 en main, GitHub Pages y https://checklistgato.com/; caché `checklist-v15`. Suite de 48 casos aprobada con tiempo real normal y reducido. Resultados y límites en el cierre de publicación; historial anterior conservado.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -463,3 +463,15 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - La candidata pasó 48 pruebas en Chrome con tiempo real normal y reducido. El reloj virtual volvió a agotar esperas de imágenes en ambos modos; no se atribuyen esos fallos a una validación física ni se ocultan.
 
 - Validación final de la candidata: 48/48 aprobadas con tiempo real normal y reducido; ES/EN a 375 px sin desborde; cancelar/restablecer con foco recuperado y persistencia tras editar/recargar offline con caché v15. Datos de prueba ficticios, sin usar notas personales.
+
+### Cierre de publicación verificada — 2026-10-25
+- Versión funcional publicada: `99f44a3d9b8dcbd74a8b5c1cc5eeed6cf3085e6a`, desde dev a main por fast-forward y push sin forzar el remoto.
+- [Despliegue Pages del cambio funcional](https://github.com/MartnMartnez14/checklist/actions/runs/40218674866): completado con éxito.
+- Aplicación, service worker, manifest, README, roadmap, arquitectura y changelog servidos por el dominio HTTPS comparados byte a byte con la versión publicada. También se comprobó el contenido del repositorio remoto.
+- 48/48 pruebas en Chrome con tiempo real normal y reducido. El ejecutor con reloj virtual agotó esperas de carga de imágenes en ambos modos; su estabilización queda pendiente y no se ocultan esos fallos.
+- Interacción pública: Restablecer estilo, Cancelar inicialmente enfocado y recuperación del foco; roadmap ES/EN y ancho 375 px sin desborde del correo.
+- Sesión aislada de prueba: actualización desde caché v13 a v15, retirada de la caché anterior y conservación de una nota y tarea ficticias.
+- Offline público verificado con red desactivada (`navigator.onLine === false`): recarga, edición y nueva recarga conservaron título y tarea completada bajo caché v15.
+- Los documentos locales anteriores de main se conservaron en copia externa con SHA-256 y stash identificado `respaldo-documentacion-main-antes-publicacion-2026-10-25`; no se reaplicaron versiones antiguas sobre la integración. Todos los worktrees conservados.
+- Este cierre es documental y no modifica aplicación, caché ni formato de respaldo; main y dev se sincronizan también con este registro.
+- Límites: sin Android físico, lector de pantalla ni Safari. CAT-21 continúa pendiente de validación física; CAT-26, cifrado real, rendimiento y demás ideas permanecen pendientes según sus estados.

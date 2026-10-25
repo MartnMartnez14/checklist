@@ -159,3 +159,7 @@ Al cambiar almacenamiento, responsabilidades, flujo de datos o despliegue:
 ### Publicación 2026-10-25
 
 La candidata usa caché `checklist-v15`, sin cambios de esquema de datos ni infraestructura. El proceso autorizado es dev → main por fast-forward → push → Pages → comprobación del dominio y documentación servida. Los resultados finales se registran en el roadmap; no confundir preparación con despliegue verificado. Los documentos locales anteriores de main se conservan mediante copia externa y stash identificado.
+
+### Resultado de publicación — 2026-10-25
+
+El cambio funcional `99f44a3` se publicó con Pages completado correctamente y archivos del dominio iguales a los del repositorio. Se verificaron actualización de caché v13 → v15 con conservación de datos ficticios y recarga/edición offline pública. El cierre documental acompaña la misma versión funcional sin cambiar caché ni esquema. README, roadmap y changelog describen los resultados y límites actuales; las secciones anteriores conservan su contexto histórico. Todos los worktrees permanecen disponibles.
