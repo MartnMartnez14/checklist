@@ -414,3 +414,15 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Versión dev integrada para publicar desde `main` en GitHub Pages, dominio `https://checklistgato.com/`, raíz del repositorio y HTTPS obligatorio.
 - Verificación previa: 44 pruebas aprobadas y diff sin errores; caché `checklist-v13`. La finalización del despliegue y los archivos públicos se verifican después del push.
 - Los registros de etapas anteriores describen su estado en ese momento. CAT-21 continúa pendiente de validación física en Android.
+
+
+### Worktree estilo y legibilidad — 2026-10-25 (sin integrar ni publicar)
+- Rama `codex/estilo-legibilidad`, desde `main` (`649a366`), en worktree independiente. Otros worktrees y cambios documentales de la carpeta principal conservados.
+- **5.2:** Restablecer estilo ES/EN al final del bloque de fondo: confirmación con Cancelar inicial; color nulo, opacidad 18 %, fondo nulo. Mantiene contenido, PIN, fijado, posiciones y conexiones; reutiliza el manejo de imágenes compartidas. Las demás ideas de vista previa y gradientes siguen pendientes.
+- **5.1:** Primer plano negro/blanco según superficie compuesta de tarjeta, iconos sin atenuación, foco y placeholders legibles; capa de lectura sobre imágenes al 96 %. Ajuste local, no certificación WCAG integral.
+- **5.3:** Realce de color de 260 ms solo al completar una tarea; sin movimiento ni cambio de tamaño, sin reproducción al cargar o redibujar, desactivado con movimiento reducido. Crear listas y cambiar de vista no reciben nuevas animaciones.
+- Corregida propagación de Escape y clics de diálogos para conservar el panel de estilo y recuperar foco al cancelar.
+- Base: 44 pruebas aprobadas. Cierre: `bash tests/run.sh` → `PASS=48 FAIL=0 NOVERIFY=0`; también 48 aprobadas en Chrome con `--force-prefers-reduced-motion`. `git diff --check` correcto.
+- Nuevas pruebas: `style-reset`, `style-shared-image`, `card-contrast`, `completion-feedback`. Cubren cancelación/botón/Escape/fondo, trampa de foco, ES/EN, 375 px, persistencia, PIN y PNG compartido. Contraste medido para textos e iconos en 60 superficies (10 colores × 3 opacidades × 2 temas), foco de edición y límites de imágenes negras/blancas bajo la capa de lectura.
+- Revisión visual en Chrome a 375 px, temas claro y oscuro. No se probaron lector de pantalla, Safari ni Android físico; el zoom Android/CAT-21 sigue abierto.
+- Caché del worktree: `checklist-v14`. Sin commit, integración a dev ni publicación.

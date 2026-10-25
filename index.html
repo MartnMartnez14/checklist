@@ -452,6 +452,23 @@
   .oss-link { color: var(--accent); font-weight: 550; text-decoration: none; }
   .oss-link:hover { text-decoration: underline; }
   @media (pointer: coarse) { a.support-card, .support-prex { min-height: 44px; } .support-copy { min-height: 40px; } }
+  /* Keep foregrounds readable over every tint; image scrims bound contrast. */
+  .note { color: var(--accent); --muted: var(--accent); --on-image: var(--accent); }
+  .note.has-bg { --scrim: rgba(255,255,255,.96); --accent: #000000 !important; }
+  :root[data-theme="dark"] .note.has-bg { --scrim: rgba(26,31,39,.96); --accent: #ffffff !important; }
+  .note-title, .item-text, .note .add-input { color: inherit; }
+  .note .tag-chip { color: inherit; background: transparent; border-color: currentColor; }
+  .note .icon-btn, .note .note-grip { opacity: 1; }
+  .note input::placeholder, .note textarea::placeholder { color: var(--muted); opacity: 1; }
+  .note .icon-btn:hover { color: var(--accent); }
+  .note .pop { color: var(--text); --muted: var(--text); --accent: var(--text); }
+  :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+  .note :focus-visible { outline-color: var(--accent); }
+  .note .pop :focus-visible { outline-color: var(--text); }
+  @media (prefers-reduced-motion: no-preference) {
+    .item.just-completed { animation: completed-highlight 260ms ease-out; }
+    @keyframes completed-highlight { from { background-color: var(--hover); } to { background-color: transparent; } }
+  }
 </style>
 </head>
 <body>
@@ -623,6 +640,8 @@
 
   const I18N = {
     es: {
+      resetStyle: "Restablecer estilo",
+      resetStyleMessage: "¿Quitar el color y la imagen de fondo y volver la opacidad al 18 %? El contenido de la lista se conserva.",
       appName: "Checklist Gato",
       lockTitle: "PIN visual",
       lockWarning: "Solo oculta el contenido en la interfaz. No cifra tus datos. El almacenamiento y los respaldos contienen el texto.",
@@ -786,6 +805,8 @@
       closeBtn: "Cerrar"
     },
     en: {
+      resetStyle: "Reset style",
+      resetStyleMessage: "Remove the color and background image and reset opacity to 18%? The list content is preserved.",
       appName: "Checklist Cat",
       lockTitle: "Visual PIN",
       lockWarning: "Only hides content in the interface. It does not encrypt your data. Storage and backups contain the text.",
@@ -1206,7 +1227,7 @@
         .filter(x => !x.disabled && x.tabIndex >= 0);
 
       const onKey = e => {
-        if (e.key === "Escape") { e.preventDefault(); finish(null); return; }
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); finish(null); return; }
         if (e.key === "Tab") {
           const list = focusables();
           if (!list.length) return;
@@ -1353,6 +1374,7 @@
       btn.setAttribute("aria-label", dark ? tr("themeLight") : tr("themeDark"));
     }
     if (persist) { try { localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); } catch (e) {} }
+    if (persist) applyAllStyles();
     linksDirty = true;
     scheduleLinks();
   }
@@ -1446,8 +1468,18 @@
     const { r, g, b } = hexToRgb(c.bg);
     return `rgba(${r}, ${g}, ${b}, ${(note.opacity ?? 18) / 100})`;
   }
+  // Choose the stronger foreground against the actual composited card color.
   function accentFor(note) {
-    return note.color == null ? "#1a73e8" : PALETTE[note.color].accent;
+    const dark = document.documentElement.dataset.theme === "dark";
+    const base = hexToRgb(dark ? "#1a1f27" : "#ffffff");
+    const tint = note.color == null ? base : hexToRgb(PALETTE[note.color].bg);
+    const alpha = note.color == null ? 0 : (note.opacity ?? 18) / 100;
+    const rgb = ["r", "g", "b"].map(k => {
+      const v = (base[k] * (1-alpha) + tint[k] * alpha) / 255;
+      return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4;
+    });
+    const luminance = rgb[0]*.2126 + rgb[1]*.7152 + rgb[2]*.0722;
+    return luminance > .179 ? "#000000" : "#ffffff";
   }
 
   // ---------- IndexedDB (imágenes) ----------
@@ -2540,7 +2572,15 @@
 
     const cb = el("input", {
       type: "checkbox", checked: item.done, "aria-label": tr("checkItemAria"),
-      onchange: e => { item.done = e.target.checked; touch(note); save(); render(); }
+      onchange: e => {
+        item.done = e.target.checked; touch(note); save(); render();
+        const fresh = document.querySelector('.note[data-id="' + CSS.escape(note.id) + '"] .item[data-item-id="' + CSS.escape(item.id) + '"]');
+        fresh?.querySelector('input[type="checkbox"]')?.focus();
+        if (item.done && !matchMedia("(prefers-reduced-motion: reduce)").matches && fresh) {
+          fresh.classList.add("just-completed");
+          fresh.addEventListener("animationend", () => fresh.classList.remove("just-completed"), {once:true});
+        }
+      }
     });
 
     const text = el("textarea", {
@@ -2684,6 +2724,7 @@
       note.opacity = Number(slider.value);
       slider.setAttribute("aria-valuetext", slider.value + "%");
       section.style.setProperty("--tint", tintFor(note));
+      section.style.setProperty("--accent", accentFor(note));
     });
     slider.addEventListener("change", () => { touch(note); save(); });
     pop.append(slider);
@@ -2717,6 +2758,21 @@
     const thumb = el("span", { className: "bg-thumb", "aria-hidden": "true" });
     pop.append(el("div", { className: "pop-row" }, [imgBtn, removeBtn, fileInput, thumb]));
     if (note.bgId) getImageURL(note.bgId).then(u => { if (u) thumb.style.backgroundImage = `url("${u}")`; });
+
+    pop.append(el("button", {
+      type: "button", className: "btn btn-secondary pop-btn", "data-pop-key": "reset-style",
+      textContent: tr("resetStyle"),
+      onclick: async () => {
+        const confirmed = await openDialog({ title: tr("resetStyle"), message: tr("resetStyleMessage"),
+          buttons: [{label: tr("cancelBtn"), value: false}, {label: tr("resetStyle"), value: true, primary: true}] });
+        if (!confirmed) return;
+        const old = note.bgId;
+        note.color = null; note.opacity = 18; note.bgId = null;
+        touch(note); save(); revokeIfUnused(old);
+        popFocusKey = "reset-style";
+        render();
+      }
+    }));
 
     pop.append(el("p", { className: "pop-title", textContent: tr("popLinks") }));
     const list = el("div", { className: "pop-links" });
@@ -2820,11 +2876,12 @@
 
   document.addEventListener("click", e => {
     if (openPopId == null) return;
-    if (e.target.closest && (e.target.closest(".pop") || e.target.closest(".note-design"))) return;
+    if (e.target.closest && (e.target.closest(".pop") || e.target.closest(".note-design") || e.target.closest(".dialog-scrim"))) return;
     closePop();
   });
 
   document.addEventListener("keydown", e => {
+    if (e.defaultPrevented) return;
     if (e.key === "Escape") {
       if (connectingSource != null) exitConnectMode();
       else if (openPopId != null) closePop();

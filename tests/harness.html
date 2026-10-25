@@ -1166,6 +1166,105 @@
     }
   }
 
+  async function t_style_reset() {
+    var seed=note("a","Keep title",["Keep task"],{color:3,opacity:60,tags:["keep"],links:["b"],pos:{x:24,y:24},pinned:true,pinnedAt:1});
+    await boot([seed,note("b","Other",[])]); resetLanguage();
+    iframe.style.width="375px";
+    cd.getElementById("style-a").click();
+    var reset=cd.querySelector('[data-pop-key="reset-style"]');
+    assert(reset.textContent==="Restablecer estilo","ES reset label");
+    var before=storedRaw();
+    for(var cancel of ["button","escape","outside"]) {
+      reset.focus();reset.click();
+      var actions=dialogs()[0].querySelectorAll('.dialog-actions button');
+      assert(cd.activeElement===actions[0],"cancel focus");
+      cd.dispatchEvent(new cw.KeyboardEvent("keydown",{key:"Tab",shiftKey:true,bubbles:true,cancelable:true}));
+      assert(cd.activeElement===actions[1],"reset focus trap");
+      if(cancel==="button") actions[0].click();
+      if(cancel==="escape") cd.dispatchEvent(new cw.KeyboardEvent("keydown",{key:"Escape",bubbles:true}));
+      if(cancel==="outside") cd.querySelector('.dialog-scrim').dispatchEvent(new cw.MouseEvent("mousedown",{bubbles:true}));
+      await sleep(10);assert(storedRaw()===before,"cancel changed data "+cancel);assert(cd.activeElement===reset,"cancel focus "+cancel+" "+cd.activeElement.outerHTML.slice(0,120));
+    }
+    reset.click(); var rect=dialogs()[0].getBoundingClientRect();
+    assert(rect.left>=0 && rect.right<=375,"mobile dialog overflow");
+    dialogs()[0].querySelector('.dialog-actions button:last-child').click();await sleep(20);
+    var result=firstNote();assert(result.color===null && result.opacity===18 && result.bgId===null,"reset values");
+    for(var key of ['title','items','tags','links','pos','pinned','pinnedAt']) assert(JSON.stringify(result[key])===JSON.stringify(seed[key]),"changed "+key);
+    assert(cd.activeElement.dataset.popKey==="reset-style","confirmed focus");
+    await remount();assert(firstNote().color===null && firstNote().opacity===18,"reset persistence");
+    cd.getElementById('lang-toggle').click();cd.getElementById('style-a').click();
+    assert(cd.querySelector('[data-pop-key="reset-style"]').textContent==='Reset style','EN reset label');
+  }
+
+  async function t_style_shared_image() {
+    await boot([lockedSeed('a'),note('b','Shared image',['Task'])]);resetLanguage();await unlockSeed('a');
+    var lock=JSON.stringify(firstNote().visualLock);
+    // Upload the same real PNG to two cards through the public file control.
+    var png=new cw.Blob([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],{type:'image/png'});
+    for(var id of ['a','b']) {
+      cd.getElementById('style-'+id).click();
+      var input=cd.querySelector('.pop input[type="file"]'), transfer=new cw.DataTransfer();
+      transfer.items.add(new cw.File([png],'shared.png',{type:'image/png'}));input.files=transfer.files;
+      input.dispatchEvent(new cw.Event('change',{bubbles:true}));
+      assert(await waitFor(()=>stored().find(n=>n.id===id).bgId,10000),'upload failed '+id+' '+alerts.join(';'));
+      await sleep(30);
+    }
+    var shared=firstNote().bgId;assert(shared===stored()[1].bgId,'image not deduplicated');
+    cd.getElementById('style-a').click();cd.querySelector('[data-pop-key="reset-style"]').click();
+    dialogs()[0].querySelector('.dialog-actions button:last-child').click();await sleep(30);
+    assert(JSON.stringify(firstNote().visualLock)===lock,'reset altered PIN');
+    assert(stored()[1].bgId===shared,'shared reference removed');
+    await remount();assert(await waitFor(()=>cd.querySelector('[data-id="b"].has-bg')),'shared image missing after reload');
+    assert(cd.querySelector('[data-id="a"].locked-note'),'PIN not retained');
+    for(var theme of ['light','dark']) {
+      if(cd.documentElement.dataset.theme!==theme) cd.getElementById('theme-toggle').click();
+      var section=cd.querySelector('[data-id="b"]');
+      // Bound both black and white images under the computed scrim.
+      var css=cw.getComputedStyle(section), scrim=css.getPropertyValue('--scrim').match(/[\d.]+/g).map(Number);
+      for(var extreme of [0,255]) {
+        var bg=scrim.slice(0,3).map(x=>x*scrim[3]+extreme*(1-scrim[3]));
+        assert(ratio(rgb(cw.getComputedStyle(section.querySelector('.item-text')).color),bg)>=4.5,'image contrast '+theme);
+      }
+    }
+  }
+
+  function rgb(value) { return value.match(/[\d.]+/g).slice(0,3).map(Number); }
+  function lum(c) { var v=c.map(x=>{x/=255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4;});return v[0]*.2126+v[1]*.7152+v[2]*.0722; }
+  function ratio(a,b) {var x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+  async function t_card_contrast() {
+    var colors=['#1a73e8','#d93025','#188038','#f9ab00','#e8710a','#9334e6','#00838f','#e52592','#5f6368','#795548'];
+    var seeds=[];colors.forEach((c,i)=>[0,18,60].forEach(o=>seeds.push(note('c'+i+'o'+o,'Title',['Task'],{color:i,opacity:o,tags:['tag'],createdAt:'2026-10-25T12:00:00Z'}))));
+    await boot(seeds); var minimum=21;
+    for(var theme of ['light','dark']) {
+      if(cd.documentElement.dataset.theme!==theme) cd.getElementById('theme-toggle').click();
+      for(var n of seeds) {
+        var section=cd.querySelector('[data-id="'+n.id+'"]'), cs=cw.getComputedStyle(section);
+        var base=rgb(cs.backgroundColor),hex=colors[n.color].slice(1),tint=[0,2,4].map(i=>parseInt(hex.slice(i,i+2),16));
+        var bg=base.map((x,i)=>x*(1-n.opacity/100)+tint[i]*n.opacity/100);
+        for(var selector of ['.note-title','.item-text','.note-created','.tag-chip','.icon-btn','.add-input']) {
+          var el=section.querySelector(selector);var contrast=ratio(rgb(cw.getComputedStyle(el).color),bg);minimum=Math.min(minimum,contrast);
+          assert(contrast>=4.5,theme+' '+n.id+' '+selector+' '+contrast);
+        }
+        var input=section.querySelector('.item-text');input.focus();
+        assert(ratio(rgb(cw.getComputedStyle(input).borderBottomColor),bg)>=3,'focus contrast');
+      }
+    }
+    return 'minimum text contrast '+minimum.toFixed(2)+':1 across 60 card surfaces';
+  }
+
+  async function t_completion_feedback() {
+    await boot([note('a','Task',['One'])]);
+    assert(!cd.querySelector('.just-completed'),'initial animation');
+    cd.querySelector('input[type="checkbox"]').click();
+    var row=cd.querySelector('.item.done');
+    var reduce=cw.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    assert(row.classList.contains('just-completed')===!reduce,'motion preference ignored');
+    assert(cd.activeElement.type==='checkbox','checkbox focus lost');
+    if(!reduce) {assert(cw.getComputedStyle(row).animationName==='completed-highlight','missing highlight');row.dispatchEvent(new cw.Event('animationend'));assert(!row.classList.contains('just-completed'),'class not cleaned');}
+    await remount();assert(!cd.querySelector('.just-completed'),'replayed on reload');
+    cd.querySelector('input[type="checkbox"]').click();assert(!cd.querySelector('.just-completed'),'animated uncheck');
+  }
+
   async function t_pin_viewport() {
     await boot([lockedSeed()]);
     var viewport=cw.visualViewport;
@@ -1226,7 +1325,11 @@
     ["map-undo-invalidation", t_map_undo_invalidation],
     ["map-drag-lifecycle", t_map_drag_lifecycle],
     ["item-drag-lifecycle", t_item_drag_lifecycle],
-    ["pin-viewport", t_pin_viewport]
+    ["pin-viewport", t_pin_viewport],
+    ["style-reset", t_style_reset],
+    ["style-shared-image", t_style_shared_image],
+    ["card-contrast", t_card_contrast],
+    ["completion-feedback", t_completion_feedback]
   ];
 
   var watchdog = setTimeout(function () {

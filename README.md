@@ -59,6 +59,8 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
   - **Bilingüe Español / Inglés (`ES` / `EN`):** Alterná en un clic entre **Checklist Gato** y **Checklist Cat** desde la barra superior (sin tocar jamás el texto de tus notas).
   - **Modo claro y modo oscuro:** Con detección automática del sistema, botón de cambio instantáneo y logos dedicados (`cat-day.png` / `cat-night.png`).
   - **Estilo por lista:** Paleta de 10 colores con control deslizable de opacidad (0 % a 60 %) y soporte para subir imágenes o GIFs animados de fondo.
+- **Restablecer estilo:** desde el panel de diseño, con confirmación, quitá color e imagen y volvé a opacidad 18 % sin alterar el contenido, conexiones, posición, fijado o PIN. Disponible en ES/EN.
+- **Legibilidad de tarjetas:** primer plano adaptado al color y opacidad, iconos visibles y capa de lectura reforzada sobre imágenes. Realce breve al completar tareas, desactivado con movimiento reducido.
 - **PIN visual por lista:** botón con candado, PIN de 4–8 dígitos y repetición para confirmarlo. Oculta título, tareas, etiquetas y fondo en la interfaz, y omite el contenido bloqueado en búsquedas. El desbloqueo dura hasta recargar o tocar «Bloquear ahora».
   - **No cifra los datos:** el contenido continúa en texto plano en el almacenamiento y los respaldos JSON. Solo se guarda un verificador SHA-256 con sal aleatoria, nunca el PIN. Requiere HTTPS o localhost con Web Crypto.
   - **Recuperación:** «Olvidé el PIN» permite quitar el bloqueo con una confirmación explícita. Es una ayuda para ocultar casualmente, sin protección frente a alguien con acceso al navegador.
@@ -105,7 +107,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal, ejecuta todos los casos de `tests/harness.html` y reporta el resumen final (`PASS=44 FAIL=0 NOVERIFY=0`). Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
+Requiere `google-chrome` y `python3`. Levanta un servidor temporal, ejecuta todos los casos de `tests/harness.html` y reporta el resumen final (`PASS=48 FAIL=0 NOVERIFY=0`). Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
 
 ---
 

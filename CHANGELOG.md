@@ -45,3 +45,11 @@ Los registros siguientes describen estados anteriores durante el desarrollo; sus
 Sin atribuir versiones ni fechas históricas: listas y tareas; vista Cuadrícula y Mapa; conexiones manuales y etiquetas; plantillas y atajos; buscador; progreso por lista; editor ampliado; hasta tres listas fijadas; temas claro/oscuro e interfaz ES/EN; imágenes locales; exportación/importación JSON con fusión; PWA y metadatos para compartir.
 
 La suite anterior a este bloque tenía 32 pruebas aprobadas. Este historial describe el repositorio local; no certifica el estado del despliegue público.
+
+
+## 2026-10-25 — Estilo y legibilidad (worktree, sin integrar)
+- Restablecer estilo con confirmación bilingüe y conservación del contenido y PIN.
+- Contraste adaptado a tintes de tarjetas, iconos y foco visibles; lectura reforzada sobre imágenes.
+- Realce breve al completar tareas con respeto por movimiento reducido.
+- Cancelar diálogos conserva panel de estilo y foco. Caché `checklist-v14`.
+- 48 pruebas aprobadas en modo normal y movimiento reducido; revisión visual a 375 px. Android físico pendiente.
