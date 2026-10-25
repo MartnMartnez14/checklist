@@ -106,12 +106,13 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 | **CAT-17** | Etiquetas visibles en botones «Importar» / «Exportar» en móvil | **P2** | Baja | **Hecho (Etapa 5 / Backlog Paso 3)** |
 | **CAT-18** | Tercera vista: **Calendario** (junto a Cuadrícula y Mapa) | **P3** | Media-Alta | **Pendiente de diseño (Etapa 10.H / Backlog Paso 5)** |
 | **CAT-19** | Metadatos SEO / OpenGraph y manifest PWA enriquecido | **P3** | Baja | **Hecho (Etapa 9 / Backlog Paso 6)** |
-| **CAT-20** | Contraseña / PIN manual por lista (contenido oculto hasta desbloquear) | **P3/P4** | Media (bloqueo visual) / Alta (cifrado real) | **Fase 1 hecha localmente; fase 2 idea (Etapa 10.I)** |
+| **CAT-20** | Contraseña / PIN manual por lista (contenido oculto hasta desbloquear) | **P3/P4** | Media (bloqueo visual) / Alta (cifrado real) | **Fase 1 implementada; fase 2 pendiente, decisión registrada (Etapa 10.I)** |
 | **CAT-21** | Arrastre táctil robusto en Android (zoom/pellizco, puntero trabado) | **P1/P2** | Media-Alta | **Endurecimiento local implementado; validación Android real pendiente (Etapa 2.7 / 7.2)** |
 | **CAT-22** | Fijar hasta 3 listas + estética «carta legendaria» holográfica | **P3** | Media | **Hecho (Etapa 5.6)** |
 | **CAT-23** | El Gato asistente: FAQ local + IA opcional | **P4** | Media → Alta | **Fase 1 hecha localmente; IA futura (Etapa 10.J)** |
 | **CAT-24** | Actualización de plantillas ES/EN (Estudios, Hábitos, Viajes, Organización) | **P2** | Baja | **Hecho (Etapa 5.7 / 10.C)** |
 | **CAT-25** | Orden automático del mapa por conexiones + Deshacer | **P2/P3** | Media | **Hecho localmente (Etapa 2.6)** |
+| **CAT-26** | Controles de zoom en modo Mapa (+ / −), relacionados con CAT-21 y CAT-25 | **P2** | Por evaluar | **Pendiente (Etapa 2.8; reporte móvil del usuario)** |
 
 ---
 
@@ -139,6 +140,12 @@ Permitir que una persona construya desde una simple checklist hasta un espacio e
   - Deshacer durante la sesión hasta cambiar listas, tamaños o posiciones; botones desactivados durante búsquedas y arrastres. No se ejecuta al editar.
   - Anchos configurables, pan/zoom y jerarquías continúan pendientes de evaluación.
 - **2.7 Robustez del arrastre táctil (CAT-21):** Endurecimiento implementado localmente: segundo puntero no sustituye al activo; limpieza y persistencia de la última posición/orden ante `pointercancel`, `lostpointercapture`, `blur`, ocultación y cambio de escala de `visualViewport`. Coordenadas CSS sin división automática por escala. Aplicado a listas e ítems. Tests sintéticos aprobados; problema original pendiente de reproducción y validación en Android real.
+- **2.8 Controles de zoom en modo Mapa (CAT-26; relacionado con CAT-21 y CAT-25):**
+  - **Prueba reportada por el usuario — 2026-10-24:** en PC funciona bien; en móvil funciona el botón de orden automático. En el teléfono probado no puede acercar ni alejar el modo Mapa, tanto en la PWA instalada como en el navegador móvil. Al activar el modo escritorio del navegador sí puede alejar. La causa técnica sigue sin confirmar; no se generaliza el resultado a todos los dispositivos.
+  - **Propuesta pendiente:** botones flotantes «+» y «−» para acercar y alejar el mapa, visibles únicamente en modo Mapa y siempre accesibles durante el desplazamiento. Definir la ubicación al implementarlos, evitando tapar tarjetas, controles u otras acciones. Se busca una solución acotada para facilitar el uso móvil.
+  - **Criterios futuros de aceptación:** tarjetas y conexiones permanecen alineadas al acercar y alejar; el arrastre y el orden automático continúan funcionando; los controles solo aparecen en Mapa y siguen accesibles al desplazarse. Comprobar en navegador móvil y PWA instalada, además de verificar que no haya regresiones en PC.
+  - **Relación con CAT-21:** el reporte aporta evidencia de uso real, pero no confirma todos los escenarios anteriores de captura de punteros, arrastre y zoom. CAT-21 permanece abierta.
+  - **Estado de este registro:** solo documentación de la propuesta; sin cambios funcionales, commits ni publicación.
 
 ---
 
@@ -241,7 +248,12 @@ Consolidar la ventaja competitiva de ser una herramienta 100% local y privada.
   - La tarjeta bloqueada muestra un nombre genérico y oculta título, ítems, etiquetas, fondo y sus textos accesibles. Conserva relaciones y posición. Búsquedas omiten su contenido; desbloqueo solo en memoria, con «Bloquear ahora» y bloqueo al recargar.
   - Aviso explícito de que no cifra y de que almacenamiento y respaldos contienen texto. «Quitar PIN» verifica el PIN; «Olvidé el PIN» ofrece recuperación confirmada sin PIN. No hay pérdida de contenido por olvidarlo en esta fase.
   - Campo opcional `visualLock: {version:1, salt, verifier}` en notas del esquema 2. Importaciones protegidas quedan bloqueadas; validación de metadatos antes de importar y comparación en la firma de fusión. Versiones antiguas pueden ignorarlo y mostrar el texto.
-  - **Fase 2 — Cifrado real (Alta):** idea futura, fuera de este bloque. Requiere evaluar AES-GCM/PBKDF2, exportación cifrada, resolución de conflictos y recuperación. Los límites y riesgos de perder datos sin clave pertenecen a esa futura fase, no al PIN visual.
+  - **Fase 2 — Cifrado real sin recuperación (Alta): decisión de evolución pendiente, registrada el 2026-10-24.** El objetivo es proteger el contenido mediante cifrado, no solo ocultarlo. Retirar «Olvidé el PIN» y cualquier mecanismo que revele texto sin la contraseña. Quitar el botón por sí solo no vuelve seguro el PIN actual.
+  - **Contraseña y advertencia futura:** exigir una contraseña suficientemente robusta, definir derivación de clave y parámetros adecuados (evaluar AES-GCM/PBKDF2) y no guardar contraseña ni clave recuperable. Antes de activarla, pedir confirmación y advertir: «Guardá la contraseña en un lugar seguro. Si la perdés, no podremos recuperar el contenido cifrado».
+  - **Lista bloqueada sin contraseña:** permitir únicamente su eliminación confirmada, sin mostrar contenido ni datos sensibles. No incorporar recuperación que evite la contraseña; olvidar la contraseña implica perder el acceso a ese contenido cifrado.
+  - **Datos y compatibilidad:** cifrar contenido sensible en reposo y al exportar; definir importación/fusión y migración segura de listas existentes sin pérdida silenciosa ni copias nuevas en texto plano. Los respaldos antiguos sin cifrar seguirán siendo legibles y no pueden protegerse retroactivamente.
+  - **Criterios futuros de cierre:** no hallar contenido sensible en texto plano en almacenamiento ni exportaciones protegidas; no poder revelar contenido sin contraseña; conservar borrado confirmado de listas bloqueadas, migración y restauración de respaldos cifrados. El diseño técnico detallado y sus pruebas se acordarán al abordar esa tarea.
+  - **Límite de este cierre:** solo documentación. La versión actual mantiene el PIN visual y su recuperación descritos arriba hasta implementar y verificar la fase nueva.
 - **J. El Gato asistente (P4, CAT-23):**
   - **Fase 1 — Gato local:** ✅ Hecho localmente. Botón en el pie y diálogo de preguntas guiadas, ocho temas en ES/EN, una respuesta visible por vez. Offline, sin IA, sin campo de chat, sin leer notas ni persistir conversaciones. Test `cat-help`.
   - **Fase 2 — IA opcional (Alta):** desactivada por defecto y con consentimiento explícito. Evaluar clave propia del usuario (advirtiendo que queda en `localStorage`) o proxy serverless con límites de costo/abuso; nunca enviar notas salvo que el usuario lo pida expresamente.
@@ -378,9 +390,10 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 | **9.6** | **CAT-18** | Tercera vista Calendario | Media-Alta | P3 | **Pendiente** |
 | **9.7** | **CAT-20 Fase 1** | PIN visual por lista | Media | P3 | **Hecho localmente; sin cifrado** |
 | **9.8** | **CAT-09** | Rendimiento a gran escala | Media-Alta | P1/P2 | **Pendiente** |
-| **9.9** | **CAT-20 Fase 2** | Cifrado real AES-GCM/PBKDF2 | Alta | P4 | **Idea** |
+| **9.9** | **CAT-20 Fase 2** | Cifrado real sin recuperación; evaluar AES-GCM/PBKDF2 | Alta | P4 | **Pendiente: decisión registrada, sin implementar** |
 | **9.10** | **CAT-13** | Visor «Mapa estelar» | Alta | P3 | **Idea** |
 | **9.11** | **CAT-15** | Sincronización cloud / Google Play | Muy alta | P4 | **Idea** |
+| **9.12** | **CAT-26** | Botones flotantes + / − para zoom en modo Mapa | Por evaluar | P2 | **Pendiente; relacionado con CAT-21 y CAT-25** |
 
 ### ✅ Cerrado en esta iteración (2026-10)
 - **CAT-24:** plantillas ES/EN con Pomodoro 25/10, explicación al espejo, hábitos saludables, equipaje y organización personal.
@@ -414,3 +427,8 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Versión dev integrada para publicar desde `main` en GitHub Pages, dominio `https://checklistgato.com/`, raíz del repositorio y HTTPS obligatorio.
 - Verificación previa: 44 pruebas aprobadas y diff sin errores; caché `checklist-v13`. La finalización del despliegue y los archivos públicos se verifican después del push.
 - Los registros de etapas anteriores describen su estado en ese momento. CAT-21 continúa pendiente de validación física en Android.
+
+### Cierre documental — 2026-10-24
+- Creado `ARQUITECTURA.md`: componentes, datos, diagramas Mermaid y flujo habitual worktrees → dev → main → Pages → dominio. Distingue este flujo del antecedente de copia verificada usado hoy.
+- CAT-20: registrada la evolución a cifrado real sin recuperación, con borrado confirmado de listas bloqueadas y advertencia de pérdida de acceso al olvidar la contraseña.
+- Solo documentación local: sin cambios funcionales, nuevo commit ni publicación.

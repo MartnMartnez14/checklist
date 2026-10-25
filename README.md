@@ -72,6 +72,8 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
 
 ## 🛠️ Detalles técnicos (Para desarrolladores y auditores)
 
+Para comprender los componentes, el flujo de datos, los diagramas y la mecánica worktrees → dev → main → publicación, consultá [Arquitectura y flujo de desarrollo](ARQUITECTURA.md).
+
 ### Arquitectura de almacenamiento local
 - **`localStorage` (`checklist-notas-v1`, `checklist-theme`, `checklist-view`):** Guarda la estructura JSON de las notas, ítems, colores, posiciones en el mapa, etiquetas, conexiones, listas fijadas (`pinned`/`pinnedAt`), metadatos opcionales `visualLock` (`version`, `salt`, `verifier`) y preferencias de vista/tema.
 - **`IndexedDB` (base `checklist-media`, almacén `images`):** Guarda los binarios (`Blob`) de las imágenes y GIFs de fondo con deduplicación por hash **SHA-256** (`crypto.subtle.digest`) y recolector de basura automático (`gcImages`) que limpia imágenes huérfanas cuando ya ninguna nota las utiliza.
@@ -85,6 +87,7 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
 - `CNAME` — Configuración de dominio personalizado (`checklistgato.com`) sobre GitHub Pages con HTTPS obligatorio.
 - `CHANGELOG.md` — Historial de cambios comprobados, sin versiones históricas atribuidas.
 - `INCIDENCIAS.md` — Seguimiento de errores y sugerencias sin datos personales.
+- `ARQUITECTURA.md` — Arquitectura, diagramas, decisiones y convenciones de desarrollo y comentarios.
 - `ROADMAP.md` — Hoja de ruta técnica, auditoría y planificación evolutiva del proyecto.
 - `tests/run.sh` y `tests/harness.html` — Suite automatizada de pruebas de regresión en Chrome headless.
 
