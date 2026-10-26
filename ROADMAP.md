@@ -514,3 +514,9 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Conservados todos los worktrees, la propuesta CAT-27, respaldo externo y stash `respaldo-main-antes-publicacion-v16-2026-10-26`. No se reaplican documentos antiguos sobre el cierre.
 - Límites: Android físico, Safari y lector de pantalla no comprobados. Los fallos intermitentes de reloj virtual y la suite completa en tiempo real con movimiento reducido siguen pendientes; las pruebas nuevas pasaron con movimiento reducido virtual. CAT-21, CAT-26, CAT-27, cifrado y rendimiento permanecen abiertos.
 - Este cierre actualiza documentación e incidencias; no modifica aplicación, caché ni datos. Dev y main se sincronizan también con este registro.
+
+#### Comprobación final de caché y cierre documental
+- Cierre documental `22a8dfc` desplegado correctamente ([Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40411190833)); README, roadmap, arquitectura, changelog e incidencias públicos idénticos a sus archivos locales.
+- La URL raíz sin parámetros y `index.html` sirven el archivo funcional correcto. Un contexto nuevo cargó v16 directamente.
+- En el contexto que comenzó con v15 se observó una respuesta antigua en la URL raíz durante la comprobación de caché; la recarga sin caché recuperó v16 y la siguiente recarga normal conservó esa versión. No se borraron notas ni almacenamiento. La causa exacta de la respuesta antigua no se atribuye a un componente sin evidencia adicional.
+- Si una sesión ya abierta no muestra los cambios, recargar sin caché (Ctrl+Shift+R en Chrome de escritorio). No usar «borrar datos del sitio» como solución, porque elimina las notas locales.

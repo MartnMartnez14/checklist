@@ -7,6 +7,8 @@
 
 **Publicación actual — 2026-10-26:** caché `checklist-v16`; vista previa de estilo, transiciones suaves y Mercado Pago disponibles en la web. Integración dev → main y [despliegue Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40410492648) verificados; 50/50 pruebas en Chrome con tiempo real normal, localmente y en el dominio público. Límites y evidencia en el cierre de ROADMAP.md.
 
+Si una pestaña antigua no muestra los cambios, probá recargar sin caché (`Ctrl+Shift+R` en Chrome de escritorio). No borres los datos del sitio: allí están tus notas.
+
 ---
 
 ## 🔒 Privacidad total y confianza (Para todos los usuarios)
