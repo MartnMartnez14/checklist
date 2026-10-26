@@ -1,5 +1,18 @@
 # Historial de cambios
 
+## Candidata integrada — 2026-10-26
+
+- Presentación, vista previa y Mercado Pago integrados en dev; CAT-27 conservado como pendiente.
+- 50/50 pruebas aprobadas en Chrome con tiempo real normal; caché v16. Publicación autorizada, verificación pública pendiente.
+- Los registros de trabajo local siguientes conservan el estado que tenían al escribirse.
+
+## 2026-10-26 — Presentación y documentación (local, sin publicar)
+
+- Vista previa integrada de estilo ES/EN con contenido de ejemplo y aplicación inmediata.
+- Transiciones de opacidad de 180 ms para nuevas listas/plantillas y cambios efectivos de vista; movimiento reducido respetado.
+- Estados actuales del roadmap aclarados; historial conservado. Caché candidata `checklist-v16`, sin cambios de formato de datos.
+- Sin commits, integración ni publicación; Android físico y demás pendientes conservados.
+
 ## Publicación verificada — 2026-10-25
 
 - Restablecer estilo ES/EN con confirmación, contraste adaptativo y realce al completar tareas con movimiento reducido.
@@ -68,3 +81,12 @@ La suite anterior a este bloque tenía 32 pruebas aprobadas. Este historial desc
 - Conservado el historial de `pin-mapa`, cuyo código ya estaba integrado.
 - Caché `checklist-v14`; 48 pruebas aprobadas en Chrome con tiempo real y en headless con movimiento reducido. El ejecutor con reloj virtual en modo normal presenta esperas intermitentes en imágenes/conexiones, documentadas en el roadmap.
 - Sin cambios en `main`, push ni publicación.
+
+- Ampliación solicitada: Mercado Pago al final de los medios de apoyo, cuenta UYU y titular proporcionados por el autor, con botón Copiar y textos ES/EN. Cambio local sin publicar.
+
+### Validación local del bloque — 2026-10-26
+- Chrome con tiempo real normal: 50/50 casos aprobados sobre el bloque final, incluido Mercado Pago.
+- Reloj virtual normal: 48/50; fallaron esperas de `delete-dialogs` y `style-shared-image`. Movimiento reducido con reloj virtual: 49/50; falló `style-shared-image`. Las dos pruebas nuevas pasaron en ambos modos. La ejecución aislada con tiempo real reducido no llegó a cargar el harness y agotó el plazo; no se declara validada la suite completa en ese modo.
+- Revisión visual: vista previa EN/claro a 375 px y ES/oscuro en escritorio; Mercado Pago ES/oscuro a 375 px sin desbordes. Copiar entrega exactamente la cuenta indicada mediante un sustituto de la API del portapapeles; no se verificó el portapapeles del sistema.
+- Imagen añadida y retirada reflejada en la muestra; recarga con servidor detenido desde caché v16 conserva estilo y muestra. Datos ficticios y origen local aislado.
+- `git diff --check` correcto. Sin Android físico, Safari ni lector de pantalla. Sin commits, integración ni publicación.

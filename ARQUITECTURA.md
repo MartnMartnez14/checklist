@@ -163,3 +163,9 @@ La candidata usa caché `checklist-v15`, sin cambios de esquema de datos ni infr
 ### Resultado de publicación — 2026-10-25
 
 El cambio funcional `99f44a3` se publicó con Pages completado correctamente y archivos del dominio iguales a los del repositorio. Se verificaron actualización de caché v13 → v15 con conservación de datos ficticios y recarga/edición offline pública. El cierre documental acompaña la misma versión funcional sin cambiar caché ni esquema. README, roadmap y changelog describen los resultados y límites actuales; las secciones anteriores conservan su contexto histórico. Todos los worktrees permanecen disponibles.
+
+## Presentación local — 2026-10-26
+
+La muestra de estilo reutiliza las variables de color, contraste y fondo de su tarjeta; muestra texto ficticio localizado, sin duplicar notas ni medios. La imagen usa la URL de Blob ya gestionada por la tarjeta. No incorpora persistencia ni modifica el esquema de respaldo.
+
+Las transiciones usan Web Animations sobre opacidad durante 180 ms, solo desde creación manual/plantillas y cambio efectivo de vista. Respetan movimiento reducido, cancelan la transición anterior sobre el mismo elemento y no alteran coordenadas ni foco. Caché candidata v16, sin publicar.

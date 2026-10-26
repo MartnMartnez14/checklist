@@ -110,7 +110,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 48 casos de `tests/harness.html`. La suite aprobó en Chrome con tiempo real, tanto normal como con movimiento reducido (`PASS=48 FAIL=0 NOVERIFY=0`); el ejecutor con reloj virtual presenta esperas intermitentes en imágenes/conexiones, registradas en el roadmap. Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
+Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 50 casos locales (48 de la publicación anterior más vista previa y transiciones) de `tests/harness.html`. La suite publicada de 48 casos aprobó en Chrome con tiempo real, tanto normal como con movimiento reducido (`PASS=48 FAIL=0 NOVERIFY=0`); el ejecutor con reloj virtual presenta esperas intermitentes en imágenes/conexiones, registradas en el roadmap. Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
 
 ---
 
@@ -127,3 +127,13 @@ Publicado bajo licencia [MIT](LICENSE).
 ## Estado de la actualización 2026-10-25
 
 Publicada y verificada en main/Pages y https://checklistgato.com/ con caché `checklist-v15`: estilo, contraste, realce de tareas y documentación sincronizada. El roadmap visible separa funciones disponibles, próximos pasos e ideas. El cierre del despliegue, la prueba offline y la actualización v13 → v15 están registrados en [ROADMAP.md](ROADMAP.md). El PIN sigue siendo visual, sin cifrado; zoom del mapa y Android físico siguen pendientes.
+
+## Mejoras locales — 2026-10-26 (sin publicar)
+
+- Panel de estilo con muestra integrada: texto de ejemplo ES/EN que refleja color, opacidad, imagen y contraste. Los cambios siguen aplicándose inmediatamente.
+- Aparición suave de 180 ms al crear listas o plantillas y cambiar entre Cuadrícula y Mapa; sin desplazamientos, desactivada con movimiento reducido.
+- Caché candidata `checklist-v16`; formato de datos y respaldos sin cambios. La publicación del 2026-10-25 descrita arriba permanece como antecedente público.
+
+- Ampliación solicitada: Mercado Pago al final de los medios de apoyo, cuenta UYU y titular proporcionados por el autor, con botón Copiar y textos ES/EN. Cambio local sin publicar.
+
+Validación local: 50/50 en Chrome con tiempo real normal; movimiento reducido completo pendiente por límites del ejecutor. Nuevas pruebas aprobadas también con movimiento reducido virtual. Recarga desde caché v16 con servidor detenido comprobada. Detalle de esperas y límites en ROADMAP.md.

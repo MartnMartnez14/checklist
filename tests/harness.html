@@ -1280,6 +1280,49 @@
     } finally {Object.keys(props).forEach(k=>delete viewport[k]);}
   }
 
+  async function t_presentation_feedback() {
+    await boot([note('a','Existing',[])]);
+    var reduce=cw.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var calls=[];
+    var original=cw.Element.prototype.animate;
+    cw.Element.prototype.animate=function(frames,options){calls.push({element:this,frames:frames,options:options});return original.call(this,frames,options);};
+    cd.getElementById('new-note').click();
+    assert(calls.length===(reduce?0:1),'new list feedback');
+    assert(cd.activeElement.classList.contains('note-title'),'new list focus');
+    if(!reduce) assert(calls[0].options.duration===180 && !calls[0].frames[0].transform,'duration or movement');
+    calls=[];cd.getElementById('view-map').click();
+    assert(calls.length===(reduce?0:1),'view feedback');
+    calls=[];cd.getElementById('view-map').click();
+    assert(calls.length===0,'same view animated');
+    cd.getElementById('search').value='Existing';
+    cd.getElementById('search').dispatchEvent(new cw.Event('input',{bubbles:true}));
+    assert(calls.length===0,'search animated');
+  }
+
+  async function t_style_preview() {
+    await boot([note('a','Private title',['Private task'],{color:3,opacity:60})]);resetLanguage();
+    iframe.style.width='375px';
+    cd.getElementById('style-a').click();
+    var preview=cd.querySelector('.style-preview');
+    assert(preview && preview.textContent.includes('Lista de ejemplo'),'ES sample');
+    assert(!preview.textContent.includes('Private'),'sample exposes personal content');
+    var before=cw.getComputedStyle(preview).backgroundImage;
+    cd.querySelector('[data-pop-key="color-1"]').click();
+    assert(cw.getComputedStyle(preview).backgroundImage!==before,'color not reflected');
+    var slider=cd.querySelector('.opacity-slider');slider.value=25;
+    slider.dispatchEvent(new cw.Event('input',{bubbles:true}));slider.dispatchEvent(new cw.Event('change',{bubbles:true}));
+    assert(cw.getComputedStyle(preview).backgroundImage.includes('0.25'),'opacity not reflected');
+    assert(firstNote().opacity===25,'opacity not saved');
+    var rect=preview.getBoundingClientRect();assert(rect.width>100 && rect.left>=0 && rect.right<=375,'preview overflow');
+    cd.getElementById('lang-toggle').click();
+    if(!cd.querySelector('.style-preview')) cd.getElementById('style-a').click();
+    assert(cd.querySelector('.style-preview').textContent.includes('Example list'),'EN sample');
+    cd.getElementById('theme-toggle').click();
+    if(!cd.querySelector('.style-preview')) cd.getElementById('style-a').click();
+    assert(cw.getComputedStyle(cd.querySelector('.style-preview')).color===cw.getComputedStyle(cd.querySelector('.note-title')).color,'contrast mismatch');
+    await remount();assert(firstNote().opacity===25,'preview changes lost');
+  }
+
   // ---------------------------------------------------------------- runner
   var tests = [
     ["merge-metadata-newer", t_probe_merge_metadata_newer],
@@ -1329,7 +1372,9 @@
     ["style-reset", t_style_reset],
     ["style-shared-image", t_style_shared_image],
     ["card-contrast", t_card_contrast],
-    ["completion-feedback", t_completion_feedback]
+    ["completion-feedback", t_completion_feedback],
+    ["presentation-feedback", t_presentation_feedback],
+    ["style-preview", t_style_preview]
   ];
 
   var watchdog = setTimeout(function () {
@@ -1340,6 +1385,7 @@
   }, 28000);
 
   (async function () {
+    localStorage.setItem("checklist-lang", "es");
     for (var i = 0; i < tests.length; i++) {
       var name = tests[i][0], fn = tests[i][1];
       try {

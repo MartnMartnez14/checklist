@@ -363,10 +363,19 @@
   .opacity-slider { width: 100%; accent-color: var(--accent); }
   .pop-row { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
   .pop-btn { padding: 6px 10px; font-size: 13px; }
-  .bg-thumb {
-    width: 38px; height: 38px; border-radius: 6px; background-size: cover; background-position: center;
-    background-color: var(--line); border: 1px solid var(--line); flex: none;
+  .style-preview {
+    margin-top: 10px; padding: 12px; border: 1px solid var(--line);
+    border-radius: var(--radius-sm); overflow-wrap: anywhere;
+    background-color: var(--card); color: var(--preview-ink);
+    background-image: linear-gradient(var(--tint, transparent), var(--tint, transparent));
   }
+  .style-preview p { margin: 6px 0 0; }
+  .note.has-bg .style-preview {
+    color: #000;
+    background-image: linear-gradient(var(--scrim), var(--scrim)), var(--bg-img);
+    background-size: cover; background-position: center;
+  }
+  :root[data-theme="dark"] .note.has-bg .style-preview { color: #fff; }
   .pop-links { max-height: 140px; overflow: auto; }
   .link-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
   .link-label { flex: 1; min-width: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -435,6 +444,8 @@
   .support-card strong { display: block; font-size: 13.5px; }
   .support-card small { display: block; font-size: 11.5px; color: var(--muted); }
   .support-prex { cursor: default; }
+  .support-mercado { max-width: 100%; box-sizing: border-box; }
+  .support-mercado > span { min-width: 0; overflow-wrap: anywhere; }
   .support-copy { padding: 6px 10px; font-size: 13px; }
   .support-note { margin: 12px 0 0; font-size: 11.5px; }
   .feedback-block { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--line); }
@@ -559,6 +570,11 @@
         <span class="btn-label" id="copy-prex-label">Copiar</span>
       </button>
     </div>
+    <div class="support-card support-prex support-mercado">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
+      <span><strong>Mercado Pago · UYU</strong><small id="mercado-sub">Cuenta: 1006269736963</small><small>Martin Martinez Garcia</small></span>
+      <button type="button" class="btn support-copy" id="copy-mercado" aria-label="Copiar cuenta de Mercado Pago"><span class="btn-label" id="copy-mercado-label">Copiar</span></button>
+    </div>
   </div>
   <p id="support-note" class="support-note">Las colaboraciones son 100% voluntarias. Starlink es un enlace de referido, no una donación directa.</p>
   <div class="feedback-block" aria-labelledby="feedback-title">
@@ -586,7 +602,7 @@
         <h3 id="rm-dev-title">✅ Disponible</h3>
         <ul>
           <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
-          <li id="rm-dev-2">Restablecer estilo, mejor legibilidad y realce suave al completar tareas.</li>
+          <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
         </ul>
       </div>
       <div class="roadmap-col">
@@ -704,6 +720,9 @@
       starlinkTitle: "Internet satelital Starlink",
       starlinkSub: "Enlace de referido",
       prexSub: "Martín Martínez — Cuenta Prex: 35502",
+      mercadoSub: "Cuenta: 1006269736963",
+      mercadoAria: "Copiar cuenta de Mercado Pago",
+      mercadoCopied: "Cuenta de Mercado Pago copiada",
       copyPrexAria: "Copiar número de cuenta Prex",
       copyBtn: "Copiar",
       copiedOk: "Copiado ✓",
@@ -721,7 +740,7 @@
       roadmapSummary: "🐾 Próximos pasos (Hoja de ruta)",
       rmDevTitle: "✅ Disponible",
       rmDev1: "PIN visual, ayuda local y orden automático del mapa con Deshacer.",
-      rmDev2: "Restablecer estilo, mejor legibilidad y realce suave al completar tareas.",
+      rmDev2: "Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.",
       rmSoonTitle: "🔜 Próximamente",
       rmSoon1: "Optimización de rendimiento para tableros con cientos o miles de listas.",
       rmSoon2: "Controles de zoom del mapa y validación de arrastre y zoom en Android real.",
@@ -774,6 +793,9 @@
       popOpacity: "Opacidad",
       popOpacityAria: "Opacidad del color",
       popBg: "Fondo",
+      stylePreview: "Vista previa",
+      previewTitle: "Lista de ejemplo",
+      previewText: "Así se verá el estilo de tu lista.",
       changeImg: "Cambiar imagen",
       addImg: "Imagen",
       removeBg: "Quitar fondo",
@@ -869,6 +891,9 @@
       starlinkTitle: "Starlink satellite internet",
       starlinkSub: "Referral link",
       prexSub: "Martín Martínez — Prex account: 35502",
+      mercadoSub: "Account: 1006269736963",
+      mercadoAria: "Copy Mercado Pago account",
+      mercadoCopied: "Mercado Pago account copied",
       copyPrexAria: "Copy Prex account number",
       copyBtn: "Copy",
       copiedOk: "Copied ✓",
@@ -886,7 +911,7 @@
       roadmapSummary: "🐾 What's next (Roadmap)",
       rmDevTitle: "✅ Available",
       rmDev1: "Visual PIN, local help, and automatic map arrangement with Undo.",
-      rmDev2: "Reset style, improved readability, and subtle feedback when completing tasks.",
+      rmDev2: "Reset style, preview, improved readability and subtle transitions.",
       rmSoonTitle: "🔜 Coming soon",
       rmSoon1: "Performance optimization for boards with hundreds or thousands of lists.",
       rmSoon2: "Map zoom controls and validation of drag and zoom on a real Android device.",
@@ -939,6 +964,9 @@
       popOpacity: "Opacity",
       popOpacityAria: "Color opacity",
       popBg: "Background",
+      stylePreview: "Preview",
+      previewTitle: "Example list",
+      previewText: "This is how your list will look.",
       changeImg: "Change image",
       addImg: "Image",
       removeBg: "Remove background",
@@ -1403,6 +1431,9 @@
     setTxt("starlink-title", "starlinkTitle");
     setTxt("starlink-sub", "starlinkSub");
     setTxt("prex-sub", "prexSub");
+    setTxt("mercado-sub", "mercadoSub");
+    setTxt("copy-mercado-label", "copyBtn");
+    document.getElementById("copy-mercado").setAttribute("aria-label", tr("mercadoAria"));
     setTxt("copy-prex-label", "copyBtn");
     setTxt("support-note", "supportNote");
     setTxt("feedback-title", "feedbackTitle");
@@ -1584,18 +1615,15 @@
 
   // ---------- Fondo por nota ----------
   async function applyBackground(section, note) {
-    const thumb = section.querySelector(".bg-thumb");
     if (!note.bgId || isVisuallyLocked(note)) {
       section.classList.remove("has-bg");
       section.style.removeProperty("--bg-img");
-      if (thumb) thumb.style.backgroundImage = "";
       return;
     }
     const url = await getImageURL(note.bgId);
     if (!url || isVisuallyLocked(note) || !section.isConnected) { section.classList.remove("has-bg"); return; }
     section.style.setProperty("--bg-img", `url("${url}")`);
     section.classList.add("has-bg");
-    if (thumb) thumb.style.backgroundImage = `url("${url}")`;
   }
 
   function applyAllStyles() {
@@ -1605,6 +1633,7 @@
       if (!note) return;
       sec.style.setProperty("--tint", tintFor(note));
       sec.style.setProperty("--accent", accentFor(note));
+      sec.style.setProperty("--preview-ink", accentFor(note));
       const hues = incident.get(note.id) || [];
       const paint = borderPaint(hues);
       if (paint) {
@@ -1905,16 +1934,34 @@
     board.classList.add("map");
   }
 
+  // Opacity only: map coordinates and focus remain unchanged. No persistent state.
+  const feedbackAnimations = new Map();
+  const reducedFeedback = matchMedia("(prefers-reduced-motion: reduce)");
+  function fadeFeedback(target) {
+    if (!target || reducedFeedback.matches || !target.animate) return;
+    feedbackAnimations.get(target)?.cancel();
+    const animation = target.animate([{ opacity: .65 }, { opacity: 1 }], { duration: 180, easing: "ease-out" });
+    feedbackAnimations.set(target, animation);
+    const clear = () => { if (feedbackAnimations.get(target) === animation) feedbackAnimations.delete(target); };
+    animation.onfinish = clear;
+    animation.oncancel = clear;
+  }
+  reducedFeedback.addEventListener("change", () => {
+    if (reducedFeedback.matches) feedbackAnimations.forEach(animation => animation.cancel());
+  });
+
   function setView(mode, persist) {
     finishActiveDrags();
     const next = mode === "map" ? "map" : "grid";
     if (next === "map" && viewMode !== "map") { initMapPositions(); save(); }
+    const changed = next !== viewMode;
     viewMode = next;
     if (persist) { try { localStorage.setItem(VIEW_KEY, viewMode); } catch (e) {} }
     const g = document.getElementById("view-grid"), mp = document.getElementById("view-map");
     if (g) g.setAttribute("aria-pressed", String(viewMode === "grid"));
     if (mp) mp.setAttribute("aria-pressed", String(viewMode === "map"));
     render();
+    if (changed) fadeFeedback(document.querySelector(".board"));
     announce(viewMode === "map" ? tr("viewMapAnnounce") : tr("viewGridAnnounce"));
   }
 
@@ -2698,6 +2745,7 @@
       });
       section.style.setProperty("--tint", tintFor(note));
       section.style.setProperty("--accent", accentFor(note));
+      section.style.setProperty("--preview-ink", accentFor(note));
       scheduleLinks();
     }
 
@@ -2728,6 +2776,7 @@
       slider.setAttribute("aria-valuetext", slider.value + "%");
       section.style.setProperty("--tint", tintFor(note));
       section.style.setProperty("--accent", accentFor(note));
+      section.style.setProperty("--preview-ink", accentFor(note));
     });
     slider.addEventListener("change", () => { touch(note); save(); });
     pop.append(slider);
@@ -2758,9 +2807,12 @@
         render();
       }
     });
-    const thumb = el("span", { className: "bg-thumb", "aria-hidden": "true" });
-    pop.append(el("div", { className: "pop-row" }, [imgBtn, removeBtn, fileInput, thumb]));
-    if (note.bgId) getImageURL(note.bgId).then(u => { if (u) thumb.style.backgroundImage = `url("${u}")`; });
+    pop.append(el("div", { className: "pop-row" }, [imgBtn, removeBtn, fileInput]));
+    pop.append(el("p", { className: "pop-title", textContent: tr("stylePreview") }));
+    pop.append(el("div", { className: "style-preview", role: "img", "aria-label": tr("stylePreview") + ": " + tr("previewText") }, [
+      el("strong", { textContent: tr("previewTitle") }),
+      el("p", { textContent: tr("previewText") })
+    ]));
 
     pop.append(el("button", {
       type: "button", className: "btn btn-secondary pop-btn", "data-pop-key": "reset-style",
@@ -2842,6 +2894,7 @@
     notes.unshift(note);
     save();
     render("title-" + note.id);
+    fadeFeedback(document.getElementById("title-" + note.id)?.closest(".note"));
   }
 
   async function openTemplates() {
@@ -2862,6 +2915,7 @@
     notes.unshift(note);
     save();
     render("title-" + note.id);
+    fadeFeedback(document.getElementById("title-" + note.id)?.closest(".note"));
   }
   document.getElementById("templates").addEventListener("click", openTemplates);
 
@@ -2921,6 +2975,29 @@
     if (label) {
       label.textContent = ok ? tr("copiedOk") : tr("copiedFail");
       announce(ok ? tr("copiedAnnounceOk") : tr("copiedAnnounceFail"));
+      setTimeout(() => { label.textContent = tr("copyBtn"); }, 1600);
+    }
+  });
+
+  const mercadoBtn = document.getElementById("copy-mercado");
+  if (mercadoBtn) mercadoBtn.addEventListener("click", async () => {
+    const nro = "1006269736963";
+    let ok = true;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(nro);
+      else throw new Error("sin clipboard");
+    } catch (e) {
+      ok = false;
+      try {
+        const ta = el("textarea", { value: nro });
+        ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.append(ta); ta.select(); ok = document.execCommand("copy"); ta.remove();
+      } catch (e2) { ok = false; }
+    }
+    const label = mercadoBtn.querySelector(".btn-label");
+    if (label) {
+      label.textContent = ok ? tr("copiedOk") : tr("copiedFail");
+      announce(ok ? tr("mercadoCopied") : tr("copiedAnnounceFail"));
       setTimeout(() => { label.textContent = tr("copyBtn"); }, 1600);
     }
   });
