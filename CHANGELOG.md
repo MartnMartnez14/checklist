@@ -1,5 +1,15 @@
 # Historial de cambios
 
+## Publicación verificada — 2026-10-26
+
+- Vista previa integrada ES/EN, transiciones de 180 ms y Mercado Pago publicados con caché `checklist-v16`.
+- Dev y main integrados por fast-forward; commit funcional `35855e0` y [Pages completado](https://github.com/MartnMartnez14/checklist/actions/runs/40410492648).
+- 50/50 pruebas en dev y en la web pública con tiempo real normal; 12 archivos públicos idénticos a la candidata. Actualización v15 → v16 conservó nota ficticia.
+- Revisión pública a 375 px, copia de cuenta y foco; sin errores de consola observados. Edición sin red guardada; limitación de emulación durante recarga pública explicada en ROADMAP.md.
+- Enlace web incorporado a la ficha del repositorio. CAT-27 preservado; pendientes Android, cifrado y limitaciones del ejecutor sin cerrar.
+- Los apartados siguientes son antecedentes; «sin publicar» describe el momento en que se registraron.
+
+
 ## Candidata integrada — 2026-10-26
 
 - Presentación, vista previa y Mercado Pago integrados en dev; CAT-27 conservado como pendiente.

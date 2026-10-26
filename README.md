@@ -5,6 +5,8 @@
 - **Aplicación web:** [https://checklistgato.com](https://checklistgato.com/)
 - **Código fuente (100 % Open Source y auditable):** [https://github.com/MartnMartnez14/checklist](https://github.com/MartnMartnez14/checklist)
 
+**Publicación actual — 2026-10-26:** caché `checklist-v16`; vista previa de estilo, transiciones suaves y Mercado Pago disponibles en la web. Integración dev → main y [despliegue Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40410492648) verificados; 50/50 pruebas en Chrome con tiempo real normal, localmente y en el dominio público. Límites y evidencia en el cierre de ROADMAP.md.
+
 ---
 
 ## 🔒 Privacidad total y confianza (Para todos los usuarios)
@@ -124,11 +126,11 @@ Checklist Gato es un proyecto independiente, gratuito y de código abierto:
 
 Publicado bajo licencia [MIT](LICENSE).
 
-## Estado de la actualización 2026-10-25
+## Antecedente de publicación — 2026-10-25
 
 Publicada y verificada en main/Pages y https://checklistgato.com/ con caché `checklist-v15`: estilo, contraste, realce de tareas y documentación sincronizada. El roadmap visible separa funciones disponibles, próximos pasos e ideas. El cierre del despliegue, la prueba offline y la actualización v13 → v15 están registrados en [ROADMAP.md](ROADMAP.md). El PIN sigue siendo visual, sin cifrado; zoom del mapa y Android físico siguen pendientes.
 
-## Mejoras locales — 2026-10-26 (sin publicar)
+## Antecedente de implementación local — 2026-10-26 (antes de publicar)
 
 - Panel de estilo con muestra integrada: texto de ejemplo ES/EN que refleja color, opacidad, imagen y contraste. Los cambios siguen aplicándose inmediatamente.
 - Aparición suave de 180 ms al crear listas o plantillas y cambiar entre Cuadrícula y Mapa; sin desplazamientos, desactivada con movimiento reducido.

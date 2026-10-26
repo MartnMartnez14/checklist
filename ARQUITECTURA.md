@@ -1,6 +1,6 @@
 # Arquitectura y flujo de desarrollo de Checklist Gato
 
-Documento de referencia para comprender y mantener el proyecto. Revisado el 2026-10-25. Distingue el comportamiento actual de las decisiones pendientes del [roadmap](ROADMAP.md).
+Documento de referencia para comprender y mantener el proyecto. Revisado el 2026-10-26. Distingue el comportamiento actual de las decisiones pendientes del [roadmap](ROADMAP.md).
 
 ## 1. Arquitectura actual
 
@@ -169,3 +169,7 @@ El cambio funcional `99f44a3` se publicó con Pages completado correctamente y a
 La muestra de estilo reutiliza las variables de color, contraste y fondo de su tarjeta; muestra texto ficticio localizado, sin duplicar notas ni medios. La imagen usa la URL de Blob ya gestionada por la tarjeta. No incorpora persistencia ni modifica el esquema de respaldo.
 
 Las transiciones usan Web Animations sobre opacidad durante 180 ms, solo desde creación manual/plantillas y cambio efectivo de vista. Respetan movimiento reducido, cancelan la transición anterior sobre el mismo elemento y no alteran coordenadas ni foco. Caché candidata v16, sin publicar.
+
+## Publicación del bloque — 2026-10-26
+
+El bloque de presentación y Mercado Pago está publicado desde dev → main con caché v16. Los registros locales anteriores se conservan como antecedentes. No cambian almacenamiento ni formato de respaldo. Pages completado y suite pública 50/50 en tiempo real normal; ver ROADMAP.md para evidencia, actualización de caché y límites de verificación. Los worktrees se conservaron y dev/main se sincronizan también con el cierre documental.

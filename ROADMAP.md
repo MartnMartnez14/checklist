@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** Bloque de presentación del 2026-10-26 implementado localmente, sin publicar; caché candidata `checklist-v16`. Última versión publicada y verificada el 2026-10-25 en main, GitHub Pages y https://checklistgato.com/; caché `checklist-v15`. Suite de 48 casos aprobada con tiempo real normal y reducido. Resultados y límites en el cierre de publicación; historial anterior conservado.
+**Estado:** Publicación funcional verificada el 2026-10-26 desde dev a main, GitHub Pages y https://checklistgato.com/; caché `checklist-v16`, commit `35855e0`. Suite local integrada y pública: 50/50 en Chrome con tiempo real normal. Límites de movimiento reducido, Android y reloj virtual conservados en el cierre.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -34,7 +34,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 ## 2. DIAGNÓSTICO Y AUDITORÍA TÉCNICA DEL ESTADO ACTUAL (BASE v1.0)
 
 ### 2.1 Estado funcional y validación
-Suite local ampliada a 50 casos; 50 aprobados en Chrome con tiempo real normal. La versión publicada anterior tenía 48 casos aprobados también con movimiento reducido. El ejecutor con reloj virtual tiene esperas intermitentes documentadas en el cierre de integración; no equivale a validación Android física.
+Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrome y tiempo real normal. La versión publicada anterior tenía 48 casos aprobados también con movimiento reducido. El ejecutor con reloj virtual tiene esperas intermitentes documentadas en el cierre de integración; no equivale a validación Android física.
 - **Arquitectura cero-dependencias:** HTML5, CSS moderno (variables CSS, `color-mix`, `conic-gradient`) y JavaScript vanilla en `index.html`.
 - **Gestión de listas y elementos:**
   - Creación, edición y borrado de listas y elementos.
@@ -59,7 +59,7 @@ Suite local ampliada a 50 casos; 50 aprobados en Chrome con tiempo real normal. 
   - Exportación en JSON incluyendo notas e imágenes codificadas en Base64.
   - Importación con validación estructural, descarga automática de copia de seguridad previa y dos modos: **Fusionar (idempotente)** y **Reemplazar**.
 - **PWA e infraestructura:**
-  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v15`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
+  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v16`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
   - Dominio personalizado `https://checklistgato.com` (DNS en Hostinger apuntando a GitHub Pages con `CNAME` y HTTPS activo).
   - **Descubrimiento y metadatos:** `description`, `canonical`, OpenGraph (título, descripción, URL e imagen absoluta), Twitter Card y `manifest.json` enriquecido (`lang`, `description`, `categories`), listos para compartir el enlace con vista previa.
 - **Seguridad XSS:**
@@ -89,7 +89,7 @@ Suite local ampliada a 50 casos; 50 aprobados en Chrome con tiempo real normal. 
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
 | **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (`mergeNotes` refinado con metadatos y enlaces locales) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v15`; distribución desde `main`) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v16`; distribución desde `main`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
 | **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
 | **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
@@ -97,7 +97,7 @@ Suite local ampliada a 50 casos; 50 aprobados en Chrome con tiempo real normal. 
 | **CAT-07** | Sección pública «🐾 Próximos pasos» dentro de la app | **P2** | Baja | **Hecho (Sección 5 / Backlog Paso 4.C)** |
 | **CAT-08** | Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`) | **P2** | Media | **Hecho (Etapa 4 / Backlog Paso 4)** |
 | **CAT-09** | Optimización y rendimiento a gran escala (100 a 10.000 listas) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2)** |
-| **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Parcialmente implementado:** restablecer estilo, contraste y realce publicados; vista previa y transiciones locales; gradientes pendientes |
+| **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Parcialmente implementado:** restablecer estilo, contraste y realce publicados; vista previa y transiciones publicadas; gradientes pendientes |
 | **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho** (README y CHANGELOG; tags Git pendientes de lanzamientos autorizados) |
 | **CAT-12** | Buscador / filtro rápido de listas, notas y etiquetas | **P3** | Baja-Media | **Hecho (Paso 8)** |
 | **CAT-13** | Visor "Mapa estelar" (3.ª vista modo universo) | **P3** | Alta | **Idea (Etapa 3.3 / 10.E)** |
@@ -125,7 +125,7 @@ Garantizar que Checklist Gato sea impecable realizando las funciones que ya ofre
 - **1.1 Protección de almacenamiento:** Capturar errores de cuota (`QuotaExceededError`) en `localStorage` e `IndexedDB`, ofreciendo al usuario exportar un respaldo inmediato si la memoria del navegador se llena.
 - **1.2 Confirmaciones seguras:** ✅ Publicado (ver cierre 2026-10-25). Borrar lista, completados y conexión usa `openDialog`, Cancelar inicialmente enfocado, Escape y cierre desde el fondo sin cambios; foco recuperado tras confirmar. Test `delete-dialogs`.
 - **1.3 Refinamiento de Fusión (`mergeNotes`):** Preservar enlaces entrantes hacia notas locales existentes y contemplar cambios de estilo/color en notas sin `updatedAt`.
-- **1.4 Ampliación de tests (`tests/harness.html`):** Suite local de 50 casos: vista previa y transiciones, base anterior, PIN visual, importación/fusión, ordenamiento/Deshacer, cancelaciones de arrastre y viewport visual. Las comprobaciones automatizadas no equivalen a una auditoría con lector de pantalla ni a pruebas en dispositivos físicos.
+- **1.4 Ampliación de tests (`tests/harness.html`):** Suite de 50 casos: vista previa y transiciones, base anterior, PIN visual, importación/fusión, ordenamiento/Deshacer, cancelaciones de arrastre y viewport visual. Las comprobaciones automatizadas no equivalen a una auditoría con lector de pantalla ni a pruebas en dispositivos físicos.
 
 ---
 
@@ -182,13 +182,13 @@ Incorporar el inglés como segundo idioma oficial sin añadir librerías externa
 ### ETAPA 5 — Personalización y Experiencia Visual (Prioridad: MEDIA — P2/P3)
 Perfeccionar la identidad visual sin recargar la aplicación.
 - **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles y capa de lectura sobre imágenes. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
-- **5.2 Fondos de listas:** Implementado Restablecer estilo con confirmación ES/EN: sin color ni imagen y opacidad 18 %, conservando datos y PIN. Vista previa integrada implementada localmente el 2026-10-26; gradientes pendientes.
+- **5.2 Fondos de listas:** Implementado Restablecer estilo con confirmación ES/EN: sin color ni imagen y opacidad 18 %, conservando datos y PIN. Vista previa integrada publicada el 2026-10-26; gradientes pendientes.
   - **CAT-27 — Visibilidad y opacidad de imágenes de fondo (P2, Pendiente):** reporte del usuario del 2026-10-25 sobre main online: las imágenes cargadas quedan de fondo, pero casi no se distinguen.
   - **Causa identificada en el código publicado:** capa de lectura fija al 96 % en ambos temas (`.note.has-bg`); oculta casi toda la imagen. El control actual de opacidad modifica el color de la tarjeta, no esa capa.
   - **Propuesta para trabajar después:** regulación independiente de la visibilidad de la imagen, ajustable por la persona; valor inicial propuesto cercano al 40 % de visibilidad de la imagen, no al 40 % de la capa que la cubre. El valor exacto se validará visualmente al abordar la tarea.
   - **Criterios futuros de aceptación:** imagen reconocible y texto legible en temas claro y oscuro; ajuste conservado al recargar y al exportar/importar. Definir y comprobar la compatibilidad con listas y respaldos existentes al implementar.
-  - **Límite de este registro:** documentación en dev; sin corrección funcional ni publicación. Estado Pendiente hasta implementar y verificar la solución.
-- **5.3 Microinteracciones discretas:** Implementado realce de color de 260 ms solo al completar tareas, sin desplazamiento, desactivado con movimiento reducido. Aparición suave de 180 ms al crear listas (incluidas plantillas) y cambiar de vista implementada localmente el 2026-10-26; sin desplazamiento y desactivada con movimiento reducido.
+  - **Límite de este registro:** propuesta documental conservada al publicar v16; sin corrección funcional. Estado Pendiente hasta implementar y verificar la solución.
+- **5.3 Microinteracciones discretas:** Implementado realce de color de 260 ms solo al completar tareas, sin desplazamiento, desactivado con movimiento reducido. Aparición suave de 180 ms al crear listas (incluidas plantillas) y cambiar de vista publicada el 2026-10-26; sin desplazamiento y desactivada con movimiento reducido.
 - **5.4 Editor ampliado (CAT-14):** ✅ **Hecho.** Modal accesible para leer y editar un ítem largo, con textarea amplio, Guardar/Cancelar, foco atrapado y Escape. Tests `item-editor`.
 - **5.5 Claridad de acciones en móvil (CAT-17):** ✅ Hecho. Etiquetas visibles de Importar, Exportar y Nueva lista, con espaciado compacto del header y comprobación a 375 px.
 - **5.6 Listas fijadas y estilo «carta legendaria» (CAT-22):** ✅ **Hecho.** Hasta 3 listas fijadas por tablero, orden persistente (primero las fijadas), botón accesible con `aria-pressed`, validación al importar/fusionar y borde holográfico animado con `conic`/`linear-gradient`, respetando `prefers-reduced-motion` y con fallback sin máscaras CSS. Tests `pin-limit`, `pin-order`, `pin-import`, `pin-import-duplicate` y `pin-holo`.
@@ -503,3 +503,14 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Suite integrada: 50/50 en Chrome con tiempo real normal. Se mantienen los límites anteriores de reloj virtual y ejecución completa con movimiento reducido.
 - Candidata v16; formato de datos sin cambios. Publicación en main y verificación HTTPS autorizadas por el autor, pendientes de confirmar en el cierre siguiente.
 - Repositorio revisado: README, licencia MIT, arquitectura, changelog, pruebas y exclusión de respaldos presentes; sin issues ni PR abiertos al consultar. Añadido el enlace https://checklistgato.com/ a la ficha del repositorio. No se incorporan dependencias, CI adicional ni numeración de releases arbitraria.
+
+### Cierre de publicación verificada — 2026-10-26
+- Versión funcional `35855e04ba3909d6e7a9f3fef4e185ff7e736e86` integrada primero en `codex/dev-offline`, luego en `main` por fast-forward; ambas ramas subidas sin forzar el remoto.
+- [Despliegue GitHub Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40410492648) completado con éxito. Dominio HTTPS configurado desde la raíz de main.
+- Doce archivos públicos comparados byte a byte: aplicación, service worker, manifest, cuatro imágenes/iconos, README, roadmap, arquitectura, changelog y harness. Suite pública en contexto aislado: 50/50 PASS, igual que dev en tiempo real normal.
+- Interacción pública: muestra de estilo/color/opacidad, ES/EN a 375 px sin desbordes, Mercado Pago con la cuenta indicada y aviso Copiado, animaciones de 180 ms al crear y cambiar de vista, foco en título conservado; sin errores de consola en esta revisión.
+- Contexto aislado de actualización: caché v15 retirada y v16 activa, conservando nota ficticia. Edición con `navigator.onLine === false` guardada y conservada tras recargar; la herramienta restableció conexión antes de inspeccionar la recarga, por lo que no se certifica una sesión pública completamente offline de extremo a extremo. La recarga local con servidor detenido sí quedó comprobada en el bloque anterior.
+- Repositorio: enlace de sitio añadido a la ficha; licencia MIT, documentación, pruebas y exclusión de respaldos comprobadas. No había issues ni PR abiertos al revisar. No se añadieron dependencias, workflows ni tags de versión arbitrarios.
+- Conservados todos los worktrees, la propuesta CAT-27, respaldo externo y stash `respaldo-main-antes-publicacion-v16-2026-10-26`. No se reaplican documentos antiguos sobre el cierre.
+- Límites: Android físico, Safari y lector de pantalla no comprobados. Los fallos intermitentes de reloj virtual y la suite completa en tiempo real con movimiento reducido siguen pendientes; las pruebas nuevas pasaron con movimiento reducido virtual. CAT-21, CAT-26, CAT-27, cifrado y rendimiento permanecen abiertos.
+- Este cierre actualiza documentación e incidencias; no modifica aplicación, caché ni datos. Dev y main se sincronizan también con este registro.
