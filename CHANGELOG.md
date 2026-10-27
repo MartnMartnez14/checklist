@@ -1,5 +1,13 @@
 # Historial de cambios
 
+## 2026-10-27 — CAT-27 (candidata validada en dev)
+
+- Visibilidad de imagen por lista de 0–100 %, valor inicial 40 %, muestra y etiqueta ES/EN; independiente de la opacidad del color.
+- Superficies de lectura para texto y controles; ajuste conservado al recargar y en respaldos/importación/fusión. Restablecer vuelve al 40 %.
+- 52/52 pruebas en tiempo real normal y reducido; teclado, temas, 375 px y recarga offline con imagen ficticia comprobados. Reloj virtual: 50 PASS, 3 FAIL (esperas de conexiones e imagen y timeout del harness). Caché candidata `checklist-v17`.
+- Sin Android físico, Safari, lector de pantalla ni auditoría WCAG integral. Sin commits, integración ni publicación.
+
+
 ## Publicación verificada — 2026-10-26
 
 - Vista previa integrada ES/EN, transiciones de 180 ms y Mercado Pago publicados con caché `checklist-v16`.

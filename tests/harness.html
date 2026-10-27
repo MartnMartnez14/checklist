@@ -52,7 +52,7 @@
       id: id, title: title || "",
       items: (texts || []).map(function (t, i) { return { id: id + "-i" + i, text: t, done: false }; }),
       showDone: true,
-      tags: [], links: [], color: null, opacity: 18, bgId: null, pos: null,
+      tags: [], links: [], color: null, opacity: 18, bgId: null, imageVisibility: 40, pos: null,
       createdAt: null, updatedAt: null,
       pinned: false, pinnedAt: null
     };
@@ -1167,7 +1167,7 @@
   }
 
   async function t_style_reset() {
-    var seed=note("a","Keep title",["Keep task"],{color:3,opacity:60,tags:["keep"],links:["b"],pos:{x:24,y:24},pinned:true,pinnedAt:1});
+    var seed=note("a","Keep title",["Keep task"],{color:3,opacity:60,imageVisibility:90,tags:["keep"],links:["b"],pos:{x:24,y:24},pinned:true,pinnedAt:1});
     await boot([seed,note("b","Other",[])]); resetLanguage();
     iframe.style.width="375px";
     cd.getElementById("style-a").click();
@@ -1188,7 +1188,7 @@
     reset.click(); var rect=dialogs()[0].getBoundingClientRect();
     assert(rect.left>=0 && rect.right<=375,"mobile dialog overflow");
     dialogs()[0].querySelector('.dialog-actions button:last-child').click();await sleep(20);
-    var result=firstNote();assert(result.color===null && result.opacity===18 && result.bgId===null,"reset values");
+    var result=firstNote();assert(result.color===null && result.opacity===18 && result.bgId===null && result.imageVisibility===40,"reset values");
     for(var key of ['title','items','tags','links','pos','pinned','pinnedAt']) assert(JSON.stringify(result[key])===JSON.stringify(seed[key]),"changed "+key);
     assert(cd.activeElement.dataset.popKey==="reset-style","confirmed focus");
     await remount();assert(firstNote().color===null && firstNote().opacity===18,"reset persistence");
@@ -1197,7 +1197,7 @@
   }
 
   async function t_style_shared_image() {
-    await boot([lockedSeed('a'),note('b','Shared image',['Task'])]);resetLanguage();await unlockSeed('a');
+    await boot([lockedSeed('a'),note('b','Shared image',['Task'],{imageVisibility:65})]);resetLanguage();await unlockSeed('a');
     var lock=JSON.stringify(firstNote().visualLock);
     // Upload the same real PNG to two cards through the public file control.
     var png=new cw.Blob([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],{type:'image/png'});
@@ -1213,14 +1213,14 @@
     cd.getElementById('style-a').click();cd.querySelector('[data-pop-key="reset-style"]').click();
     dialogs()[0].querySelector('.dialog-actions button:last-child').click();await sleep(30);
     assert(JSON.stringify(firstNote().visualLock)===lock,'reset altered PIN');
-    assert(stored()[1].bgId===shared,'shared reference removed');
+    assert(stored()[1].bgId===shared && stored()[1].imageVisibility===65,'shared reference or visibility removed');
     await remount();assert(await waitFor(()=>cd.querySelector('[data-id="b"].has-bg')),'shared image missing after reload');
     assert(cd.querySelector('[data-id="a"].locked-note'),'PIN not retained');
     for(var theme of ['light','dark']) {
       if(cd.documentElement.dataset.theme!==theme) cd.getElementById('theme-toggle').click();
       var section=cd.querySelector('[data-id="b"]');
       // Bound both black and white images under the computed scrim.
-      var css=cw.getComputedStyle(section), scrim=css.getPropertyValue('--scrim').match(/[\d.]+/g).map(Number);
+      var css=cw.getComputedStyle(section), scrim=css.getPropertyValue('--read-surface').match(/[\d.]+/g).map(Number);
       for(var extreme of [0,255]) {
         var bg=scrim.slice(0,3).map(x=>x*scrim[3]+extreme*(1-scrim[3]));
         assert(ratio(rgb(cw.getComputedStyle(section.querySelector('.item-text')).color),bg)>=4.5,'image contrast '+theme);
@@ -1323,6 +1323,76 @@
     await remount();assert(firstNote().opacity===25,'preview changes lost');
   }
 
+  async function t_image_visibility() {
+    var legacy=note('v','Sample',['Example'],{color:2,opacity:22}); delete legacy.imageVisibility;
+    await boot([legacy]); resetLanguage();iframe.style.width='375px';
+    cd.getElementById('style-v').click();
+    var range=cd.querySelector('[data-pop-key="image-visibility"]');
+    assert(range && range.value==='40' && range.getAttribute('aria-valuetext')==='40%','legacy default');
+    assert(range.getAttribute('aria-label').includes('imagen'),'Spanish label');
+    var png=new cw.Blob([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],{type:'image/png'});
+    var file=cd.querySelector('.pop input[type=file]'),dt=new cw.DataTransfer();
+    dt.items.add(new cw.File([png],'sample.png',{type:'image/png'})); file.files=dt.files;file.dispatchEvent(new cw.Event('change',{bubbles:true}));
+    assert(await waitFor(()=>firstNote().bgId && cd.querySelector('.note.has-bg'),10000),'image upload');
+    if(!cd.querySelector('[data-pop-key="image-visibility"]'))cd.getElementById('style-v').click();
+    var section=cd.querySelector('.note'),preview=cd.querySelector('.style-preview');range=cd.querySelector('[data-pop-key="image-visibility"]');
+    for(var value of [0,40,100]) {
+      range.value=value;range.dispatchEvent(new cw.Event('input',{bubbles:true}));
+      assert(range.getAttribute('aria-valuetext')===value+'%','accessible value');
+      assert(Math.abs(Number(cw.getComputedStyle(section).getPropertyValue('--image-shade'))-(100-value)/100)<.001,'card shade '+value);
+      assert(cw.getComputedStyle(preview).backgroundImage.includes('blob:'),'preview missing image');
+      assert(cw.getComputedStyle(preview).backgroundImage.startsWith('linear-gradient('),'preview overlay');
+    }
+    range.focus();range.dispatchEvent(new cw.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
+    range.value=73;range.dispatchEvent(new cw.Event('input',{bubbles:true}));range.dispatchEvent(new cw.Event('change',{bubbles:true}));
+    assert(firstNote().imageVisibility===73 && firstNote().opacity===22,'saved visibility or color changed');
+    var rect=range.getBoundingClientRect();assert(rect.left>=0 && rect.right<=375,'range overflow');
+    for(var theme of ['light','dark']) {
+      if(cd.documentElement.dataset.theme!==theme)cd.getElementById('theme-toggle').click();
+      var card=await waitFor(()=>cd.querySelector('.note.has-bg'),10000);
+      assert(card,'missing image after theme');
+      var surface=cw.getComputedStyle(card).getPropertyValue('--read-surface').match(/[\d.]+/g).map(Number);
+      for(var extreme of [0,255]) {
+        var bg=surface.slice(0,3).map(x=>x*surface[3]+extreme*(1-surface[3]));
+        assert(ratio(rgb(cw.getComputedStyle(card.querySelector('.item-text')).color),bg)>=4.5,'reading surface contrast '+theme);
+      }
+    }
+    cd.getElementById('lang-toggle').click();if(!cd.querySelector('[data-pop-key="image-visibility"]'))cd.getElementById('style-v').click();
+    assert(cd.querySelector('[data-pop-key="image-visibility"]').getAttribute('aria-label')==='Background image visibility','English label');
+    await remount();assert(firstNote().imageVisibility===73,'visibility lost after reload');
+    var exported=null,OriginalBlob=cw.Blob;
+    cw.Blob=function(parts,options){if(options && options.type==='application/json')exported=JSON.parse(parts.join(''));return new OriginalBlob(parts,options);};
+    cd.getElementById('export').click();assert(await waitFor(()=>exported,10000),'image export missing');
+    assert(exported.notes[0].imageVisibility===73 && exported.images[exported.notes[0].bgId],'image backup incomplete');
+    resetLanguage();await importAndChoose(exported,'Reemplazar');await dismissDialogs();
+    assert(firstNote().imageVisibility===73 && firstNote().bgId,'image replacement lost data');
+    assert(await waitFor(()=>cd.querySelector('.note.has-bg'),10000),'restored image missing');
+  }
+
+  async function t_image_visibility_backup() {
+    await boot([note('a','Backup',['One'],{imageVisibility:65})]);resetLanguage();
+    var exported=null,OriginalBlob=cw.Blob;
+    cw.Blob=function(parts,options){if(options && options.type==='application/json')exported=JSON.parse(parts.join(''));return new OriginalBlob(parts,options);};
+    cd.getElementById('export').click();assert(await waitFor(()=>exported),'no export');
+    assert(exported.schema===2 && exported.notes[0].imageVisibility===65,'export field');
+    await importAndChoose(exported,'Reemplazar');await dismissDialogs();
+    assert(firstNote().imageVisibility===65,'replace field');
+    var other=note('a','Backup',['One'],{imageVisibility:90});
+    await importAndChoose(v2([other]),'Fusionar');await dismissDialogs();
+    assert(stored().length===2 && stored().some(n=>n.imageVisibility===90),'merge missed visibility-only conflict');
+    await importAndChoose(v2([other]),'Fusionar');await dismissDialogs();
+    assert(stored().length===2,'visibility conflict duplicated twice');
+    var old=note('old','Old',[]);delete old.imageVisibility;
+    await importAndChoose(v2([old]),'Reemplazar');await dismissDialogs();
+    assert(firstNote().imageVisibility===40,'old backup default');
+    var legacy=note('legacy','Legacy',[]);delete legacy.imageVisibility;
+    await importAndChoose([legacy],'Reemplazar');await dismissDialogs();
+    assert(firstNote().imageVisibility===40,'legacy array backup default');
+    var invalid=note('invalid','Invalid',[],{imageVisibility:500});
+    await importAndChoose(v2([invalid]),'Reemplazar');await dismissDialogs();
+    assert(firstNote().imageVisibility===40,'invalid visibility default');
+  }
+
   // ---------------------------------------------------------------- runner
   var tests = [
     ["merge-metadata-newer", t_probe_merge_metadata_newer],
@@ -1374,7 +1444,9 @@
     ["card-contrast", t_card_contrast],
     ["completion-feedback", t_completion_feedback],
     ["presentation-feedback", t_presentation_feedback],
-    ["style-preview", t_style_preview]
+    ["style-preview", t_style_preview],
+    ["image-visibility", t_image_visibility],
+    ["image-visibility-backup", t_image_visibility_backup]
   ];
 
   var watchdog = setTimeout(function () {

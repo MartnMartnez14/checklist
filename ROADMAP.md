@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** Publicación funcional verificada el 2026-10-26 desde dev a main, GitHub Pages y https://checklistgato.com/; caché `checklist-v16`, commit `35855e0`. Suite local integrada y pública: 50/50 en Chrome con tiempo real normal. Límites de movimiento reducido, Android y reloj virtual conservados en el cierre.
+**Estado:** CAT-27 implementado y verificado localmente en dev con caché candidata `checklist-v17`; sin publicación. Publicación funcional verificada el 2026-10-26 desde dev a main, GitHub Pages y https://checklistgato.com/; caché `checklist-v16`, commit `35855e0`. Suite local integrada y pública: 50/50 en Chrome con tiempo real normal. Límites de movimiento reducido, Android y reloj virtual conservados en el cierre.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -114,7 +114,7 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
 | **CAT-24** | Actualización de plantillas ES/EN (Estudios, Hábitos, Viajes, Organización) | **P2** | Baja | **Hecho (Etapa 5.7 / 10.C)** |
 | **CAT-25** | Orden automático del mapa por conexiones + Deshacer | **P2/P3** | Media | **Publicado (Etapa 2.6; cierre 2026-10-25)** |
 | **CAT-26** | Controles de zoom en modo Mapa (+ / −), relacionados con CAT-21 y CAT-25 | **P2** | Por evaluar | **Pendiente (Etapa 2.8; reporte móvil del usuario)** |
-| **CAT-27** | Visibilidad y opacidad de imágenes de fondo | **P2** | Por evaluar | **Pendiente (Etapa 5.2; reporte sobre main online)** |
+| **CAT-27** | Visibilidad y opacidad de imágenes de fondo | **P2** | Media | **Verificado localmente en dev; sin publicar (Etapa 5.2)** |
 
 ---
 
@@ -183,11 +183,11 @@ Incorporar el inglés como segundo idioma oficial sin añadir librerías externa
 Perfeccionar la identidad visual sin recargar la aplicación.
 - **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles y capa de lectura sobre imágenes. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
 - **5.2 Fondos de listas:** Implementado Restablecer estilo con confirmación ES/EN: sin color ni imagen y opacidad 18 %, conservando datos y PIN. Vista previa integrada publicada el 2026-10-26; gradientes pendientes.
-  - **CAT-27 — Visibilidad y opacidad de imágenes de fondo (P2, Pendiente):** reporte del usuario del 2026-10-25 sobre main online: las imágenes cargadas quedan de fondo, pero casi no se distinguen.
+  - **CAT-27 — Visibilidad y opacidad de imágenes de fondo (P2, verificado localmente; pendiente de publicación):** reporte del usuario del 2026-10-25 sobre main online: las imágenes cargadas quedan de fondo, pero casi no se distinguen.
   - **Causa identificada en el código publicado:** capa de lectura fija al 96 % en ambos temas (`.note.has-bg`); oculta casi toda la imagen. El control actual de opacidad modifica el color de la tarjeta, no esa capa.
-  - **Propuesta para trabajar después:** regulación independiente de la visibilidad de la imagen, ajustable por la persona; valor inicial propuesto cercano al 40 % de visibilidad de la imagen, no al 40 % de la capa que la cubre. El valor exacto se validará visualmente al abordar la tarea.
-  - **Criterios futuros de aceptación:** imagen reconocible y texto legible en temas claro y oscuro; ajuste conservado al recargar y al exportar/importar. Definir y comprobar la compatibilidad con listas y respaldos existentes al implementar.
-  - **Límite de este registro:** propuesta documental conservada al publicar v16; sin corrección funcional. Estado Pendiente hasta implementar y verificar la solución.
+  - **Implementación local:** barra independiente 0–100 %, valor inicial 40 % de visibilidad, incluida la vista previa; superficies de lectura para texto y controles sobre la imagen. La barra anterior sigue controlando la opacidad del color.
+  - **Comprobaciones locales:** se conserva al recargar, exportar/importar y fusionar; los datos sin el campo reciben el 40 %. Se verificaron imagen compartida, PIN visual, dos temas, teclado y recarga offline aislada. Sin certificación WCAG ni Android físico.
+  - **Estado:** verificado localmente, pendiente de integración a main y publicación autorizadas. La web publicada sigue usando la capa del 96 %.
 - **5.3 Microinteracciones discretas:** Implementado realce de color de 260 ms solo al completar tareas, sin desplazamiento, desactivado con movimiento reducido. Aparición suave de 180 ms al crear listas (incluidas plantillas) y cambiar de vista publicada el 2026-10-26; sin desplazamiento y desactivada con movimiento reducido.
 - **5.4 Editor ampliado (CAT-14):** ✅ **Hecho.** Modal accesible para leer y editar un ítem largo, con textarea amplio, Guardar/Cancelar, foco atrapado y Escape. Tests `item-editor`.
 - **5.5 Claridad de acciones en móvil (CAT-17):** ✅ Hecho. Etiquetas visibles de Importar, Exportar y Nueva lista, con espaciado compacto del header y comprobación a 375 px.
@@ -401,7 +401,7 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 | **9.10** | **CAT-13** | Visor «Mapa estelar» | Alta | P3 | **Idea** |
 | **9.11** | **CAT-15** | Sincronización cloud / Google Play | Muy alta | P4 | **Idea** |
 | **9.12** | **CAT-26** | Botones flotantes + / − para zoom en modo Mapa | Por evaluar | P2 | **Pendiente; relacionado con CAT-21 y CAT-25** |
-| **9.13** | **CAT-27** | Visibilidad y control independiente de opacidad de imágenes | Por evaluar | P2 | **Pendiente; Etapa 5.2** |
+| **9.13** | **CAT-27** | Visibilidad y control independiente de opacidad de imágenes | Media | P2 | **Verificado localmente en dev; pendiente de publicación** |
 
 ### ✅ Cerrado en esta iteración (2026-10)
 - **CAT-24:** plantillas ES/EN con Pomodoro 25/10, explicación al espejo, hábitos saludables, equipaje y organización personal.
@@ -520,3 +520,16 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - La URL raíz sin parámetros y `index.html` sirven el archivo funcional correcto. Un contexto nuevo cargó v16 directamente.
 - En el contexto que comenzó con v15 se observó una respuesta antigua en la URL raíz durante la comprobación de caché; la recarga sin caché recuperó v16 y la siguiente recarga normal conservó esa versión. No se borraron notas ni almacenamiento. La causa exacta de la respuesta antigua no se atribuye a un componente sin evidencia adicional.
 - Si una sesión ya abierta no muestra los cambios, recargar sin caché (Ctrl+Shift+R en Chrome de escritorio). No usar «borrar datos del sitio» como solución, porque elimina las notas locales.
+
+### CAT-27 — 2026-10-27 (dev local, sin publicar)
+- Barra «Visibilidad de imagen» ES/EN con valor visible y accesible: 0–100 %, predeterminado 40 %, independiente del color. La tarjeta y la muestra se actualizan en tiempo real; restablecer estilo vuelve al 40 %.
+- El campo numérico `imageVisibility` se guarda por lista y se incluye en exportación de esquema 2 y firma de fusión. Si falta o es inválido, se normaliza a 40; versiones antiguas pueden ignorar el ajuste visual. El respaldo previo no se altera.
+- Superficies de lectura en textos y controles; medidas de contraste en fondos extremos blanco/negro, temas claro y oscuro. Revisión visual de 375 px, con imagen sintética clara y oscura; sin auditoría WCAG integral, lector de pantalla, Safari ni Android físico.
+- Suite: 52/52 PASS en Chrome con tiempo real normal y con movimiento reducido. El comando `bash tests/run.sh` con reloj virtual produjo 50 PASS y un timeout del harness antes de completar las dos pruebas nuevas; se mantiene documentada la limitación del ejecutor, sin confundirla con la suite en tiempo real.
+- Teclado: End y flecha izquierda ajustan 99 % y su valor accesible. En sesión aislada y offline (`navigator.onLine === false`), la recarga conservó imagen y 99 % bajo caché candidata `checklist-v17`.
+- Sin commits, integración a main ni publicación. CAT-21, CAT-26 y rendimiento siguen pendientes.
+
+### Preparación de publicación CAT-27 — 2026-10-27
+- Revalidación integrada: 52/52 PASS en Chrome con tiempo real normal y movimiento reducido. Pruebas con imagen y respaldo real, fusión, compatibilidad, teclado y recarga offline aislada de v17.
+- `bash tests/run.sh` con reloj virtual: 50 PASS, 3 FAIL (`delete-dialogs`, `style-shared-image` y timeout general); las dos pruebas nuevas de visibilidad pasaron. Las esperas intermitentes del ejecutor continúan pendientes de investigación y no se presentan como aprobadas.
+- Candidata local con caché v17; publicación autorizada y comprobaciones públicas pendientes al preparar este registro.

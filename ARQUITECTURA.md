@@ -173,3 +173,11 @@ Las transiciones usan Web Animations sobre opacidad durante 180 ms, solo desde c
 ## Publicación del bloque — 2026-10-26
 
 El bloque de presentación y Mercado Pago está publicado desde dev → main con caché v16. Los registros locales anteriores se conservan como antecedentes. No cambian almacenamiento ni formato de respaldo. Pages completado y suite pública 50/50 en tiempo real normal; ver ROADMAP.md para evidencia, actualización de caché y límites de verificación. Los worktrees se conservaron y dev/main se sincronizan también con el cierre documental.
+
+## CAT-27 local — 2026-10-27 (sin publicar)
+
+`imageVisibility` es un número entero por lista de 0 a 100, con valor predeterminado 40 para datos ausentes o inválidos. Se incluye en el JSON de esquema 2 y en la firma que detecta diferencias al fusionar. El archivo de respaldo anterior no se modifica; una versión anterior de la aplicación puede ignorar el nuevo ajuste de presentación.
+
+La tarjeta y la muestra comparten `--image-shade` (100 menos la visibilidad). Las superficies de lectura sobre sus elementos contienen texto y controles sin depender de los colores de la imagen; se mantiene el color de primer plano apropiado al tema. La barra de color sigue usando `opacity`. Restablecer estilo elimina la imagen y vuelve `imageVisibility` a 40 sin modificar contenido o PIN.
+
+Caché candidata v17, 52/52 pruebas en tiempo real normal y reducido; reloj virtual con timeout tras 50. Recarga offline y persistencia de imagen ficticia comprobadas en navegador aislado; ver límites de cobertura en ROADMAP.md. Sin publicación.

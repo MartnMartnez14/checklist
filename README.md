@@ -114,7 +114,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 50 casos locales (48 de la publicación anterior más vista previa y transiciones) de `tests/harness.html`. La suite publicada de 48 casos aprobó en Chrome con tiempo real, tanto normal como con movimiento reducido (`PASS=48 FAIL=0 NOVERIFY=0`); el ejecutor con reloj virtual presenta esperas intermitentes en imágenes/conexiones, registradas en el roadmap. Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
+Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 52 casos locales (50 de la publicación v16 más dos de visibilidad de imágenes) de `tests/harness.html`. La suite publicada de 48 casos aprobó en Chrome con tiempo real, tanto normal como con movimiento reducido (`PASS=48 FAIL=0 NOVERIFY=0`); el ejecutor con reloj virtual presenta esperas intermitentes en imágenes/conexiones, registradas en el roadmap. Incluye PIN visual/importación, ordenamiento/Deshacer, viewport de diálogos y cancelación de arrastres. Las pruebas sintéticas no confirman el problema original en Android físico.
 
 ---
 
@@ -141,3 +141,9 @@ Publicada y verificada en main/Pages y https://checklistgato.com/ con caché `ch
 - Ampliación solicitada: Mercado Pago al final de los medios de apoyo, cuenta UYU y titular proporcionados por el autor, con botón Copiar y textos ES/EN. Cambio local sin publicar.
 
 Validación local: 50/50 en Chrome con tiempo real normal; movimiento reducido completo pendiente por límites del ejecutor. Nuevas pruebas aprobadas también con movimiento reducido virtual. Recarga desde caché v16 con servidor detenido comprobada. Detalle de esperas y límites en ROADMAP.md.
+
+## CAT-27 local — 2026-10-27 (sin publicar)
+
+En dev, la barra **Visibilidad de imagen** ajusta por lista de 0 a 100 % cuánto se ve el fondo; comienza en 40 %, independiente de la opacidad del color. Se refleja en la muestra y se guarda en el JSON con los datos de la lista. Las listas y respaldos antiguos sin este ajuste usan el 40 %. Restablecer estilo lo devuelve a 40 %. Superficies de lectura protegen textos y controles sobre imágenes.
+
+Validación local: 52/52 en Chrome con tiempo real normal y movimiento reducido; teclado, dos temas, viewport de 375 px y recarga offline con imagen ficticia comprobados. El ejecutor de reloj virtual agotó el plazo tras 50 pruebas. Sin prueba Android física, Safari, lector de pantalla ni auditoría integral de accesibilidad. La web publicada continúa en v16.
