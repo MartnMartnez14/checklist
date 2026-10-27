@@ -1219,13 +1219,81 @@
     for(var theme of ['light','dark']) {
       if(cd.documentElement.dataset.theme!==theme) cd.getElementById('theme-toggle').click();
       var section=cd.querySelector('[data-id="b"]');
-      // Bound both black and white images under the computed scrim.
-      var css=cw.getComputedStyle(section), scrim=css.getPropertyValue('--read-surface').match(/[\d.]+/g).map(Number);
-      for(var extreme of [0,255]) {
-        var bg=scrim.slice(0,3).map(x=>x*scrim[3]+extreme*(1-scrim[3]));
-        assert(ratio(rgb(cw.getComputedStyle(section.querySelector('.item-text')).color),bg)>=4.5,'image contrast '+theme);
+      assert(['rgb(0, 0, 0)','rgb(255, 255, 255)'].includes(cw.getComputedStyle(section.querySelector('.item-text')).color),'automatic image ink');
+      assert(cw.getComputedStyle(section.querySelector('.item-text')).textShadow!=='none','missing text outline');
+    }
+  }
+
+  async function t_image_auto_ink() {
+    await boot([note('ink','Image title',['First task','Second task'],{color:3,opacity:60})]);resetLanguage();
+    for(var sample of [['#ffffff','rgb(0, 0, 0)'],['#000000','rgb(255, 255, 255)'],['#eeeeee','rgb(0, 0, 0)'],['#182235','rgb(255, 255, 255)']]) {
+      cd.getElementById('style-ink').click();
+      var canvas=cd.createElement('canvas');canvas.width=canvas.height=32;
+      var context=canvas.getContext('2d');context.fillStyle=sample[0];context.fillRect(0,0,32,32);
+      var blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
+      var input=cd.querySelector('.pop input[type=file]'),dt=new cw.DataTransfer();
+      dt.items.add(new cw.File([blob],'contrast.png',{type:'image/png'}));input.files=dt.files;input.dispatchEvent(new cw.Event('change',{bubbles:true}));
+      assert(await waitFor(()=>cd.querySelector('.note.has-bg') && cw.getComputedStyle(cd.querySelector('.item-text')).color===sample[1],10000),'automatic ink '+sample[0]);
+      for(var theme of ['light','dark']) {
+        if(cd.documentElement.dataset.theme!==theme)cd.getElementById('theme-toggle').click();
+        assert(await waitFor(()=>cd.querySelector('.note.has-bg'),10000),'image theme');
+        var card=cd.querySelector('.note'),cs=cw.getComputedStyle(card),text=card.querySelector('.item-text');
+        assert(cw.getComputedStyle(text).color===sample[1],'theme affects opaque image ink');
+        assert(ratio(rgb(cw.getComputedStyle(text).color),rgb(sample[0]==='#ffffff'?'rgb(255,255,255)':sample[0]==='#000000'?'rgb(0,0,0)':sample[0]==='#eeeeee'?'rgb(238,238,238)':'rgb(24,34,53)'))>=4.5,'uniform image contrast');
+        assert(cs.backgroundImage.startsWith('url(') && !cs.backgroundImage.includes('gradient'),'image is tinted');
+        assert(!card.querySelector('.note-reading-panel'),'reading panel remains');
+        assert(cw.getComputedStyle(text).textShadow!=='none','text outline missing');
+        if(!cd.querySelector('.pop'))cd.getElementById('style-ink').click();
+        card=cd.querySelector('.note');await waitFor(()=>card.classList.contains('has-bg'));
+        assert(cd.activeElement.dataset.popKey==='image' || cd.activeElement===cd.body,'image popover focus');
+        var preview=cd.querySelector('.style-preview');
+        assert(cw.getComputedStyle(preview).color===sample[1] && cw.getComputedStyle(preview).backgroundImage===cw.getComputedStyle(card).backgroundImage,'preview mismatch');
+        assert(cw.getComputedStyle(cd.querySelector('[data-pop-key="opacity"]')).display==='none','color control visible with image');
+        // Old color values remain available when removing the image, but cannot tint it.
+        cd.querySelector('[data-pop-key="color-1"]').click();
+        assert(cw.getComputedStyle(card.querySelector('.item-text')).color===sample[1],'color overwrites image ink');
+        var add=cd.getElementById('add-ink');add.value='Image task';add.dispatchEvent(new cw.Event('change',{bubbles:true}));
+        assert(stored()[0].items.some(i=>i.text==='Image task'),'editing over image');
+        cd.getElementById('style-ink').click();
       }
     }
+    await remount();assert(await waitFor(()=>cd.querySelector('.note.has-bg')),'ink after reload');
+    cd.getElementById('style-ink').click();cd.querySelector('[data-pop-key="remove-bg"]').click();
+    assert(!cd.querySelector('.note.has-bg'),'remove image');
+    if(!cd.querySelector('.pop'))cd.getElementById('style-ink').click();
+    assert(cw.getComputedStyle(cd.querySelector('[data-pop-key="opacity"]')).display!=='none','color controls not restored');
+  }
+
+  async function t_image_mixed_alpha() {
+    await boot([note('alpha','Transparent and mixed',['Editable text'],{color:3,opacity:60})]);resetLanguage();
+    async function upload(blob) {
+      if(!cd.querySelector('.pop'))cd.getElementById('style-alpha').click();
+      var input=cd.querySelector('.pop input[type=file]'),dt=new cw.DataTransfer();
+      dt.items.add(new cw.File([blob],'local.png',{type:'image/png'}));input.files=dt.files;input.dispatchEvent(new cw.Event('change',{bubbles:true}));
+      assert(await waitFor(()=>cd.querySelector('.note.has-bg'),10000),'image applied');
+    }
+    var canvas=cd.createElement('canvas');canvas.width=canvas.height=48;
+    await upload(await new Promise(r=>canvas.toBlob(r,'image/png')));
+    for(var theme of ['light','dark']) {
+      if(cd.documentElement.dataset.theme!==theme)cd.getElementById('theme-toggle').click();
+      var expected=theme==='light'?'rgb(0, 0, 0)':'rgb(255, 255, 255)';
+      assert(await waitFor(()=>cw.getComputedStyle(cd.querySelector('.item-text')).color===expected),'transparent image ink '+theme);
+    }
+    var ctx=canvas.getContext('2d');ctx.fillStyle='#000';ctx.fillRect(0,0,48,48);ctx.fillStyle='#fff';ctx.fillRect(0,0,24,48);
+    // Wait for a new stored reference as the preceding card already has an image.
+    var old=firstNote().bgId;
+    await upload(await new Promise(r=>canvas.toBlob(r,'image/png')));
+    assert(await waitFor(()=>firstNote().bgId!==old && cd.querySelector('.note.has-bg')),'mixed image');
+    var card=cd.querySelector('.note'),text=card.querySelector('.item-text'),ink=cw.getComputedStyle(text).color;
+    assert(['rgb(0, 0, 0)','rgb(255, 255, 255)'].includes(ink),'mixed image automatic ink');
+    var shadow=cw.getComputedStyle(text).textShadow;
+    assert(shadow.includes(ink==='rgb(0, 0, 0)'?'rgb(255, 255, 255)':'rgb(0, 0, 0)'),'opposite halo');
+    // Fast theme switches must not leave an old asynchronous analysis in place.
+    cd.getElementById('theme-toggle').click();cd.getElementById('theme-toggle').click();
+    assert(await waitFor(()=>cd.querySelector('.note.has-bg')),'fast theme update');
+    old=firstNote().bgId;await upload(new cw.Blob(['invalid image bytes'],{type:'image/png'}));
+    assert(await waitFor(()=>firstNote().bgId!==old && cd.querySelector('.note.has-bg')),'undecodable image fallback');
+    assert(cd.querySelector('.item-text').value==='Editable text','image error lost content');
   }
 
   function rgb(value) { return value.match(/[\d.]+/g).slice(0,3).map(Number); }
@@ -1323,48 +1391,21 @@
     await remount();assert(firstNote().opacity===25,'preview changes lost');
   }
 
-  async function t_image_visibility() {
-    var legacy=note('v','Sample',['Example'],{color:2,opacity:22}); delete legacy.imageVisibility;
-    await boot([legacy]); resetLanguage();iframe.style.width='375px';
+  async function t_image_original_backup() {
+    await boot([note('v','Sample',['Example'],{color:2,opacity:22,imageVisibility:73})]);resetLanguage();iframe.style.width='375px';
     cd.getElementById('style-v').click();
-    var range=cd.querySelector('[data-pop-key="image-visibility"]');
-    assert(range && range.value==='40' && range.getAttribute('aria-valuetext')==='40%','legacy default');
-    assert(range.getAttribute('aria-label').includes('imagen'),'Spanish label');
+    assert(!cd.querySelector('[data-pop-key="image-visibility"]'),'obsolete veil control');
     var png=new cw.Blob([Uint8Array.from(atob('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII='),c=>c.charCodeAt(0))],{type:'image/png'});
     var file=cd.querySelector('.pop input[type=file]'),dt=new cw.DataTransfer();
-    dt.items.add(new cw.File([png],'sample.png',{type:'image/png'})); file.files=dt.files;file.dispatchEvent(new cw.Event('change',{bubbles:true}));
+    dt.items.add(new cw.File([png],'sample.png',{type:'image/png'}));file.files=dt.files;file.dispatchEvent(new cw.Event('change',{bubbles:true}));
     assert(await waitFor(()=>firstNote().bgId && cd.querySelector('.note.has-bg'),10000),'image upload');
-    if(!cd.querySelector('[data-pop-key="image-visibility"]'))cd.getElementById('style-v').click();
-    var section=cd.querySelector('.note'),preview=cd.querySelector('.style-preview');range=cd.querySelector('[data-pop-key="image-visibility"]');
-    for(var value of [0,40,100]) {
-      range.value=value;range.dispatchEvent(new cw.Event('input',{bubbles:true}));
-      assert(range.getAttribute('aria-valuetext')===value+'%','accessible value');
-      assert(Math.abs(Number(cw.getComputedStyle(section).getPropertyValue('--image-shade'))-(100-value)/100)<.001,'card shade '+value);
-      assert(cw.getComputedStyle(preview).backgroundImage.includes('blob:'),'preview missing image');
-      assert(cw.getComputedStyle(preview).backgroundImage.startsWith('linear-gradient('),'preview overlay');
-    }
-    range.focus();range.dispatchEvent(new cw.KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));
-    range.value=73;range.dispatchEvent(new cw.Event('input',{bubbles:true}));range.dispatchEvent(new cw.Event('change',{bubbles:true}));
-    assert(firstNote().imageVisibility===73 && firstNote().opacity===22,'saved visibility or color changed');
-    var rect=range.getBoundingClientRect();assert(rect.left>=0 && rect.right<=375,'range overflow');
-    for(var theme of ['light','dark']) {
-      if(cd.documentElement.dataset.theme!==theme)cd.getElementById('theme-toggle').click();
-      var card=await waitFor(()=>cd.querySelector('.note.has-bg'),10000);
-      assert(card,'missing image after theme');
-      var surface=cw.getComputedStyle(card).getPropertyValue('--read-surface').match(/[\d.]+/g).map(Number);
-      for(var extreme of [0,255]) {
-        var bg=surface.slice(0,3).map(x=>x*surface[3]+extreme*(1-surface[3]));
-        assert(ratio(rgb(cw.getComputedStyle(card.querySelector('.item-text')).color),bg)>=4.5,'reading surface contrast '+theme);
-      }
-    }
-    cd.getElementById('lang-toggle').click();if(!cd.querySelector('[data-pop-key="image-visibility"]'))cd.getElementById('style-v').click();
-    assert(cd.querySelector('[data-pop-key="image-visibility"]').getAttribute('aria-label')==='Background image visibility','English label');
-    await remount();assert(firstNote().imageVisibility===73,'visibility lost after reload');
+    await remount();assert(firstNote().imageVisibility===73 && firstNote().opacity===22,'legacy values lost');
+    assert(await waitFor(()=>cd.querySelector('.note.has-bg')),'image reload');
     var exported=null,OriginalBlob=cw.Blob;
     cw.Blob=function(parts,options){if(options && options.type==='application/json')exported=JSON.parse(parts.join(''));return new OriginalBlob(parts,options);};
     cd.getElementById('export').click();assert(await waitFor(()=>exported,10000),'image export missing');
     assert(exported.notes[0].imageVisibility===73 && exported.images[exported.notes[0].bgId],'image backup incomplete');
-    resetLanguage();await importAndChoose(exported,'Reemplazar');await dismissDialogs();
+    await importAndChoose(exported,'Reemplazar');await dismissDialogs();
     assert(firstNote().imageVisibility===73 && firstNote().bgId,'image replacement lost data');
     assert(await waitFor(()=>cd.querySelector('.note.has-bg'),10000),'restored image missing');
   }
@@ -1445,7 +1486,9 @@
     ["completion-feedback", t_completion_feedback],
     ["presentation-feedback", t_presentation_feedback],
     ["style-preview", t_style_preview],
-    ["image-visibility", t_image_visibility],
+    ["image-auto-ink", t_image_auto_ink],
+    ["image-mixed-alpha", t_image_mixed_alpha],
+    ["image-original-backup", t_image_original_backup],
     ["image-visibility-backup", t_image_visibility_backup]
   ];
 

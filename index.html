@@ -48,8 +48,6 @@
     --hover: color-mix(in srgb, var(--accent) 12%, transparent);
     --surface: rgba(255,255,255,.82);
     --bg-glow: rgba(26,115,232,.10);
-    --scrim: rgba(255,255,255,.82);
-    --scrim-input: rgba(255,255,255,.60);
     --on-image: #202124;
     --edge-manual: #5f6368; --edge-manual-hover: #202124;
     --edge-tag: #9334e6; --edge-tag-hover: #6f1fb0;
@@ -69,8 +67,6 @@
     --hover: color-mix(in srgb, var(--accent) 18%, transparent);
     --surface: rgba(20,24,31,.72);
     --bg-glow: rgba(138,180,248,.08);
-    --scrim: rgba(12,15,20,.72);
-    --scrim-input: rgba(0,0,0,.35);
     --on-image: #f1f3f4;
     --edge-manual:#9aa0a6; --edge-manual-hover:#e8eaed;
     --edge-tag:#c58af9; --edge-tag-hover:#d7adfb;
@@ -236,10 +232,10 @@
   }
 
   .note.has-bg {
-    background-image: linear-gradient(var(--scrim), var(--scrim)), var(--bg-img, none);
+    background-image: var(--bg-img, none);
     background-size: cover; background-position: center;
   }
-  .note.has-bg .add-input { background: var(--scrim-input); border-radius: var(--radius-sm); }
+  .note.has-bg .add-input { background: transparent; border-radius: var(--radius-sm); }
   .note.has-bg .add-input::placeholder { color: var(--on-image); }
   .note.has-bg .note-title,
   .note.has-bg .item-text { color: var(--on-image); }
@@ -371,11 +367,10 @@
   }
   .style-preview p { margin: 6px 0 0; }
   .note.has-bg .style-preview {
-    color: #000;
-    background-image: linear-gradient(var(--scrim), var(--scrim)), var(--bg-img);
+    color: var(--image-ink);
+    background-image: var(--bg-img);
     background-size: cover; background-position: center;
   }
-  :root[data-theme="dark"] .note.has-bg .style-preview { color: #fff; }
   .pop-links { max-height: 140px; overflow: auto; }
   .link-row { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
   .link-label { flex: 1; min-width: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -466,27 +461,34 @@
   .oss-link { color: var(--accent); font-weight: 550; text-decoration: none; }
   .oss-link:hover { text-decoration: underline; }
   @media (pointer: coarse) { a.support-card, .support-prex { min-height: 44px; } .support-copy { min-height: 40px; } }
-  /* Keep foregrounds readable over every tint; image scrims bound contrast. */
+  /* Image cards show the original image; only the lettering has a fine halo. */
   .note { color: var(--accent); --muted: var(--accent); --on-image: var(--accent); }
   .note.has-bg {
-    --scrim: rgba(255,255,255,var(--image-shade, .6));
-    --read-surface: rgba(255,255,255,.96);
-    --accent: #000000 !important;
+    --accent: var(--image-ink, #ffffff) !important;
+    --letter-halo: -1px 0 var(--image-outline), 1px 0 var(--image-outline),
+      0 -1px var(--image-outline), 0 1px var(--image-outline),
+      -.6px -.6px var(--image-outline), .6px -.6px var(--image-outline),
+      -.6px .6px var(--image-outline), .6px .6px var(--image-outline);
   }
-  :root[data-theme="dark"] .note.has-bg {
-    --scrim: rgba(26,31,39,var(--image-shade, .6));
-    --read-surface: rgba(26,31,39,.96);
-    --accent: #ffffff !important;
+  .note.has-bg > :is(.note-created,.note-tags,.note-progress),
+  .note.has-bg > .note-head .note-title,
+  .note.has-bg > .tag-chips .tag-chip,
+  .note.has-bg > .item .item-text,
+  .note.has-bg > .add-form .add-input,
+  .note.has-bg > .done-bar :is(.toggle,.clear),
+  .note.has-bg .style-preview { text-shadow: var(--letter-halo); }
+  .note.has-bg > .note-head .icon-btn,
+  .note.has-bg > .item :is(.icon-btn,.item-grip) {
+    filter: drop-shadow(0 0 1px var(--image-outline));
   }
-  /* Keep text and controls readable independently of the image visibility. */
-  .note.has-bg > :is(.note-created,.note-head,.visual-lock-controls,.note-tags,.tag-chips,.note-progress,.item,.add-form,.done-bar) {
-    background-image: linear-gradient(var(--read-surface),var(--read-surface));
-    border-radius: var(--radius-sm);
+  .note.has-bg > .tag-chips .tag-chip { box-shadow: 0 0 0 1px var(--image-outline); }
+  .note.has-bg :is(input,textarea)::placeholder { text-shadow: inherit; }
+  .note.has-bg > :not(.pop) :focus-visible,
+  .note.has-bg > :is(input,textarea):focus-visible {
+    box-shadow: 0 0 0 4px var(--image-outline);
   }
-  .note.has-bg .style-preview :is(strong,p) {
-    background: var(--read-surface); border-radius: var(--radius-sm);
-  }
-  .note.has-bg .style-preview strong { display: inline-block; }
+  .note.has-bg .pop .plain-background-control { display: none; }
+  .note.has-bg .visual-lock-controls .btn { color: var(--text); background: var(--card); }
   .note.has-bg .item.just-completed { animation-name: completed-on-image; }
   @keyframes completed-on-image { from { box-shadow: inset 0 0 0 2px var(--accent); } to { box-shadow: inset 0 0 0 2px transparent; } }
   .note-title, .item-text, .note .add-input { color: inherit; }
@@ -679,7 +681,7 @@
   const I18N = {
     es: {
       resetStyle: "Restablecer estilo",
-      resetStyleMessage: "¿Quitar el color y la imagen de fondo y volver la opacidad del color al 18 % y la visibilidad de imagen al 40 %? El contenido de la lista se conserva.",
+      resetStyleMessage: "¿Quitar el color y la imagen de fondo y volver la opacidad del color al 18 %? El contenido de la lista se conserva.",
       appName: "Checklist Gato",
       lockTitle: "PIN visual",
       lockWarning: "Solo oculta el contenido en la interfaz. No cifra tus datos. El almacenamiento y los respaldos contienen el texto.",
@@ -812,8 +814,6 @@
       popOpacity: "Opacidad",
       popOpacityAria: "Opacidad del color",
       popBg: "Fondo",
-      imageVisibility: "Visibilidad de imagen",
-      imageVisibilityAria: "Visibilidad de la imagen de fondo",
       stylePreview: "Vista previa",
       previewTitle: "Lista de ejemplo",
       previewText: "Así se verá el estilo de tu lista.",
@@ -852,7 +852,7 @@
     },
     en: {
       resetStyle: "Reset style",
-      resetStyleMessage: "Remove the color and background image and reset color opacity to 18% and image visibility to 40%? The list content is preserved.",
+      resetStyleMessage: "Remove the color and background image and reset color opacity to 18%? The list content is preserved.",
       appName: "Checklist Cat",
       lockTitle: "Visual PIN",
       lockWarning: "Only hides content in the interface. It does not encrypt your data. Storage and backups contain the text.",
@@ -985,8 +985,6 @@
       popOpacity: "Opacity",
       popOpacityAria: "Color opacity",
       popBg: "Background",
-      imageVisibility: "Image visibility",
-      imageVisibilityAria: "Background image visibility",
       stylePreview: "Preview",
       previewTitle: "Example list",
       previewText: "This is how your list will look.",
@@ -1617,7 +1615,10 @@
   }
   function revokeImageURL(id) {
     const url = urlCache.get(id);
-    if (url) { URL.revokeObjectURL(url); urlCache.delete(id); }
+    if (url) {
+      URL.revokeObjectURL(url); urlCache.delete(id);
+      imageInkCache.delete(url + ":dark"); imageInkCache.delete(url + ":light");
+    }
   }
   function revokeIfUnused(id) {
     if (!id) return;
@@ -1638,15 +1639,62 @@
   }
 
   // ---------- Fondo por nota ----------
+  // Cache a tiny local sample per blob URL/theme; never store pixels in backups.
+  const imageInkCache = new Map();
+  function imageInkFor(url, dark) {
+    const key = url + (dark ? ":dark" : ":light");
+    if (!imageInkCache.has(key)) imageInkCache.set(key, (async () => {
+      try {
+        const image = new Image();
+        image.src = url;
+        await image.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 48;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        // Transparent parts show the neutral theme background, never the tint.
+        ctx.fillStyle = dark ? "#1a1f27" : "#ffffff";
+        ctx.fillRect(0, 0, 48, 48);
+        ctx.drawImage(image, 0, 0, 48, 48);
+        const pixels = ctx.getImageData(0, 0, 48, 48).data;
+        let black = 0, white = 0, luminance = 0;
+        for (let i = 0; i < pixels.length; i += 4) {
+          const channels = [pixels[i], pixels[i+1], pixels[i+2]].map(v => {
+            v /= 255;
+            return v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4;
+          });
+          const l = channels[0]*.2126 + channels[1]*.7152 + channels[2]*.0722;
+          if ((l + .05) / .05 >= 4.5) black++;
+          if (1.05 / (l + .05) >= 4.5) white++;
+          luminance += l;
+        }
+        // Prefer the color readable over more pixels; break ties by luminance.
+        return black === white ? (luminance / (pixels.length / 4) > .179 ? "#000000" : "#ffffff")
+          : black > white ? "#000000" : "#ffffff";
+      } catch (err) {
+        // Undecodable images keep a safe theme fallback; the outline still applies.
+        return dark ? "#ffffff" : "#000000";
+      }
+    })());
+    return imageInkCache.get(key);
+  }
+
   async function applyBackground(section, note) {
-    if (!note.bgId || isVisuallyLocked(note)) {
+    const imageId = note.bgId;
+    const dark = document.documentElement.dataset.theme === "dark";
+    if (!imageId || isVisuallyLocked(note)) {
       section.classList.remove("has-bg");
-      section.style.removeProperty("--bg-img");
+      for (const name of ["--bg-img", "--image-ink", "--image-outline"]) section.style.removeProperty(name);
       return;
     }
-    const url = await getImageURL(note.bgId);
-    if (!url || isVisuallyLocked(note) || !section.isConnected) { section.classList.remove("has-bg"); return; }
+    const url = await getImageURL(imageId);
+    if (!url) { section.classList.remove("has-bg"); return; }
+    const ink = await imageInkFor(url, dark);
+    // Ignore an analysis that finished after a theme/image/PIN/render change.
+    if (note.bgId !== imageId || isVisuallyLocked(note) || !section.isConnected ||
+        dark !== (document.documentElement.dataset.theme === "dark")) return;
     section.style.setProperty("--bg-img", `url("${url}")`);
+    section.style.setProperty("--image-ink", ink);
+    section.style.setProperty("--image-outline", ink === "#000000" ? "#ffffff" : "#000000");
     section.classList.add("has-bg");
   }
 
@@ -1658,7 +1706,6 @@
       sec.style.setProperty("--tint", tintFor(note));
       sec.style.setProperty("--accent", accentFor(note));
       sec.style.setProperty("--preview-ink", accentFor(note));
-      sec.style.setProperty("--image-shade", String((100 - note.imageVisibility) / 100));
       const hues = incident.get(note.id) || [];
       const paint = borderPaint(hues);
       if (paint) {
@@ -2705,7 +2752,7 @@
       return;
     }
     openPopId = note.id;
-    popFocusKey = note.color == null ? "color-none" : "color-" + note.color;
+    popFocusKey = note.bgId ? "image" : note.color == null ? "color-none" : "color-" + note.color;
     render();
   }
 
@@ -2727,8 +2774,8 @@
     const pop = el("div", { className: "pop", role: "dialog", "aria-label": tr("popAria") });
     pop.addEventListener("click", e => e.stopPropagation());
 
-    pop.append(el("p", { className: "pop-title", textContent: tr("popColor") }));
-    const group = el("div", { className: "swatches", role: "radiogroup", "aria-label": tr("popColorGroup") });
+    pop.append(el("p", { className: "pop-title plain-background-control", textContent: tr("popColor") }));
+    const group = el("div", { className: "swatches plain-background-control", role: "radiogroup", "aria-label": tr("popColorGroup") });
     const swatches = [];
     const noneSelected = note.color == null;
     const noneSw = el("button", {
@@ -2789,10 +2836,10 @@
     });
     pop.append(group);
 
-    pop.append(el("p", { className: "pop-title", textContent: tr("popOpacity") }));
+    pop.append(el("p", { className: "pop-title plain-background-control", textContent: tr("popOpacity") }));
     const slider = el("input", {
       type: "range", min: 0, max: 60, step: 1, value: note.opacity,
-      className: "opacity-slider", "aria-label": tr("popOpacityAria"),
+      className: "opacity-slider plain-background-control", "aria-label": tr("popOpacityAria"),
       "data-pop-key": "opacity"
     });
     slider.setAttribute("aria-valuetext", note.opacity + "%");
@@ -2833,22 +2880,6 @@
       }
     });
     pop.append(el("div", { className: "pop-row" }, [imgBtn, removeBtn, fileInput]));
-    const visibilityLabel = el("label", { className: "pop-title", htmlFor: "image-visibility-" + note.id, textContent: tr("imageVisibility") + " · " + note.imageVisibility + "%" });
-    visibilityLabel.style.display = "block";
-    const visibility = el("input", {
-      id: "image-visibility-" + note.id, type: "range", min: 0, max: 100, step: 1,
-      value: note.imageVisibility, className: "opacity-slider image-visibility-slider",
-      "aria-label": tr("imageVisibilityAria"), "data-pop-key": "image-visibility"
-    });
-    visibility.setAttribute("aria-valuetext", note.imageVisibility + "%");
-    visibility.addEventListener("input", () => {
-      note.imageVisibility = Number(visibility.value);
-      visibility.setAttribute("aria-valuetext", visibility.value + "%");
-      visibilityLabel.textContent = tr("imageVisibility") + " · " + visibility.value + "%";
-      section.style.setProperty("--image-shade", String((100 - note.imageVisibility) / 100));
-    });
-    visibility.addEventListener("change", () => { touch(note); save(); });
-    pop.append(visibilityLabel, visibility);
     pop.append(el("p", { className: "pop-title", textContent: tr("stylePreview") }));
     pop.append(el("div", { className: "style-preview", role: "img", "aria-label": tr("stylePreview") + ": " + tr("previewText") }, [
       el("strong", { textContent: tr("previewTitle") }),

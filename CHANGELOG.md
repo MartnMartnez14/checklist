@@ -1,5 +1,11 @@
 # Historial de cambios
 
+## 2026-10-27 — Imagen completa y texto automático (candidata para publicación)
+- Imagen directa como fondo de toda la lista, sin panel, velo ni mezcla con el color. Letras negras/blancas elegidas con una muestra local de 48×48 píxeles y contorno fino de color opuesto; vista previa equivalente.
+- Color y opacidad disponibles para listas sin imagen; al quitar una imagen se recupera el estilo anterior. Se retira el control de visibilidad; su campo histórico se conserva en los datos y respaldos sin efecto visual.
+- Chrome con tiempo real: 54/54 PASS normal y 54/54 reducido. Casos nuevos de imágenes claras/oscuras, mixtas, transparentes, dañadas, cambios de tema, edición y respaldo. Recarga offline conserva notas e imágenes; capturas sintéticas de escritorio, 375 px y mapa.
+- El contorno y la selección automática no garantizan contraste suficiente en toda fotografía compleja. Sin auditoría WCAG integral ni pruebas físicas Android, Safari o lector de pantalla. Caché candidata `checklist-v18`; publicación autorizada y verificación online pendiente.
+
 ## 2026-10-27 — CAT-27 publicado y verificado
 
 - Control de visibilidad de imágenes y superficies de lectura publicados con caché `checklist-v17`; commit funcional `ea40c33` y [despliegue Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40570456782) completado.

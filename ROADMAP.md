@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** CAT-27 publicado y verificado el 2026-10-27 desde dev a main y https://checklistgato.com/; caché `checklist-v17`, commit funcional `ea40c33`. Suite: 52/52 en Chrome con tiempo real normal y reducido en dev; 52/52 con tiempo normal en la web pública. Límites del reloj virtual y pruebas físicas en el cierre.
+**Estado:** candidata v18 con imagen completa, letras negras/blancas automáticas y contorno fino; 54/54 pruebas locales normal y reducido. Publicación en main autorizada, comprobación online pendiente. CAT-27 v17 permanece como antecedente documentado.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -181,7 +181,7 @@ Incorporar el inglés como segundo idioma oficial sin añadir librerías externa
 
 ### ETAPA 5 — Personalización y Experiencia Visual (Prioridad: MEDIA — P2/P3)
 Perfeccionar la identidad visual sin recargar la aplicación.
-- **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles y capa de lectura sobre imágenes. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
+- **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles; imágenes con texto automático y contorno fino en la candidata v18. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
 - **5.2 Fondos de listas:** Implementado Restablecer estilo con confirmación ES/EN: sin color ni imagen y opacidad 18 %, conservando datos y PIN. Vista previa integrada publicada el 2026-10-26; gradientes pendientes.
   - **CAT-27 — Visibilidad y opacidad de imágenes de fondo (P2, publicado):** reporte del usuario del 2026-10-25 sobre main online: las imágenes cargadas quedan de fondo, pero casi no se distinguen.
   - **Causa identificada en la versión v16:** capa de lectura fija al 96 % en ambos temas (`.note.has-bg`); oculta casi toda la imagen. El control actual de opacidad modifica el color de la tarjeta, no esa capa.
@@ -543,3 +543,16 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Respaldados el diff y los ocho archivos de dev en `/tmp/checklist-cat27-publicacion-20261027` con hashes; todos los worktrees y respaldos Git previos conservados. `/tmp` es temporal.
 - Límites: sin Android físico, Safari ni lector de pantalla; no se declara auditoría integral de accesibilidad. CAT-21, CAT-26, cifrado y rendimiento siguen pendientes.
 - El cierre documental posterior registra estos resultados sin modificar la aplicación ni la caché.
+
+### Ajuste visual posterior a CAT-27 — 2026-10-27 (local, sin publicar)
+- Dirección final acordada: imagen de fondo completa, sin panel ni mezcla con color. El texto elige negro/blanco mediante una muestra local de 48×48 píxeles, priorizando el color que alcanza contraste 4,5:1 en más muestras; contorno fino opuesto. Las fotografías mixtas no tienen contraste garantizado en todas las zonas.
+- Análisis en memoria compartido por imagen/tema; contempla transparencia sobre la base neutra del tema, errores de decodificación y resultados asíncronos obsoletos. No se envían imágenes a servicios externos ni se agregan dependencias.
+- Muestra con el mismo fondo y letras. Controles de color/opacidad ocultos con imagen; disponibles al quitarla, conservando sus valores. Retirado el control de velo; `imageVisibility` se mantiene por compatibilidad en almacenamiento y exportación/importación, sin efecto visual.
+- Suite Chrome con tiempo real: 54/54 PASS normal y 54/54 reducido. Casos nuevos: texto automático en fondos claros/oscuros, independencia del tema/color, contorno, imágenes mixtas/transparentes/dañadas, cambios rápidos de tema, edición, eliminación de imagen y respaldo. Conservadas regresiones de PIN, ordenamiento y conexiones.
+- Capturas con datos e imágenes sintéticos a 1200 px y 375 px, temas claro/oscuro, listas largas/vacías, completados, mapa y vista previa. Recarga offline aislada con `navigator.onLine === false`, JSON de notas idéntico e imágenes visibles.
+- Sin commit, publicación ni modificación de caché. Pendientes Android físico, Safari, lector de pantalla y auditoría integral de accesibilidad; el contraste en fondos uniformes aprobado no equivale a garantizar lectura sobre toda fotografía.
+
+### Preparación de publicación de imagen completa — 2026-10-27
+- Publicación en main/online autorizada por el usuario tras revisar las capturas locales. Caché candidata `checklist-v18`; se conserva el campo histórico `imageVisibility` sin efecto visual.
+- Respaldo del diff y de los seis archivos de la candidata en `/tmp/checklist-image-release` antes de preparar la publicación. Los otros worktrees se conservan sin modificar. `/tmp` es temporal.
+- Comprobaciones finales y transición v17 → v18 pendientes al preparar este registro; no se afirman resultados públicos anticipados.
