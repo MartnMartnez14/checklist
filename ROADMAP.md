@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** CAT-27 implementado y verificado localmente en dev con caché candidata `checklist-v17`; sin publicación. Publicación funcional verificada el 2026-10-26 desde dev a main, GitHub Pages y https://checklistgato.com/; caché `checklist-v16`, commit `35855e0`. Suite local integrada y pública: 50/50 en Chrome con tiempo real normal. Límites de movimiento reducido, Android y reloj virtual conservados en el cierre.
+**Estado:** CAT-27 publicado y verificado el 2026-10-27 desde dev a main y https://checklistgato.com/; caché `checklist-v17`, commit funcional `ea40c33`. Suite: 52/52 en Chrome con tiempo real normal y reducido en dev; 52/52 con tiempo normal en la web pública. Límites del reloj virtual y pruebas físicas en el cierre.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -89,7 +89,7 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
 | **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (`mergeNotes` refinado con metadatos y enlaces locales) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v16`; distribución desde `main`) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v17`; distribución desde `main`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
 | **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
 | **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
@@ -114,7 +114,7 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
 | **CAT-24** | Actualización de plantillas ES/EN (Estudios, Hábitos, Viajes, Organización) | **P2** | Baja | **Hecho (Etapa 5.7 / 10.C)** |
 | **CAT-25** | Orden automático del mapa por conexiones + Deshacer | **P2/P3** | Media | **Publicado (Etapa 2.6; cierre 2026-10-25)** |
 | **CAT-26** | Controles de zoom en modo Mapa (+ / −), relacionados con CAT-21 y CAT-25 | **P2** | Por evaluar | **Pendiente (Etapa 2.8; reporte móvil del usuario)** |
-| **CAT-27** | Visibilidad y opacidad de imágenes de fondo | **P2** | Media | **Verificado localmente en dev; sin publicar (Etapa 5.2)** |
+| **CAT-27** | Visibilidad y opacidad de imágenes de fondo | **P2** | Media | **Publicado y verificado (Etapa 5.2)** |
 
 ---
 
@@ -183,11 +183,11 @@ Incorporar el inglés como segundo idioma oficial sin añadir librerías externa
 Perfeccionar la identidad visual sin recargar la aplicación.
 - **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles y capa de lectura sobre imágenes. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
 - **5.2 Fondos de listas:** Implementado Restablecer estilo con confirmación ES/EN: sin color ni imagen y opacidad 18 %, conservando datos y PIN. Vista previa integrada publicada el 2026-10-26; gradientes pendientes.
-  - **CAT-27 — Visibilidad y opacidad de imágenes de fondo (P2, verificado localmente; pendiente de publicación):** reporte del usuario del 2026-10-25 sobre main online: las imágenes cargadas quedan de fondo, pero casi no se distinguen.
-  - **Causa identificada en el código publicado:** capa de lectura fija al 96 % en ambos temas (`.note.has-bg`); oculta casi toda la imagen. El control actual de opacidad modifica el color de la tarjeta, no esa capa.
-  - **Implementación local:** barra independiente 0–100 %, valor inicial 40 % de visibilidad, incluida la vista previa; superficies de lectura para texto y controles sobre la imagen. La barra anterior sigue controlando la opacidad del color.
+  - **CAT-27 — Visibilidad y opacidad de imágenes de fondo (P2, publicado):** reporte del usuario del 2026-10-25 sobre main online: las imágenes cargadas quedan de fondo, pero casi no se distinguen.
+  - **Causa identificada en la versión v16:** capa de lectura fija al 96 % en ambos temas (`.note.has-bg`); oculta casi toda la imagen. El control actual de opacidad modifica el color de la tarjeta, no esa capa.
+  - **Implementación publicada:** barra independiente 0–100 %, valor inicial 40 % de visibilidad, incluida la vista previa; superficies de lectura para texto y controles sobre la imagen. La barra anterior sigue controlando la opacidad del color.
   - **Comprobaciones locales:** se conserva al recargar, exportar/importar y fusionar; los datos sin el campo reciben el 40 %. Se verificaron imagen compartida, PIN visual, dos temas, teclado y recarga offline aislada. Sin certificación WCAG ni Android físico.
-  - **Estado:** verificado localmente, pendiente de integración a main y publicación autorizadas. La web publicada sigue usando la capa del 96 %.
+  - **Estado:** publicado y verificado en v17; ver el cierre del 2026-10-27.
 - **5.3 Microinteracciones discretas:** Implementado realce de color de 260 ms solo al completar tareas, sin desplazamiento, desactivado con movimiento reducido. Aparición suave de 180 ms al crear listas (incluidas plantillas) y cambiar de vista publicada el 2026-10-26; sin desplazamiento y desactivada con movimiento reducido.
 - **5.4 Editor ampliado (CAT-14):** ✅ **Hecho.** Modal accesible para leer y editar un ítem largo, con textarea amplio, Guardar/Cancelar, foco atrapado y Escape. Tests `item-editor`.
 - **5.5 Claridad de acciones en móvil (CAT-17):** ✅ Hecho. Etiquetas visibles de Importar, Exportar y Nueva lista, con espaciado compacto del header y comprobación a 375 px.
@@ -401,7 +401,7 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 | **9.10** | **CAT-13** | Visor «Mapa estelar» | Alta | P3 | **Idea** |
 | **9.11** | **CAT-15** | Sincronización cloud / Google Play | Muy alta | P4 | **Idea** |
 | **9.12** | **CAT-26** | Botones flotantes + / − para zoom en modo Mapa | Por evaluar | P2 | **Pendiente; relacionado con CAT-21 y CAT-25** |
-| **9.13** | **CAT-27** | Visibilidad y control independiente de opacidad de imágenes | Media | P2 | **Verificado localmente en dev; pendiente de publicación** |
+| **9.13** | **CAT-27** | Visibilidad y control independiente de opacidad de imágenes | Media | P2 | **Publicado y verificado** |
 
 ### ✅ Cerrado en esta iteración (2026-10)
 - **CAT-24:** plantillas ES/EN con Pomodoro 25/10, explicación al espejo, hábitos saludables, equipaje y organización personal.
@@ -533,3 +533,13 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Revalidación integrada: 52/52 PASS en Chrome con tiempo real normal y movimiento reducido. Pruebas con imagen y respaldo real, fusión, compatibilidad, teclado y recarga offline aislada de v17.
 - `bash tests/run.sh` con reloj virtual: 50 PASS, 3 FAIL (`delete-dialogs`, `style-shared-image` y timeout general); las dos pruebas nuevas de visibilidad pasaron. Las esperas intermitentes del ejecutor continúan pendientes de investigación y no se presentan como aprobadas.
 - Candidata local con caché v17; publicación autorizada y comprobaciones públicas pendientes al preparar este registro.
+
+### Cierre de publicación CAT-27 — 2026-10-27
+- Integración dev → main por fast-forward y push sin forzar. Commit funcional `ea40c33a3717018021e23e739e4309113e4df95d`; [despliegue Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40570456782) completado correctamente.
+- Archivo `index.html`, `sw.js`, manifest, cuatro imágenes/iconos, README, roadmap, arquitectura, changelog, incidencias y harness públicos comparados byte a byte con el commit funcional: 13/13 coinciden.
+- Suite integrada local en Chrome: 52/52 PASS con tiempo real normal y reducido. Suite pública aislada: 52/52 PASS con tiempo real normal. El ejecutor `bash tests/run.sh` con reloj virtual registró 50 PASS y tres fallos de espera (`delete-dialogs`, `style-shared-image` y timeout general); las dos pruebas nuevas pasaron. El problema intermitente del ejecutor no se declara resuelto.
+- Web pública, navegador aislado a 375 px: ajuste de visibilidad con teclado (99 %), etiqueta accesible, imagen sintética y recarga offline con `navigator.onLine === false`; v17 conservó imagen y ajuste. No representa una prueba en Android físico.
+- Actualización v16 → v17 de las versiones exactas del repositorio en un origen local aislado: nota, tarea, identificador y hash de imagen conservados; ajuste inicial 40 %, caché v16 retirada y v17 activa. Ajuste 99 % y recarga offline con datos conservados. La sesión pública original v16 se preparó, pero no pudo continuarse por cierre de su entrada; no se afirma que esa transición se haya comprobado en el dominio público.
+- Respaldados el diff y los ocho archivos de dev en `/tmp/checklist-cat27-publicacion-20261027` con hashes; todos los worktrees y respaldos Git previos conservados. `/tmp` es temporal.
+- Límites: sin Android físico, Safari ni lector de pantalla; no se declara auditoría integral de accesibilidad. CAT-21, CAT-26, cifrado y rendimiento siguen pendientes.
+- El cierre documental posterior registra estos resultados sin modificar la aplicación ni la caché.

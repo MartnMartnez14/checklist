@@ -5,7 +5,7 @@
 - **Aplicación web:** [https://checklistgato.com](https://checklistgato.com/)
 - **Código fuente (100 % Open Source y auditable):** [https://github.com/MartnMartnez14/checklist](https://github.com/MartnMartnez14/checklist)
 
-**Publicación actual — 2026-10-26:** caché `checklist-v16`; vista previa de estilo, transiciones suaves y Mercado Pago disponibles en la web. Integración dev → main y [despliegue Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40410492648) verificados; 50/50 pruebas en Chrome con tiempo real normal, localmente y en el dominio público. Límites y evidencia en el cierre de ROADMAP.md.
+**Publicación actual — 2026-10-27:** CAT-27 disponible en [Checklist Gato](https://checklistgato.com/), con caché `checklist-v17`. La visibilidad de imágenes se ajusta por lista, de forma independiente al color; [Pages completó el despliegue](https://github.com/MartnMartnez14/checklist/actions/runs/40570456782). Dev pasó 52/52 pruebas en tiempo real normal y reducido; la web pública pasó 52/52 en tiempo normal. Evidencia y límites en ROADMAP.md.
 
 Si una pestaña antigua no muestra los cambios, probá recargar sin caché (`Ctrl+Shift+R` en Chrome de escritorio). No borres los datos del sitio: allí están tus notas.
 
@@ -142,8 +142,8 @@ Publicada y verificada en main/Pages y https://checklistgato.com/ con caché `ch
 
 Validación local: 50/50 en Chrome con tiempo real normal; movimiento reducido completo pendiente por límites del ejecutor. Nuevas pruebas aprobadas también con movimiento reducido virtual. Recarga desde caché v16 con servidor detenido comprobada. Detalle de esperas y límites en ROADMAP.md.
 
-## CAT-27 local — 2026-10-27 (sin publicar)
+## CAT-27 — implementación local previa a la publicación (2026-10-27)
 
 En dev, la barra **Visibilidad de imagen** ajusta por lista de 0 a 100 % cuánto se ve el fondo; comienza en 40 %, independiente de la opacidad del color. Se refleja en la muestra y se guarda en el JSON con los datos de la lista. Las listas y respaldos antiguos sin este ajuste usan el 40 %. Restablecer estilo lo devuelve a 40 %. Superficies de lectura protegen textos y controles sobre imágenes.
 
-Validación local: 52/52 en Chrome con tiempo real normal y movimiento reducido; teclado, dos temas, viewport de 375 px y recarga offline con imagen ficticia comprobados. El ejecutor de reloj virtual agotó el plazo tras 50 pruebas. Sin prueba Android física, Safari, lector de pantalla ni auditoría integral de accesibilidad. La web publicada continúa en v16.
+Validación local: 52/52 en Chrome con tiempo real normal y movimiento reducido; teclado, dos temas, viewport de 375 px y recarga offline con imagen ficticia comprobados. El ejecutor de reloj virtual agotó el plazo tras 50 pruebas. Sin prueba Android física, Safari, lector de pantalla ni auditoría integral de accesibilidad. Ese registro describe la etapa local previa; CAT-27 se publicó posteriormente en v17.

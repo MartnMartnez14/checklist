@@ -8,6 +8,8 @@ La fecha indica el registro documental, no la fecha del reporte original.
 | ID | Fecha | Tipo | Descripción | Prioridad | Estado | Resolución |
 |---|---|---|---|---|---|---|
 | CAT-21 | 2026-10-24 | Error documentado en roadmap | En Android, el asa puede quedar trabada al hacer zoom/pellizco en Mapa. Pendiente de reproducción local y de prueba en dispositivo real. | P1 | En desarrollo | Endurecimiento publicado: cancelación/captura/foco/visibilidad/zoom y segundo puntero; tests sintéticos aprobados. Falta reproducir el problema original y validar en Android físico. No se considera resuelto. |
-| CAT-27 | 2026-10-25 | Presentación de imágenes | Las imágenes de fondo casi no se distinguen por la capa de lectura fija al 96 %. La vista previa v16 conserva el mismo comportamiento. | P2 | En desarrollo | Implementado y verificado en dev: barra independiente, valor inicial 40 %, persistencia, respaldos y superficies de lectura. Pendiente de integración y publicación; detalle en ROADMAP.md. |
+| CAT-27 | 2026-10-25 | Presentación de imágenes | Las imágenes de fondo casi no se distinguen por la capa de lectura fija al 96 %. La vista previa v16 conserva el mismo comportamiento. | P2 | Resuelto | Publicado en v17: barra independiente, valor inicial 40 %, persistencia, respaldos y superficies de lectura. Verificación local y pública registrada en ROADMAP.md. |
 
 Cierre del 2026-10-26: CAT-21 sigue pendiente de Android físico. Las mejoras de presentación publicadas no resuelven CAT-26 ni CAT-27. Las limitaciones del ejecutor de pruebas están registradas en el cierre del roadmap.
+
+Cierre del 2026-10-27: CAT-27 publicado y verificado; CAT-21 continúa abierta a validación Android física y CAT-26 permanece pendiente.

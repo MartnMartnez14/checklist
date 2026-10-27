@@ -1,5 +1,13 @@
 # Historial de cambios
 
+## 2026-10-27 — CAT-27 publicado y verificado
+
+- Control de visibilidad de imágenes y superficies de lectura publicados con caché `checklist-v17`; commit funcional `ea40c33` y [despliegue Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40570456782) completado.
+- 52/52 pruebas en dev con tiempo real normal y reducido; 52/52 en la web pública con tiempo normal. Reloj virtual: 50 PASS y tres fallos de espera/timeout, pendiente de estabilizar.
+- Web pública: imagen, teclado y recarga offline verificados con datos ficticios. Actualización v16 → v17 con nota e imagen probada en origen local aislado; transición completa en dominio público no verificada.
+- Sin Android físico, Safari ni lector de pantalla. Detalles en ROADMAP.md.
+
+
 ## 2026-10-27 — CAT-27 (candidata validada en dev)
 
 - Visibilidad de imagen por lista de 0–100 %, valor inicial 40 %, muestra y etiqueta ES/EN; independiente de la opacidad del color.
