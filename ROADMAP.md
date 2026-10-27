@@ -2,7 +2,7 @@
 
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
-**Estado:** candidata v18 con imagen completa, letras negras/blancas automáticas y contorno fino; 54/54 pruebas locales normal y reducido. Publicación en main autorizada, comprobación online pendiente. CAT-27 v17 permanece como antecedente documentado.
+**Estado:** imagen completa y texto automático publicados y verificados el 2026-10-27 en main/https://checklistgato.com/; caché `checklist-v18`, commit funcional `f09727b`. Suite local: 54/54 normal y reducido; web pública: 54/54 normal. Transición local v17 → v18 y recarga offline pública verificadas. Límites de fotos complejas y pruebas físicas en el cierre.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -89,7 +89,7 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
 | **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (`mergeNotes` refinado con metadatos y enlaces locales) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v17`; distribución desde `main`) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché actual: `checklist-v18`; distribución desde `main`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
 | **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
 | **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
@@ -181,13 +181,13 @@ Incorporar el inglés como segundo idioma oficial sin añadir librerías externa
 
 ### ETAPA 5 — Personalización y Experiencia Visual (Prioridad: MEDIA — P2/P3)
 Perfeccionar la identidad visual sin recargar la aplicación.
-- **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles; imágenes con texto automático y contorno fino en la candidata v18. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
+- **5.1 Modo claro y oscuro:** Implementados contraste adaptativo en tarjetas, iconos sin atenuación, foco y placeholders legibles; imágenes con texto automático y contorno fino en v18. Medidos diez colores a opacidades 0 %, 18 % y 60 % en ambos temas; no es una auditoría WCAG integral.
 - **5.2 Fondos de listas:** Implementado Restablecer estilo con confirmación ES/EN: sin color ni imagen y opacidad 18 %, conservando datos y PIN. Vista previa integrada publicada el 2026-10-26; gradientes pendientes.
   - **CAT-27 — Visibilidad y opacidad de imágenes de fondo (P2, publicado):** reporte del usuario del 2026-10-25 sobre main online: las imágenes cargadas quedan de fondo, pero casi no se distinguen.
   - **Causa identificada en la versión v16:** capa de lectura fija al 96 % en ambos temas (`.note.has-bg`); oculta casi toda la imagen. El control actual de opacidad modifica el color de la tarjeta, no esa capa.
-  - **Implementación publicada:** barra independiente 0–100 %, valor inicial 40 % de visibilidad, incluida la vista previa; superficies de lectura para texto y controles sobre la imagen. La barra anterior sigue controlando la opacidad del color.
+  - **Implementación publicada en v17:** barra independiente 0–100 %, valor inicial 40 % de visibilidad, incluida la vista previa; superficies de lectura para texto y controles sobre la imagen. La barra anterior sigue controlando la opacidad del color.
   - **Comprobaciones locales:** se conserva al recargar, exportar/importar y fusionar; los datos sin el campo reciben el 40 %. Se verificaron imagen compartida, PIN visual, dos temas, teclado y recarga offline aislada. Sin certificación WCAG ni Android físico.
-  - **Estado:** publicado y verificado en v17; ver el cierre del 2026-10-27.
+  - **Estado:** v17 publicada; en v18 se reemplaza la barra y las superficies por imagen completa, texto automático y contorno. Ver los cierres del 2026-10-27.
 - **5.3 Microinteracciones discretas:** Implementado realce de color de 260 ms solo al completar tareas, sin desplazamiento, desactivado con movimiento reducido. Aparición suave de 180 ms al crear listas (incluidas plantillas) y cambiar de vista publicada el 2026-10-26; sin desplazamiento y desactivada con movimiento reducido.
 - **5.4 Editor ampliado (CAT-14):** ✅ **Hecho.** Modal accesible para leer y editar un ítem largo, con textarea amplio, Guardar/Cancelar, foco atrapado y Escape. Tests `item-editor`.
 - **5.5 Claridad de acciones en móvil (CAT-17):** ✅ Hecho. Etiquetas visibles de Importar, Exportar y Nueva lista, con espaciado compacto del header y comprobación a 375 px.
@@ -556,3 +556,12 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Publicación en main/online autorizada por el usuario tras revisar las capturas locales. Caché candidata `checklist-v18`; se conserva el campo histórico `imageVisibility` sin efecto visual.
 - Respaldo del diff y de los seis archivos de la candidata en `/tmp/checklist-image-release` antes de preparar la publicación. Los otros worktrees se conservan sin modificar. `/tmp` es temporal.
 - Comprobaciones finales y transición v17 → v18 pendientes al preparar este registro; no se afirman resultados públicos anticipados.
+
+### Cierre de publicación de imagen completa — 2026-10-27
+- Publicación autorizada en main mediante push sin forzar. Commit funcional `f09727b41e821c36c24363435625e5a72caf2182`; [despliegue Pages](https://github.com/MartnMartnez14/checklist/actions/runs/40575181195) completado correctamente.
+- Candidata final local: 54/54 PASS normal y 54/54 reducido en Chrome con tiempo real. Se corrigió además la confirmación ES/EN de restablecer estilo para quitar la referencia al control retirado.
+- Web pública en sesión aislada: 54/54 PASS con tiempo normal. Trece archivos públicos (aplicación, service worker, manifest, cuatro imágenes/iconos, README, roadmap, changelog, arquitectura, incidencias y harness) comparados por SHA-256: 13/13 coinciden con el commit funcional.
+- Prueba pública con imágenes sintéticas claras/oscuras y notas ficticias: texto negro/blanco automático, temas claro/oscuro, viewport 375 px, mapa y vista previa. Recarga offline con `navigator.onLine === false`, JSON de notas idéntico e imágenes visibles; caché activa `checklist-v18`.
+- Transición v17 → v18 de las versiones exactas en origen local aislado: notas idénticas, hash del archivo de imagen idéntico, v17 retirada y v18 activa; recarga offline conserva todo. No se presenta como una transición de una instalación real del usuario.
+- Conservados los otros worktrees; no se sincroniza dev por iniciativa propia. Capturas y resultados de prueba fuera del repositorio. El cierre documental posterior no cambia aplicación ni caché.
+- Límites: fotos mixtas/cargadas sin garantía de contraste en todas sus zonas; sin Android físico, Safari ni lector de pantalla ni auditoría WCAG integral. CAT-21 y CAT-26 siguen pendientes.

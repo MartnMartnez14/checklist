@@ -5,7 +5,7 @@
 - **Aplicación web:** [https://checklistgato.com](https://checklistgato.com/)
 - **Código fuente (100 % Open Source y auditable):** [https://github.com/MartnMartnez14/checklist](https://github.com/MartnMartnez14/checklist)
 
-**Actualización candidata — 2026-10-27:** imagen completa de fondo con letras negras/blancas automáticas y contorno fino, sin paneles ni mezcla de color; caché `checklist-v18`. Sin imagen se conserva el estilo de color. Suite local: 54/54 con movimiento normal y reducido; publicación autorizada, comprobación online pendiente. Evidencia y límites en ROADMAP.md.
+**Publicación actual — 2026-10-27:** imagen completa de fondo con letras negras/blancas automáticas y contorno fino, sin paneles ni mezcla de color; caché `checklist-v18`. Sin imagen se conserva el estilo de color. [Despliegue completado](https://github.com/MartnMartnez14/checklist/actions/runs/40575181195); 54/54 pruebas locales normal y reducido y 54/54 en la web pública con tiempo normal. Recarga offline verificada con imágenes de prueba. Evidencia y límites en ROADMAP.md.
 
 Si una pestaña antigua no muestra los cambios, probá recargar sin caché (`Ctrl+Shift+R` en Chrome de escritorio). No borres los datos del sitio: allí están tus notas.
 
@@ -114,7 +114,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 54 casos de `tests/harness.html`. La candidata v18 aprobó 54/54 en Chrome con tiempo real normal y reducido; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento y conexiones. El ejecutor con reloj virtual tiene antecedentes de esperas intermitentes, registrados en el roadmap. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
+Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 54 casos de `tests/harness.html`. La versión v18 aprobó 54/54 en Chrome con tiempo real normal y reducido; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento y conexiones. El ejecutor con reloj virtual tiene antecedentes de esperas intermitentes, registrados en el roadmap. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
 
 ---
 

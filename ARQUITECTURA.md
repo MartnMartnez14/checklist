@@ -185,3 +185,9 @@ Caché candidata v17, 52/52 pruebas en tiempo real normal y reducido; reloj virt
 ## CAT-27 publicado — 2026-10-27
 
 El commit funcional `ea40c33` se integró de dev a main y Pages completó el despliegue de v17. La visibilidad de imagen modifica presentación y agrega `imageVisibility` al esquema 2; los respaldos anteriores se normalizan al 40 %. Pruebas, actualización local v16 → v17 y límites constan en ROADMAP.md. El cierre documental no modifica la aplicación ni la caché.
+
+## Imagen completa y contraste automático publicados — 2026-10-27
+
+V18 reemplaza las superficies y el velo de v17 por la imagen directa. `imageInkFor` analiza una muestra local de 48×48 píxeles y elige negro/blanco por cobertura de contraste, con contorno opuesto. Se comparte el resultado por URL de imagen y tema; la transparencia se compone con la base neutra del tema. Errores de decodificación usan tinta del tema; se descartan resultados obsoletos tras cambios de imagen/tema/PIN/renderizado.
+
+Color/opacidad se muestran solo sin imagen; sus valores se conservan. `imageVisibility` mantiene normalización, exportación/importación y firma de fusión por compatibilidad, pero no tiene efecto visual ni control en pantalla. No hay cambios de esquema, dependencias ni envíos externos. La selección y el contorno no garantizan contraste en toda fotografía compleja. Evidencia de publicación y límites en ROADMAP.md.
