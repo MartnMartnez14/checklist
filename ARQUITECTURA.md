@@ -192,12 +192,14 @@ V18 reemplaza las superficies y el velo de v17 por la imagen directa. `imageInkF
 
 Color/opacidad se muestran solo sin imagen; sus valores se conservan. `imageVisibility` mantiene normalización, exportación/importación y firma de fusión por compatibilidad, pero no tiene efecto visual ni control en pantalla. No hay cambios de esquema, dependencias ni envíos externos. La selección y el contorno no garantizan contraste en toda fotografía compleja. Evidencia de publicación y límites en ROADMAP.md.
 
-## Rediseño editorial — 2026-10-30 (local, sin publicar)
+## Rediseño editorial — 2026-10-30 (publicado y verificado)
 
 La presentación se reorganiza sin tocar el modelo de datos. El header pasa a `.header-main` (marca, estado, CTA) y `.header-tools` (búsqueda y acciones); la fila de herramientas se desplaza horizontalmente en móvil y conserva los IDs y etiquetas de los controles existentes. El tablero usa un lienzo decorativo con `.board-wordmark` y `.board-decor`, ambos `aria-hidden` y `pointer-events:none`, por debajo de las tarjetas y del SVG de conexiones.
 
 El footer se agrupa en `.footer-top` con tres `.footer-col`: Apoyar (Ko-fi, PayPal, Starlink), Transferencias (Prex y Mercado Pago) y Proyecto (feedback, ayuda, hoja de ruta). `.support-links` conserva exactamente los tres enlaces externos que valida la suite. La franja `.footer-legal` reúne el sello Open Source, la licencia MIT y la nota de colaboración voluntaria. `#footer-wordmark` se actualiza desde `applyLang` y muestra el nombre completo en mayúsculas.
 
-Los tokens de color y las pilas tipográficas locales viven en `:root` y `:root[data-theme="dark"]`; los estilos nuevos se agregaron al final de la hoja existente para no reescribir reglas de tarjetas, imágenes, PIN o conexiones. No se modifican `PALETTE`, `imageInkFor`, el esquema 2, `localStorage` ni IndexedDB. `manifest.json` actualiza sus colores y `sw.js` usa la caché candidata `checklist-v19`.
+Los tokens de color y las pilas tipográficas locales viven en `:root` y `:root[data-theme="dark"]`; los estilos nuevos se agregaron al final de la hoja existente para no reescribir reglas de tarjetas, imágenes, PIN o conexiones. No se modifican `PALETTE`, `imageInkFor`, el esquema 2, `localStorage` ni IndexedDB. `manifest.json` actualiza sus colores y `sw.js` usa la caché `checklist-v19`.
 
-La suite pasa a 57 casos. `tests/run.sh` usa `tests/cdp-run.mjs` (Node 24) para esperar el `DONE` real del harness y evitar falsos negativos de decodificación de imágenes del reloj virtual; si Node no está disponible, conserva el ejecutor anterior con `--virtual-time-budget`. Resultado local: 57/57 PASS. Sin publicación ni validación en Android físico, Safari o lector de pantalla.
+La suite pasa a 57 casos. `tests/run.sh` usa `tests/cdp-run.mjs` (Node 24) para esperar el `DONE` real del harness y evitar falsos negativos de decodificación de imágenes del reloj virtual; si Node no está disponible, conserva el ejecutor anterior con `--virtual-time-budget`. Resultado local: 57/57 PASS.
+
+La publicación siguió `codex/diseno-editorial` → `codex/dev-offline` → `main` por fast-forward, con commit funcional `a5f5def3f963102bd8a65d6dd8e804f38c65d201` y [Pages 41112613399](https://github.com/MartnMartnez14/checklist/actions/runs/41112613399). El harness público aprobó 57/57; se verificaron la caché `checklist-v19`, el manifest, las capturas 1440/390 px en ambos temas y una recarga offline con `navigator.onLine === false`. Sin cambios de esquema, force push ni validación en Android físico, Safari o lector de pantalla.

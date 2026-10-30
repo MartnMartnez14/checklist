@@ -3,7 +3,7 @@
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
 **Estado:** imagen completa y texto automático publicados y verificados el 2026-10-27 en main/https://checklistgato.com/; caché `checklist-v18`, commit funcional `f09727b`. Suite local: 54/54 normal y reducido; web pública: 54/54 normal. Transición local v17 → v18 y recarga offline pública verificadas. Límites de fotos complejas y pruebas físicas en el cierre.<br>
-**Rediseño editorial local — 2026-10-30:** header Builderstable de dos filas, lienzo Buzz y footer Turion implementados en la rama `codex/diseno-editorial`; caché candidata `checklist-v19`, 57/57 PASS con tiempo real. Sin publicación.
+**Rediseño editorial publicado — 2026-10-30:** header Builderstable de dos filas, lienzo Buzz y footer Turion publicados en main/https://checklistgato.com/; caché `checklist-v19`, commit funcional `a5f5def`, 57/57 PASS local y público, recarga offline v19 verificada.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -90,7 +90,7 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
 | **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (`mergeNotes` refinado con metadatos y enlaces locales) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché pública: `checklist-v18`; candidata local: `checklist-v19`; distribución desde `main`) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché pública: `checklist-v19`; distribución desde `main`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
 | **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
 | **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
@@ -117,7 +117,7 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
 | **CAT-26** | Controles de zoom en modo Mapa (+ / −), relacionados con CAT-21 y CAT-25 | **P2** | Por evaluar | **Pendiente (Etapa 2.8; reporte móvil del usuario)** |
 | **CAT-27** | Visibilidad y opacidad de imágenes de fondo | **P2** | Media | **Publicado y verificado (Etapa 5.2)** |
 | **CAT-28** | Ajuste moderado de legibilidad sobre imágenes en PC | **P2** | Por evaluar | **En evaluación (Etapa 5.1)** |
-| **CAT-29** | Rediseño editorial: header Builderstable, lienzo Buzz y footer Turion | **P2** | Media | **Implementación local (2026-10-30); 57/57 PASS; caché candidata v19; sin publicar** |
+| **CAT-29** | Rediseño editorial: header Builderstable, lienzo Buzz y footer Turion | **P2** | Media | **Publicado y verificado (2026-10-30); 57/57 PASS local y público; caché v19** |
 
 ---
 
@@ -574,12 +574,13 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Conservados los otros worktrees; no se sincroniza dev por iniciativa propia. Capturas y resultados de prueba fuera del repositorio. El cierre documental posterior no cambia aplicación ni caché.
 - Límites: fotos mixtas/cargadas sin garantía de contraste en todas sus zonas; sin Android físico, Safari ni lector de pantalla ni auditoría WCAG integral. CAT-21 y CAT-26 siguen pendientes.
 
-### Rediseño editorial — 2026-10-30 (local, sin publicar)
+### Rediseño editorial — 2026-10-30 (publicado y verificado)
 - Dirección visual acordada: header de dos filas inspirado en Builderstable (carbón, microtexto mono, CTA lima, navegación con subrayado), lienzo Buzz (papel cálido o carbón, grilla de puntos, wordmark «GATO» y motivos flotantes) y footer Turion (columnas, franja legal, wordmark recortado y gatos existentes como stickers).
 - Estructura nueva: `.header-main` + `.header-tools`; el CTA «Nueva lista» queda en la fila superior y la barra de herramientas agrupa búsqueda, vistas, idioma, tema, GitHub, exportar/importar y plantillas. En ≤700 px la barra se desplaza horizontalmente y conserva etiquetas visibles.
 - Footer: tres columnas (Apoyar, Transferencias, Proyecto); `.support-links` conserva exactamente Ko-fi, PayPal y Starlink; Prex/Mercado Pago pasan a «Transferencias»; feedback, ayuda, hoja de ruta y sello Open Source mantienen IDs. Se agrega enlace real a la licencia MIT.
 - Tokens nuevos para claro/oscuro, tipografías del sistema y radios editoriales. Se conservan ambos temas, los 10 colores de lista, las imágenes, el PIN visual y toda la lógica de datos. Sin cambios de esquema ni dependencias.
 - `manifest.json` actualiza `background_color`/`theme_color`; `index.html` actualiza `theme-color`; `sw.js` pasa a `checklist-v19`.
 - Pruebas: 57/57 PASS en Chrome con tiempo real, incluidos los 54 casos existentes y tres nuevos (`redesign-structure`, `redesign-mobile`, `redesign-theme`). `tests/run.sh` usa `tests/cdp-run.mjs` con Node 24 para esperar `DONE` y evitar los falsos negativos de decodificación de imágenes del reloj virtual; el ejecutor con `--virtual-time-budget` queda como respaldo.
-- Verificación visual local en 1440, 768 y 375 px, temas claro/oscuro, tablero vacío, móvil y footer completo. Sin Android físico, Safari, lector de pantalla ni auditoría WCAG integral. La legibilidad sobre fotografías complejas conserva los límites ya registrados.
-- Sin commit de publicación ni push. La rama de tarea es `codex/diseno-editorial`, basada en `main` (`6b4f093`, v18); no se modificó el cambio local pendiente de `ROADMAP.md` en el worktree principal.
+- Verificación visual en 1440, 768, 390 y 320 px, temas claro/oscuro, tablero vacío, tarjetas y footer completo. Sin Android físico, Safari, lector de pantalla ni auditoría WCAG integral. La legibilidad sobre fotografías complejas conserva los límites ya registrados.
+- Publicado desde `codex/diseno-editorial` → `codex/dev-offline` → `main` por fast-forward, con commit funcional `a5f5def3f963102bd8a65d6dd8e804f38c65d201` y [Pages 41112613399](https://github.com/MartnMartnez14/checklist/actions/runs/41112613399) completado. El cambio pendiente CAT-28 se incorporó al ROADMAP antes del commit y se conservó un stash de respaldo.
+- Web pública: caché `checklist-v19`, `manifest.json` con colores nuevos, header/footer visibles, harness 57/57 y recarga offline desde la caché v19. Capturas públicas a 1440 y 390 px en ambos temas. Sin force push ni cambios de esquema.

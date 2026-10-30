@@ -5,9 +5,9 @@
 - **Aplicación web:** [https://checklistgato.com](https://checklistgato.com/)
 - **Código fuente (100 % Open Source y auditable):** [https://github.com/MartnMartnez14/checklist](https://github.com/MartnMartnez14/checklist)
 
-**Publicación actual — 2026-10-27:** imagen completa de fondo con letras negras/blancas automáticas y contorno fino, sin paneles ni mezcla de color; caché `checklist-v18`. Sin imagen se conserva el estilo de color. [Despliegue completado](https://github.com/MartnMartnez14/checklist/actions/runs/40575181195); 54/54 pruebas locales normal y reducido y 54/54 en la web pública con tiempo normal. Recarga offline verificada con imágenes de prueba. Evidencia y límites en ROADMAP.md.
+**Publicación actual — 2026-10-30:** rediseño editorial con header de dos filas inspirado en Builderstable, lienzo con grilla de puntos y wordmark gigante al estilo Buzz, y footer en columnas con wordmark recortado y gatos flotantes al estilo Turion. Se conservan ambos temas, los 10 colores de lista y todos los datos. Caché `checklist-v19`; commit funcional `a5f5def` y [despliegue Pages completado](https://github.com/MartnMartnez14/checklist/actions/runs/41112613399). 57/57 pruebas locales y 57/57 en la web pública con tiempo real; recarga offline verificada con la caché v19. Evidencia y límites en ROADMAP.md.
 
-**Rediseño editorial — implementación local 2026-10-30 (sin publicar):** header de dos filas inspirado en Builderstable, lienzo con grilla de puntos y wordmark gigante al estilo Buzz, y footer en columnas con wordmark recortado y gatos flotantes al estilo Turion. Se conservan ambos temas, los 10 colores de lista y todos los datos. Caché candidata `checklist-v19`; 57/57 pruebas en Chrome con tiempo real. Sin commit de publicación.
+**Antecedente de publicación — 2026-10-27:** imagen completa de fondo con letras negras/blancas automáticas y contorno fino, sin paneles ni mezcla de color; caché `checklist-v18`. Sin imagen se conserva el estilo de color. [Despliegue completado](https://github.com/MartnMartnez14/checklist/actions/runs/40575181195); 54/54 pruebas locales normal y reducido y 54/54 en la web pública con tiempo normal. Recarga offline verificada con imágenes de prueba.
 
 Si una pestaña antigua no muestra los cambios, probá recargar sin caché (`Ctrl+Shift+R` en Chrome de escritorio). No borres los datos del sitio: allí están tus notas.
 
@@ -116,7 +116,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `tests/cdp-run.mjs` en tiempo real y espera a que el harness marque `DONE`. Levanta un servidor temporal y ejecuta los 57 casos de `tests/harness.html`. La candidata v19 aprobó 57/57 en Chrome con tiempo real; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento, conexiones y tres comprobaciones nuevas del rediseño (estructura, móvil y temas). El ejecutor alternativo con reloj virtual conserva antecedentes de esperas intermitentes. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
+Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `tests/cdp-run.mjs` en tiempo real y espera a que el harness marque `DONE`. Levanta un servidor temporal y ejecuta los 57 casos de `tests/harness.html`. La versión v19 publicada aprobó 57/57 en Chrome local y 57/57 en la web pública con tiempo real; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento, conexiones y tres comprobaciones nuevas del rediseño (estructura, móvil y temas). El ejecutor alternativo con reloj virtual conserva antecedentes de esperas intermitentes. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
 
 ---
 
