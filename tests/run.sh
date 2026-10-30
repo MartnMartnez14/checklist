@@ -25,12 +25,20 @@ for _ in $(seq 1 50); do
   sleep 0.1
 done
 
-google-chrome --headless=new --disable-gpu --no-sandbox \
-  --window-size=1200,2800 \
-  --virtual-time-budget=30000 \
-  --dump-dom "http://127.0.0.1:$PORT/tests/harness.html" \
-  >"$DOM_OUT" 2>"$ERR_LOG"
-CHROME_RC=$?
+HARNESS_URL="http://127.0.0.1:$PORT/tests/harness.html"
+if command -v node >/dev/null 2>&1; then
+  # Tiempo real: espera document.title === "DONE". Evita falsos negativos de
+  # decodificación de imágenes con --virtual-time-budget.
+  node "$ROOT/tests/cdp-run.mjs" "$HARNESS_URL" "$DOM_OUT" 2>"$ERR_LOG"
+  CHROME_RC=$?
+else
+  google-chrome --headless=new --disable-gpu --no-sandbox \
+    --window-size=1200,2800 \
+    --virtual-time-budget=60000 \
+    --dump-dom "$HARNESS_URL" \
+    >"$DOM_OUT" 2>"$ERR_LOG"
+  CHROME_RC=$?
+fi
 
 cleanup
 trap - EXIT INT TERM

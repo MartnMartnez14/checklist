@@ -25,7 +25,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#1a73e8">
+<meta name="theme-color" content="#f4f1e8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <script>
 (function () {
@@ -37,44 +37,52 @@
   var el = document.documentElement;
   el.dataset.theme = t; el.style.colorScheme = t;
   var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute("content", dark ? "#0e1116" : "#ffffff");
+  if (meta) meta.setAttribute("content", dark ? "#0d0e0c" : "#f4f1e8");
 })();
 </script>
 <style>
   :root {
     color-scheme: light;
-    --bg: #f1f3f4; --card: #ffffff; --text: #202124; --muted: #5f6368;
-    --accent: #1a73e8; --line: #e0e0e0; --danger: #d93025;
-    --hover: color-mix(in srgb, var(--accent) 12%, transparent);
-    --surface: rgba(255,255,255,.82);
-    --bg-glow: rgba(26,115,232,.10);
-    --on-image: #202124;
-    --edge-manual: #5f6368; --edge-manual-hover: #202124;
-    --edge-tag: #9334e6; --edge-tag-hover: #6f1fb0;
+    --bg: #f4f1e8; --card: #fffdf7; --text: #171812; --muted: #6b6a61;
+    --accent: #c8f04b; --accent-ink: #141510; --link: #4a6100; --line: #ded8c9; --danger: #b3261e;
+    --hover: rgba(23,24,18,.06);
+    --surface: rgba(244,241,232,.88);
+    --bg-glow: rgba(200,240,75,.18);
+    --on-image: #171812;
+    --edge-manual: #6b6a61; --edge-manual-hover: #171812;
+    --edge-tag: #7a4bb5; --edge-tag-hover: #5e3396;
     --conn-s:64%; --conn-l:42%; --edge-w:2px;
-    --dot:color-mix(in srgb, var(--text) 12%, transparent);
-    --glow-2:rgba(147,52,230,.08); --note-w:300px;
+    --dot: rgba(23,24,18,.14);
+    --glow-2: rgba(147,102,213,.10); --note-w:300px;
+    --watermark: rgba(23,24,18,.05);
     --tag-s: 62%; --tag-l: 38%; --ring-a: .55;
-    --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-pill: 999px;
-    --shadow-1: 0 1px 2px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06);
-    --shadow-2: 0 4px 10px rgba(0,0,0,.10), 0 12px 28px rgba(0,0,0,.10);
-    --shadow-pop: 0 8px 30px rgba(0,0,0,.18);
+    --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-pill: 999px;
+    --shadow-1: 0 1px 2px rgba(23,24,18,.06), 0 3px 10px rgba(23,24,18,.05);
+    --shadow-2: 0 6px 16px rgba(23,24,18,.10), 0 16px 36px rgba(23,24,18,.08);
+    --shadow-pop: 0 8px 30px rgba(23,24,18,.18);
+    --font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-display: ui-serif, Georgia, "Times New Roman", serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --footer-a: #f4f1e8; --footer-b: #e9e0f7; --footer-c: #f3ead9;
     --t-fast: 120ms ease; --t-med: 180ms ease;
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg:#0e1116; --card:#1a1f27; --text:#e8eaed; --muted:#9aa0a6; --accent:#8ab4f8; --line:#2c323b; --danger:#f28b82;
-    --hover: color-mix(in srgb, var(--accent) 18%, transparent);
-    --surface: rgba(20,24,31,.72);
-    --bg-glow: rgba(138,180,248,.08);
-    --on-image: #f1f3f4;
-    --edge-manual:#9aa0a6; --edge-manual-hover:#e8eaed;
-    --edge-tag:#c58af9; --edge-tag-hover:#d7adfb;
-    --conn-s:72%; --conn-l:68%; --glow-2:rgba(197,138,249,.07);
+    --bg:#0d0e0c; --card:#171914; --text:#f2f0e6; --muted:#a3a193; --accent:#d4ff5f; --accent-ink:#0d0e0c; --link:#d4ff5f; --line:#2a2d25; --danger:#ff8a80;
+    --hover: rgba(212,255,95,.10);
+    --surface: rgba(13,14,12,.82);
+    --bg-glow: rgba(212,255,95,.10);
+    --on-image: #f2f0e6;
+    --edge-manual:#a3a193; --edge-manual-hover:#f2f0e6;
+    --edge-tag:#c9a7f5; --edge-tag-hover:#dcc4ff;
+    --conn-s:72%; --conn-l:68%; --glow-2:rgba(147,102,213,.12);
+    --dot: rgba(242,240,230,.16);
+    --watermark: rgba(242,240,230,.05);
     --tag-s:70%; --tag-l:70%; --ring-a:.70;
-    --shadow-1: 0 1px 2px rgba(0,0,0,.4), 0 2px 10px rgba(0,0,0,.35);
-    --shadow-2: 0 6px 16px rgba(0,0,0,.45), 0 16px 40px rgba(0,0,0,.4);
+    --shadow-1: 0 1px 2px rgba(0,0,0,.35), 0 3px 14px rgba(0,0,0,.30);
+    --shadow-2: 0 8px 20px rgba(0,0,0,.45), 0 18px 44px rgba(0,0,0,.35);
     --shadow-pop: 0 10px 34px rgba(0,0,0,.55);
+    --footer-a: #0d0e0c; --footer-b: #1c1526; --footer-c: #0d0e0c;
   }
   * { box-sizing: border-box; }
   body {
@@ -504,6 +512,455 @@
     .item.just-completed { animation: completed-highlight 260ms ease-out; }
     @keyframes completed-highlight { from { background-color: var(--hover); } to { background-color: transparent; } }
   }
+
+  /* ============================================================
+     Rediseño editorial — Header Builderstable / Lienzo Buzz /
+     Footer Turion. Solo presentación: no altera datos ni lógica.
+     ============================================================ */
+  body { font-family: var(--font-ui); }
+
+  /* --- Header de dos filas --- */
+  header {
+    padding: 0;
+    display: block;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-main {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+    padding: 13px clamp(16px,3vw,32px) 11px;
+    min-height: 64px;
+  }
+  .header-main .brand { gap: 12px; }
+  .header-main .brand-mark {
+    width: 38px; height: 38px; border-radius: 10px;
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  #app-title {
+    font-family: var(--font-display);
+    font-size: clamp(20px,2.1vw,27px);
+    font-weight: 600;
+    letter-spacing: .025em;
+    text-transform: uppercase;
+  }
+  .brand-sub {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .header-note {
+    justify-self: center;
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .header-note::before {
+    content: "";
+    width: 7px; height: 7px; flex: none;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+  .header-primary { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .header-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0 clamp(16px,3vw,32px) 12px;
+  }
+  .header-tools .search-box {
+    flex: 1 1 260px;
+    max-width: 420px;
+    background: color-mix(in srgb, var(--card) 72%, transparent);
+    border-radius: var(--radius-md);
+  }
+  .header-tools .search-box input { font-family: var(--font-ui); }
+  .header-tools > * { flex: none; }
+
+  .btn {
+    color: var(--text);
+    border-radius: var(--radius-md);
+    padding: 8px 14px;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    box-shadow: none;
+  }
+  .btn:hover { background: var(--hover); color: var(--link); }
+  .btn.btn-primary,
+  .btn.btn-primary:hover {
+    background: var(--accent);
+    border-color: transparent;
+    color: var(--accent-ink);
+    filter: none;
+  }
+  .btn.btn-primary:hover { transform: translateY(-1px); }
+  :root[data-theme="dark"] .btn.btn-primary { color: var(--accent-ink); }
+  .btn-secondary { color: var(--text); background: transparent; border-color: var(--line); }
+  .btn-secondary:hover { background: var(--hover); color: var(--link); }
+  .theme-toggle, .lang-toggle {
+    background: transparent;
+    border-color: var(--line);
+    color: var(--text);
+  }
+  .lang-toggle {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+  }
+  .btn-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+  }
+  .seg {
+    background: transparent;
+    border-color: var(--line);
+    border-radius: var(--radius-md);
+    padding: 2px;
+  }
+  .seg-btn {
+    border-radius: calc(var(--radius-md) - 2px);
+    padding: 7px 10px;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .seg-btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg-label { line-height: 1; }
+  .header-tools :focus-visible { outline-color: var(--link); }
+
+  @media (max-width: 900px) {
+    .header-note { display: none; }
+    .header-main { grid-template-columns: 1fr auto; }
+  }
+  @media (max-width: 700px) {
+    .header-main { padding: 10px 14px 8px; gap: 10px; min-height: 56px; }
+    .header-main .brand-mark { width: 32px; height: 32px; }
+    .header-tools {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0 14px 10px;
+    }
+    .header-tools::-webkit-scrollbar { display: none; }
+    .header-tools .search-box { flex: 0 0 230px; max-width: none; }
+    .seg-label { display: none; }
+    .brand-sub { display: block; font-size: 9px; }
+  }
+  @media (max-width: 420px) {
+    #app-title { font-size: 18px; }
+    .header-tools .search-box { flex-basis: 205px; }
+  }
+
+  /* --- Lienzo del tablero (Buzz) --- */
+  .board {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(900px 480px at 14% -8%, var(--bg-glow), transparent 68%),
+      radial-gradient(760px 420px at 92% 0%, var(--glow-2), transparent 70%);
+    background-repeat: no-repeat;
+  }
+  .board::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+    background-size: 22px 22px;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.72) 62%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.72) 62%, transparent 100%);
+  }
+  .board-wordmark {
+    position: absolute;
+    top: -0.16em;
+    left: 50%;
+    z-index: 0;
+    transform: translateX(-50%);
+    pointer-events: none;
+    user-select: none;
+    font-family: var(--font-display);
+    font-size: clamp(150px, 30vw, 540px);
+    line-height: .72;
+    letter-spacing: -.06em;
+    text-transform: uppercase;
+    color: var(--watermark);
+    white-space: nowrap;
+  }
+  .board-decor {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .board-decor span {
+    position: absolute;
+    display: block;
+    width: 42px; height: 42px;
+    color: var(--text);
+    opacity: .12;
+    animation: decor-float 12s ease-in-out infinite;
+  }
+  .board-decor span:nth-child(1) { left: 7%; top: 18%; animation-delay: -2s; }
+  .board-decor span:nth-child(2) { right: 9%; top: 26%; width: 30px; height: 30px; animation-delay: -5s; }
+  .board-decor span:nth-child(3) { left: 22%; bottom: 16%; width: 26px; height: 26px; animation-delay: -8s; }
+  .board-decor span:nth-child(4) { right: 24%; bottom: 9%; width: 34px; height: 34px; animation-delay: -3s; }
+  .board-decor span:nth-child(5) { left: 48%; top: 8%; width: 22px; height: 22px; animation-delay: -6s; }
+  .board-decor svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.5; }
+  @keyframes decor-float {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-14px) rotate(6deg); }
+  }
+  main { position: relative; z-index: 2; }
+  main.map-mode { z-index: 2; }
+  #links { z-index: 1; }
+  .note {
+    border: 1px solid color-mix(in srgb, var(--line) 82%, transparent);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-1);
+  }
+  .note:hover { box-shadow: var(--shadow-2); }
+  .empty strong {
+    font-family: var(--font-display);
+    font-size: 27px;
+    font-weight: 600;
+    letter-spacing: .01em;
+  }
+
+  /* --- Footer (Turion) --- */
+  .support {
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+    padding: clamp(40px,6vw,78px) clamp(18px,4vw,48px) 0;
+    color: var(--text);
+    background: linear-gradient(180deg, var(--footer-a) 0%, var(--footer-b) 58%, var(--footer-c) 100%);
+  }
+  .footer-top {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr 1.2fr;
+    gap: clamp(24px,4vw,56px);
+  }
+  .footer-col { min-width: 0; }
+  .support-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .support-title::before {
+    content: "";
+    width: 7px; height: 7px; flex: none;
+    background: var(--accent);
+    border-radius: 1px;
+  }
+  .support-text {
+    max-width: 38ch;
+    margin: 0 0 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .support-links, .support-list { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+  .support-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+    color: var(--text);
+  }
+  .support-card:last-child { border-bottom: 1px solid var(--line); }
+  a.support-card:hover { background: transparent; color: var(--link); }
+  .support-card .i { width: 19px; height: 19px; color: var(--link); }
+  .support-card strong { font-size: 13px; font-weight: 600; }
+  .support-card small { font-size: 11.5px; color: var(--muted); }
+  .support-copy {
+    margin-left: auto;
+    padding: 5px 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .support-copy:hover { background: var(--hover); color: var(--link); }
+  .feedback-block { margin: 0; padding: 0; border: 0; }
+  .feedback-actions { display: block; }
+  .feedback-actions .support-card { max-width: none; }
+  .footer-col > #cat-help { margin-top: 14px; }
+  .roadmap-details { margin: 16px 0 0; padding: 0; border: 0; font-size: 12px; }
+  .roadmap-summary {
+    display: block;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+  .roadmap-summary:hover { color: var(--link); }
+  .roadmap-grid { grid-template-columns: 1fr; gap: 8px; margin-top: 10px; }
+  .roadmap-col {
+    padding: 2px 0 2px 12px;
+    background: transparent;
+    border: 0;
+    border-left: 1px solid var(--line);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .roadmap-col h3 {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  .roadmap-col ul, .roadmap-col li { font-size: 12px; }
+
+  .footer-legal {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: clamp(28px,4vw,48px) auto 0;
+    padding: 18px 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .oss-seal {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 9.5px;
+  }
+  .oss-seal .i { color: var(--link); }
+  .oss-link {
+    color: var(--link);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid color-mix(in srgb, var(--link) 40%, transparent);
+  }
+  .oss-link:hover { border-bottom-color: var(--link); }
+  .support-note {
+    flex: 1 1 100%;
+    margin: 0;
+    font-family: var(--font-ui);
+    font-size: 10.5px;
+    line-height: 1.5;
+    letter-spacing: .02em;
+    text-transform: none;
+  }
+  .footer-brand {
+    position: relative;
+    z-index: 1;
+    height: clamp(96px, 17vw, 270px);
+    margin: 8px auto 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden;
+  }
+  .footer-wordmark {
+    display: block;
+    font-family: var(--font-display);
+    font-size: clamp(52px, 10.8vw, 190px);
+    line-height: .72;
+    letter-spacing: -.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--text);
+    opacity: .92;
+    transform: translateY(14%);
+    user-select: none;
+  }
+  .footer-cat {
+    position: absolute;
+    z-index: 2;
+    width: clamp(54px, 7vw, 110px);
+    aspect-ratio: 1;
+    object-fit: cover;
+    padding: 5px;
+    border-radius: 22%;
+    background: var(--card);
+    box-shadow: 0 10px 24px rgba(0,0,0,.18), 0 0 0 1px var(--line);
+    pointer-events: none;
+    filter: drop-shadow(0 12px 18px rgba(0,0,0,.18));
+  }
+  .footer-cat.cat-a { left: 12%; bottom: 6%; animation: cat-float 9s ease-in-out infinite; }
+  .footer-cat.cat-b { right: 15%; bottom: 18%; width: clamp(44px, 5.5vw, 88px); animation: cat-float 11s ease-in-out infinite reverse; }
+  @keyframes cat-float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-12px) rotate(4deg); }
+  }
+  @media (max-width: 900px) {
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .footer-col:last-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 640px) {
+    .footer-top { grid-template-columns: 1fr; gap: 30px; }
+    .footer-col:last-child { grid-column: auto; }
+    .footer-brand { height: 92px; }
+    .footer-wordmark { font-size: 12vw; }
+    .footer-cat.cat-b { display: none; }
+    .footer-legal { gap: 10px 16px; }
+    .feedback-actions .support-card { flex-wrap: wrap; }
+    #feedback-mailto { overflow-wrap: anywhere; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .board-decor span, .footer-cat { animation: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -529,21 +986,29 @@
   <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 4H4v5M15 4h5v5M15 20h5v-5M9 20H4v-5"/></symbol>
   <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 5.5 3 2.5v2H7v-2l3-2.5z"/><path d="M12 13v8"/></symbol>
+  <symbol id="i-paw" viewBox="0 0 24 24"><ellipse cx="12" cy="15.5" rx="4.6" ry="3.8"/><ellipse cx="5.6" cy="10.4" rx="1.9" ry="2.4" transform="rotate(-18 5.6 10.4)"/><ellipse cx="9.6" cy="7.1" rx="1.9" ry="2.4"/><ellipse cx="14.4" cy="7.1" rx="1.9" ry="2.4"/><ellipse cx="18.4" cy="10.4" rx="1.9" ry="2.4" transform="rotate(18 18.4 10.4)"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/></symbol>
 </svg>
 <header>
-  <div class="brand">
-    <img class="brand-mark brand-day" src="cat-day.png" width="34" height="34" alt="" aria-hidden="true">
-    <img class="brand-mark brand-night" src="cat-night.png" width="34" height="34" alt="" aria-hidden="true">
-    <div class="brand-text"><h1 id="app-title">Checklist Gato</h1><p class="brand-sub" id="stats">0 listas · 0 conexiones</p></div>
+  <div class="header-main">
+    <div class="brand">
+      <img class="brand-mark brand-day" src="cat-day.png" width="34" height="34" alt="" aria-hidden="true">
+      <img class="brand-mark brand-night" src="cat-night.png" width="34" height="34" alt="" aria-hidden="true">
+      <div class="brand-text"><h1 id="app-title">Checklist Gato</h1><p class="brand-sub" id="stats">0 listas · 0 conexiones</p></div>
+    </div>
+    <p class="header-note" id="header-note">100% privado · offline · sin cuentas</p>
+    <div class="header-primary">
+      <button class="btn btn-primary" id="new-note" aria-keyshortcuts="N"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="btn-label" id="new-note-label">Nueva lista</span></button>
+    </div>
   </div>
-  <div class="actions">
+  <div class="header-tools">
     <label class="search-box" for="search">
       <svg class="i" aria-hidden="true" focusable="false"><use href="#i-search"/></svg>
       <input id="search" type="search" placeholder="Buscar listas, tareas o etiquetas" aria-label="Buscar listas, tareas o etiquetas" aria-keyshortcuts="/" autocomplete="off">
     </label>
     <div class="seg" id="view-group" role="group" aria-label="Vista del tablero">
-      <button class="seg-btn" id="view-grid" type="button" aria-pressed="true" aria-label="Vista cuadrícula" aria-keyshortcuts="G"><svg class="i" aria-hidden="true"><use href="#i-grid"/></svg></button>
-      <button class="seg-btn" id="view-map" type="button" aria-pressed="false" aria-label="Vista mapa" aria-keyshortcuts="M"><svg class="i" aria-hidden="true"><use href="#i-map"/></svg></button>
+      <button class="seg-btn" id="view-grid" type="button" aria-pressed="true" aria-label="Vista cuadrícula" aria-keyshortcuts="G"><svg class="i" aria-hidden="true"><use href="#i-grid"/></svg><span class="seg-label" id="view-grid-label">Cuadrícula</span></button>
+      <button class="seg-btn" id="view-map" type="button" aria-pressed="false" aria-label="Vista mapa" aria-keyshortcuts="M"><svg class="i" aria-hidden="true"><use href="#i-map"/></svg><span class="seg-label" id="view-map-label">Mapa</span></button>
     </div>
     <button class="btn lang-toggle" id="lang-toggle" type="button" aria-label="Cambiar idioma a inglés" title="Español / English">ES</button>
     <button class="btn theme-toggle" id="theme-toggle" type="button" aria-label="Activar modo oscuro" aria-pressed="false">
@@ -559,93 +1024,125 @@
     <button class="btn btn-secondary" id="templates" type="button" aria-haspopup="dialog"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-template"/></svg><span class="btn-label" id="templates-label">Plantillas</span></button>
     <button class="btn" type="button" id="arrange-map" hidden>Ordenar mapa</button>
     <button class="btn" type="button" id="undo-map" hidden>Deshacer orden</button>
-    <button class="btn btn-primary" id="new-note" aria-keyshortcuts="N"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg><span class="btn-label" id="new-note-label">Nueva lista</span></button>
   </div>
 </header>
 
 <div class="board">
+  <div class="board-wordmark" aria-hidden="true">GATO</div>
+  <div class="board-decor" aria-hidden="true">
+    <span><svg viewBox="0 0 24 24"><use href="#i-paw"/></svg></span>
+    <span><svg viewBox="0 0 24 24"><use href="#i-spark"/></svg></span>
+    <span><svg viewBox="0 0 24 24"><use href="#i-paw"/></svg></span>
+    <span><svg viewBox="0 0 24 24"><use href="#i-spark"/></svg></span>
+    <span><svg viewBox="0 0 24 24"><use href="#i-paw"/></svg></span>
+  </div>
   <main id="notes"></main>
   <svg id="links" aria-hidden="true" focusable="false"></svg>
 </div>
 <footer class="support" aria-labelledby="support-title">
-  <h2 id="support-title" class="support-title">Apoyar el proyecto</h2>
-  <p id="support-text" class="support-text">¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.</p>
-  <div class="support-links">
-    <a class="support-card" href="https://ko-fi.com/martinmartinezgarcia" target="_blank" rel="noopener noreferrer">
-      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-coffee"/></svg>
-      <span><strong>Ko-fi</strong><small id="kofi-sub">Invitame un cafecito</small></span>
-    </a>
-    <a class="support-card" href="https://www.paypal.com/paypalme/blufferedtwitch" target="_blank" rel="noopener noreferrer">
-      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg>
-      <span><strong>PayPal</strong><small id="paypal-sub">Donación voluntaria</small></span>
-    </a>
-    <a class="support-card" href="https://starlink.com/es?referral=RC-DF-5848974-78640-68&app_source=share" target="_blank" rel="noopener noreferrer">
-      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-satellite"/></svg>
-      <span><strong id="starlink-title">Internet satelital Starlink</strong><small id="starlink-sub">Enlace de referido</small></span>
-    </a>
-    <div class="support-card support-prex">
-      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
-      <span><strong>Prex</strong><small id="prex-sub">Martín Martínez — Cuenta Prex: 35502</small></span>
-      <button type="button" class="btn support-copy" id="copy-prex" aria-label="Copiar número de cuenta Prex">
-        <svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>
-        <span class="btn-label" id="copy-prex-label">Copiar</span>
-      </button>
+  <div class="footer-top">
+    <div class="footer-col">
+      <h2 id="support-title" class="support-title">Apoyar el proyecto</h2>
+      <p id="support-text" class="support-text">¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.</p>
+      <div class="support-links">
+        <a class="support-card" href="https://ko-fi.com/martinmartinezgarcia" target="_blank" rel="noopener noreferrer">
+          <svg class="i" aria-hidden="true" focusable="false"><use href="#i-coffee"/></svg>
+          <span><strong>Ko-fi</strong><small id="kofi-sub">Invitame un cafecito</small></span>
+        </a>
+        <a class="support-card" href="https://www.paypal.com/paypalme/blufferedtwitch" target="_blank" rel="noopener noreferrer">
+          <svg class="i" aria-hidden="true" focusable="false"><use href="#i-heart"/></svg>
+          <span><strong>PayPal</strong><small id="paypal-sub">Donación voluntaria</small></span>
+        </a>
+        <a class="support-card" href="https://starlink.com/es?referral=RC-DF-5848974-78640-68&app_source=share" target="_blank" rel="noopener noreferrer">
+          <svg class="i" aria-hidden="true" focusable="false"><use href="#i-satellite"/></svg>
+          <span><strong id="starlink-title">Internet satelital Starlink</strong><small id="starlink-sub">Enlace de referido</small></span>
+        </a>
+      </div>
     </div>
-    <div class="support-card support-prex support-mercado">
-      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
-      <span><strong>Mercado Pago · UYU</strong><small id="mercado-sub">Cuenta: 1006269736963</small><small>Martin Martinez Garcia</small></span>
-      <button type="button" class="btn support-copy" id="copy-mercado" aria-label="Copiar cuenta de Mercado Pago"><span class="btn-label" id="copy-mercado-label">Copiar</span></button>
+
+    <div class="footer-col">
+      <h2 id="transfer-title" class="support-title">Transferencias</h2>
+      <div class="support-list">
+        <div class="support-card support-prex">
+          <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
+          <span><strong>Prex</strong><small id="prex-sub">Martín Martínez — Cuenta Prex: 35502</small></span>
+          <button type="button" class="btn support-copy" id="copy-prex" aria-label="Copiar número de cuenta Prex">
+            <svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>
+            <span class="btn-label" id="copy-prex-label">Copiar</span>
+          </button>
+        </div>
+        <div class="support-card support-prex support-mercado">
+          <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
+          <span><strong>Mercado Pago · UYU</strong><small id="mercado-sub">Cuenta: 1006269736963</small><small>Martin Martinez Garcia</small></span>
+          <button type="button" class="btn support-copy" id="copy-mercado" aria-label="Copiar cuenta de Mercado Pago"><span class="btn-label" id="copy-mercado-label">Copiar</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="feedback-block" aria-labelledby="feedback-title">
+        <h2 id="feedback-title" class="support-title">Ayudanos a mejorar Checklist Gato</h2>
+        <p id="feedback-text" class="support-text">Checklist Gato es un proyecto independiente que continúa creciendo. Si encontraste un error, tenés alguna sugerencia o simplemente querés compartir tu experiencia, podés escribirme. Leo los comentarios y los tengo en cuenta para futuras mejoras.</p>
+        <div class="feedback-actions">
+          <div class="support-card support-prex">
+            <svg class="i" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg>
+            <span>
+              <a id="feedback-mailto" class="oss-link" href="mailto:mmartinez23bio@hotmail.com?subject=Checklist%20Gato%20-%20Comentarios">mmartinez23bio@hotmail.com</a>
+              <small id="feedback-sub">Reportar errores, sugerencias o comentarios</small>
+            </span>
+            <button type="button" class="btn support-copy" id="copy-email" aria-label="Copiar correo de contacto">
+              <svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>
+              <span class="btn-label" id="copy-email-label">Copiar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn" id="cat-help" aria-haspopup="dialog">🐾 Ayuda del gato</button>
+      <details class="roadmap-details" id="roadmap-details">
+        <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
+        <div class="roadmap-grid">
+          <div class="roadmap-col">
+            <h3 id="rm-dev-title">✅ Disponible</h3>
+            <ul>
+              <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
+              <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
+            </ul>
+          </div>
+          <div class="roadmap-col">
+            <h3 id="rm-soon-title">🔜 Próximamente</h3>
+            <ul>
+              <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
+              <li id="rm-soon-2">Controles de zoom del mapa y validación de arrastre y zoom en Android real.</li>
+            </ul>
+          </div>
+          <div class="roadmap-col">
+            <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
+            <ul>
+              <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
+              <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
+            </ul>
+          </div>
+        </div>
+      </details>
     </div>
   </div>
-  <p id="support-note" class="support-note">Las colaboraciones son 100% voluntarias. Starlink es un enlace de referido, no una donación directa.</p>
-  <div class="feedback-block" aria-labelledby="feedback-title">
-    <h2 id="feedback-title" class="support-title">Ayudanos a mejorar Checklist Gato</h2>
-    <p id="feedback-text" class="support-text">Checklist Gato es un proyecto independiente que continúa creciendo. Si encontraste un error, tenés alguna sugerencia o simplemente querés compartir tu experiencia, podés escribirme. Leo los comentarios y los tengo en cuenta para futuras mejoras.</p>
-    <div class="feedback-actions">
-      <div class="support-card support-prex">
-        <svg class="i" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg>
-        <span>
-          <a id="feedback-mailto" class="oss-link" href="mailto:mmartinez23bio@hotmail.com?subject=Checklist%20Gato%20-%20Comentarios">mmartinez23bio@hotmail.com</a>
-          <small id="feedback-sub">Reportar errores, sugerencias o comentarios</small>
-        </span>
-        <button type="button" class="btn support-copy" id="copy-email" aria-label="Copiar correo de contacto">
-          <svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg>
-          <span class="btn-label" id="copy-email-label">Copiar</span>
-        </button>
-      </div>
+
+  <div class="footer-legal">
+    <div class="oss-seal">
+      <svg class="i" aria-hidden="true" focusable="false"><use href="#i-github"/></svg>
+      <span id="oss-text">Proyecto escalable a largo plazo, 100% Open Source y auditable.</span>
+      <a class="oss-link" id="github-footer" href="https://github.com/MartnMartnez14/checklist" target="_blank" rel="noopener noreferrer">Ver repositorio en GitHub</a>
     </div>
+    <a class="oss-link footer-license" id="license-link" href="https://github.com/MartnMartnez14/checklist/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Licencia MIT</a>
+    <p id="support-note" class="support-note">Las colaboraciones son 100% voluntarias. Starlink es un enlace de referido, no una donación directa.</p>
   </div>
-  <button type="button" class="btn" id="cat-help" aria-haspopup="dialog">🐾 Ayuda del gato</button>
-  <details class="roadmap-details" id="roadmap-details">
-    <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
-    <div class="roadmap-grid">
-      <div class="roadmap-col">
-        <h3 id="rm-dev-title">✅ Disponible</h3>
-        <ul>
-          <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
-          <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
-        </ul>
-      </div>
-      <div class="roadmap-col">
-        <h3 id="rm-soon-title">🔜 Próximamente</h3>
-        <ul>
-          <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
-          <li id="rm-soon-2">Controles de zoom del mapa y validación de arrastre y zoom en Android real.</li>
-        </ul>
-      </div>
-      <div class="roadmap-col">
-        <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
-        <ul>
-          <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
-          <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
-        </ul>
-      </div>
-    </div>
-  </details>
-  <div class="oss-seal">
-    <svg class="i" aria-hidden="true" focusable="false"><use href="#i-github"/></svg>
-    <span id="oss-text">Proyecto escalable a largo plazo, 100% Open Source y auditable.</span>
-    <a class="oss-link" id="github-footer" href="https://github.com/MartnMartnez14/checklist" target="_blank" rel="noopener noreferrer">Ver repositorio en GitHub</a>
+
+  <div class="footer-brand" aria-hidden="true">
+    <img class="footer-cat cat-a brand-day" src="cat-day.png" alt="">
+    <img class="footer-cat cat-a brand-night" src="cat-night.png" alt="">
+    <img class="footer-cat cat-b brand-day" src="cat-day.png" alt="">
+    <img class="footer-cat cat-b brand-night" src="cat-night.png" alt="">
+    <span class="footer-wordmark" id="footer-wordmark">CHECKLIST GATO</span>
   </div>
 </footer>
 <p id="sr-status" role="status" aria-live="polite" class="visually-hidden"></p>
@@ -683,6 +1180,7 @@
       resetStyle: "Restablecer estilo",
       resetStyleMessage: "¿Quitar el color y la imagen de fondo y volver la opacidad del color al 18 %? El contenido de la lista se conserva.",
       appName: "Checklist Gato",
+      headerNote: "100% privado · offline · sin cuentas",
       lockTitle: "PIN visual",
       lockWarning: "Solo oculta el contenido en la interfaz. No cifra tus datos. El almacenamiento y los respaldos contienen el texto.",
       setPin: "Ocultar con PIN",
@@ -711,6 +1209,8 @@
       viewGroup: "Vista del tablero",
       viewGrid: "Vista cuadrícula",
       viewMap: "Vista mapa",
+      viewGridShort: "Cuadrícula",
+      viewMapShort: "Mapa",
       langAria: "Cambiar idioma a inglés",
       themeLight: "Activar modo claro",
       themeDark: "Activar modo oscuro",
@@ -735,6 +1235,7 @@
         { title: "Organización personal", items: ["Ver mails y llamadas perdidas", "Revisar agenda o calendario virtual", "Ordenar escritorio", "Planificar la semana"] }
       ],
       supportTitle: "Apoyar el proyecto",
+      transferTitle: "Transferencias",
       supportText: "¿Te gustó el proyecto? Si querés colaborar de forma voluntaria, podés invitarme a un cafecito o mate. Es totalmente opcional y me ayuda a seguir trabajando en la aplicación.",
       kofiSub: "Invitame un cafecito",
       paypalSub: "Donación voluntaria",
@@ -777,6 +1278,7 @@
       clearDoneConfirm: n => `¿Borrar ${n} elemento(s) completado(s)?`,
       ossText: "Proyecto escalable a largo plazo, 100% Open Source y auditable.",
       ossLink: "Ver repositorio en GitHub",
+      licenseLink: "Licencia MIT",
       gripHelp: "Pulsa las flechas para mover; con Mayús, más distancia.",
       emptyStrong: "Sin listas todavía",
       emptyHint: 'Pulsa "+ Nueva lista" para empezar.',
@@ -854,6 +1356,7 @@
       resetStyle: "Reset style",
       resetStyleMessage: "Remove the color and background image and reset color opacity to 18%? The list content is preserved.",
       appName: "Checklist Cat",
+      headerNote: "100% private · offline · no accounts",
       lockTitle: "Visual PIN",
       lockWarning: "Only hides content in the interface. It does not encrypt your data. Storage and backups contain the text.",
       setPin: "Hide with PIN",
@@ -882,6 +1385,8 @@
       viewGroup: "Board view",
       viewGrid: "Grid view",
       viewMap: "Map view",
+      viewGridShort: "Grid",
+      viewMapShort: "Map",
       langAria: "Switch language to Spanish",
       themeLight: "Activate light mode",
       themeDark: "Activate dark mode",
@@ -906,6 +1411,7 @@
         { title: "Personal organization", items: ["Check emails and missed calls", "Review agenda or online calendar", "Tidy the desk", "Plan the week"] }
       ],
       supportTitle: "Support the project",
+      transferTitle: "Transfers",
       supportText: "Did you like the project? If you'd like to contribute voluntarily, you can buy me a coffee or mate. It's completely optional and helps me keep improving the app.",
       kofiSub: "Buy me a coffee",
       paypalSub: "Voluntary donation",
@@ -948,6 +1454,7 @@
       clearDoneConfirm: n => `Delete ${n} completed item(s)?`,
       ossText: "Long-term scalable project, 100% Open Source and auditable.",
       ossLink: "View repository on GitHub",
+      licenseLink: "MIT License",
       gripHelp: "Press arrow keys to move; hold Shift for larger steps.",
       emptyStrong: "No lists yet",
       emptyHint: 'Click "+ New list" to get started.',
@@ -1420,7 +1927,7 @@
     root.dataset.theme = dark ? "dark" : "light";
     root.style.colorScheme = dark ? "dark" : "light";
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", dark ? "#0e1116" : "#ffffff");
+    if (meta) meta.setAttribute("content", dark ? "#0d0e0c" : "#f4f1e8");
     const btn = document.getElementById("theme-toggle");
     if (btn) {
       btn.setAttribute("aria-pressed", String(dark));
@@ -1442,11 +1949,17 @@
     setTxt("undo-map", "undoMap");
     setTxt("cat-help", "catHelpTitle");
     setTxt("app-title", "appName");
+    setTxt("header-note", "headerNote");
+    const footerWordmark = document.getElementById("footer-wordmark");
+    if (footerWordmark) footerWordmark.textContent = tr("appName").toUpperCase();
+    setTxt("view-grid-label", "viewGridShort");
+    setTxt("view-map-label", "viewMapShort");
     setTxt("export-label", "exportBtn");
     setTxt("import-label", "importBtn");
     setTxt("new-note-label", "newNoteBtn");
     setTxt("templates-label", "templatesBtn");
     setTxt("support-title", "supportTitle");
+    setTxt("transfer-title", "transferTitle");
     setTxt("support-text", "supportText");
     setTxt("kofi-sub", "kofiSub");
     setTxt("paypal-sub", "paypalSub");
@@ -1474,6 +1987,7 @@
     setTxt("rm-ideas-2", "rmIdeas2");
     setTxt("oss-text", "ossText");
     setTxt("github-footer", "ossLink");
+    setTxt("license-link", "licenseLink");
     setTxt("grip-help", "gripHelp");
 
     const vg = document.getElementById("view-group");

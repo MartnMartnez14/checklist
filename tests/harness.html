@@ -1434,6 +1434,89 @@
     assert(firstNote().imageVisibility===40,'invalid visibility default');
   }
 
+  // ---------------------------------------------------------------- rediseño
+  async function t_redesign_structure() {
+    await boot([]);
+    resetLanguage();
+    assert(cd.querySelector(".header-main"), "falta .header-main");
+    assert(cd.querySelector(".header-tools"), "falta .header-tools");
+    assert(cd.querySelector(".footer-top"), "falta .footer-top");
+    assert(cd.querySelectorAll(".footer-col").length === 3, "el footer debe tener 3 columnas");
+    var wm = cd.getElementById("footer-wordmark");
+    assert(wm && wm.textContent.trim() === "CHECKLIST GATO", "wordmark ES incorrecto");
+    assert(cd.getElementById("header-note"), "falta #header-note");
+    assert(cd.getElementById("transfer-title"), "falta #transfer-title");
+    assert(cd.getElementById("license-link"), "falta #license-link");
+    assert(cd.getElementById("view-grid-label").textContent.trim() === "Cuadrícula", "etiqueta de vista ES incorrecta");
+
+    cd.getElementById("lang-toggle").click();
+    await sleep(40);
+    assert(wm.textContent.trim() === "CHECKLIST CAT", "wordmark EN incorrecto: " + wm.textContent);
+    assert(/private/i.test(cd.getElementById("header-note").textContent), "header-note EN no tradujo");
+    assert(cd.getElementById("view-grid-label").textContent.trim() === "Grid", "etiqueta de vista EN incorrecta");
+    assert(cd.getElementById("transfer-title").textContent.trim() === "Transfers", "transfer-title EN no tradujo");
+    assert(cd.getElementById("license-link").textContent.trim() === "MIT License", "license-link EN no tradujo");
+
+    cd.getElementById("lang-toggle").click();
+    await sleep(40);
+    assert(wm.textContent.trim() === "CHECKLIST GATO", "wordmark no volvió a ES");
+  }
+
+  async function t_redesign_mobile() {
+    await boot([]);
+    resetLanguage();
+    try {
+      iframe.style.width = "375px";
+      await sleep(80);
+      assert(cd.documentElement.scrollWidth <= 376,
+        "desborde horizontal del documento: " + cd.documentElement.scrollWidth);
+      var tools = cd.querySelector(".header-tools");
+      assert(tools && tools.scrollWidth >= tools.clientWidth, "la barra de herramientas no es desplazable");
+      ["export-label", "import-label", "new-note-label"].forEach(function (id) {
+        var lbl = cd.getElementById(id);
+        assert(lbl, "falta etiqueta " + id);
+        var style = cw.getComputedStyle(lbl);
+        assert(style.display !== "none", "etiqueta oculta en móvil: " + id);
+        var rect = lbl.getBoundingClientRect();
+        assert(rect.width > 0 && rect.height > 0, "etiqueta sin dimensiones en móvil: " + id);
+      });
+      var newBtn = cd.getElementById("new-note").getBoundingClientRect();
+      assert(newBtn.right <= 376, "Nueva lista desborda el viewport: " + newBtn.right);
+    } finally {
+      iframe.style.width = "1000px";
+      await sleep(40);
+    }
+  }
+
+  async function t_redesign_theme() {
+    await boot([]);
+    resetLanguage();
+    if (cd.documentElement.dataset.theme !== "light") {
+      cd.getElementById("theme-toggle").click();
+      await sleep(180);
+    }
+    var light = cw.getComputedStyle(cd.body).backgroundColor;
+    assert(light === "rgb(244, 241, 232)", "fondo claro inesperado: " + light);
+    var btn = cd.getElementById("new-note");
+    var bs = cw.getComputedStyle(btn);
+    assert(bs.backgroundColor === "rgb(200, 240, 75)", "CTA claro no es lima: " + bs.backgroundColor);
+    assert(bs.color === "rgb(20, 21, 16)", "texto del CTA claro no es oscuro: " + bs.color);
+    var meta = cd.querySelector('meta[name="theme-color"]');
+    assert(meta && meta.getAttribute("content") === "#f4f1e8", "theme-color claro incorrecto");
+
+    cd.getElementById("theme-toggle").click();
+    await sleep(180);
+    assert(cd.documentElement.dataset.theme === "dark", "el tema no cambió a oscuro");
+    assert(await waitFor(() => cw.getComputedStyle(btn).backgroundColor === "rgb(212, 255, 95)", 2000),
+      "CTA oscuro no es lima: " + cw.getComputedStyle(btn).backgroundColor);
+    assert(cw.getComputedStyle(cd.body).backgroundColor === "rgb(13, 14, 12)", "fondo oscuro inesperado");
+    assert(cw.getComputedStyle(btn).color === "rgb(13, 14, 12)", "texto del CTA oscuro no es oscuro");
+    assert(meta.getAttribute("content") === "#0d0e0c", "theme-color oscuro incorrecto");
+
+    cd.getElementById("theme-toggle").click();
+    await sleep(120);
+  }
+
   // ---------------------------------------------------------------- runner
   var tests = [
     ["merge-metadata-newer", t_probe_merge_metadata_newer],
@@ -1489,7 +1572,10 @@
     ["image-auto-ink", t_image_auto_ink],
     ["image-mixed-alpha", t_image_mixed_alpha],
     ["image-original-backup", t_image_original_backup],
-    ["image-visibility-backup", t_image_visibility_backup]
+    ["image-visibility-backup", t_image_visibility_backup],
+    ["redesign-structure", t_redesign_structure],
+    ["redesign-mobile", t_redesign_mobile],
+    ["redesign-theme", t_redesign_theme]
   ];
 
   var watchdog = setTimeout(function () {
@@ -1497,7 +1583,7 @@
       log("HARNESS", "FAIL", "timeout: los tests no terminaron a tiempo");
       document.title = "DONE";
     }
-  }, 28000);
+  }, 55000);
 
   (async function () {
     localStorage.setItem("checklist-lang", "es");
