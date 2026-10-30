@@ -1,5 +1,14 @@
 # Historial de cambios
 
+## 2026-10-30 — Rediseño editorial (implementación local, sin publicar)
+- Header sticky de dos filas: marca serif, estado mono, CTA lima y barra de herramientas con búsqueda, vistas, idioma, tema, GitHub, exportar/importar y plantillas. En móvil, la barra se desplaza horizontalmente sin ocultar etiquetas.
+- Lienzo del tablero con grilla de puntos, resplandores tenues, wordmark gigante «GATO» y motivos flotantes; mismo tratamiento en Cuadrícula y Mapa, sin capturar punteros ni alterar tarjetas, conexiones o arrastre.
+- Footer en tres columnas (Apoyar, Transferencias, Proyecto) con franja legal y wordmark recortado «CHECKLIST GATO» / «CHECKLIST CAT»; los gatos existentes flotan como stickers sobre el pie. Todos los enlaces, copiados, feedback, ayuda y hoja de ruta conservan sus IDs y traducciones.
+- Nuevos tokens de color y tipografía del sistema; se conservan los dos temas y los 10 colores personalizables. Sin cambios de esquema, almacenamiento, exportación/importación ni dependencias externas.
+- `manifest.json` y `theme-color` actualizados; caché candidata `checklist-v19`.
+- Suite real: 57/57 PASS en Chrome. `tests/run.sh` usa `tests/cdp-run.mjs` con Node 24 para esperar el final real y evitar falsos negativos de imágenes del reloj virtual; se conserva el ejecutor anterior como respaldo.
+- Sin commit de publicación. Límites: sin Android físico, Safari, lector de pantalla ni auditoría WCAG integral; el contraste sobre fotografías complejas sigue dependiendo del análisis local existente.
+
 ## 2026-10-27 — Imagen completa y texto automático (publicado y verificado)
 - Imagen directa como fondo de toda la lista, sin panel, velo ni mezcla con el color. Letras negras/blancas elegidas con una muestra local de 48×48 píxeles y contorno fino de color opuesto; vista previa equivalente.
 - Color y opacidad disponibles para listas sin imagen; al quitar una imagen se recupera el estilo anterior. Se retira el control de visibilidad; su campo histórico se conserva en los datos y respaldos sin efecto visual.

@@ -7,6 +7,8 @@
 
 **Publicación actual — 2026-10-27:** imagen completa de fondo con letras negras/blancas automáticas y contorno fino, sin paneles ni mezcla de color; caché `checklist-v18`. Sin imagen se conserva el estilo de color. [Despliegue completado](https://github.com/MartnMartnez14/checklist/actions/runs/40575181195); 54/54 pruebas locales normal y reducido y 54/54 en la web pública con tiempo normal. Recarga offline verificada con imágenes de prueba. Evidencia y límites en ROADMAP.md.
 
+**Rediseño editorial — implementación local 2026-10-30 (sin publicar):** header de dos filas inspirado en Builderstable, lienzo con grilla de puntos y wordmark gigante al estilo Buzz, y footer en columnas con wordmark recortado y gatos flotantes al estilo Turion. Se conservan ambos temas, los 10 colores de lista y todos los datos. Caché candidata `checklist-v19`; 57/57 pruebas en Chrome con tiempo real. Sin commit de publicación.
+
 Si una pestaña antigua no muestra los cambios, probá recargar sin caché (`Ctrl+Shift+R` en Chrome de escritorio). No borres los datos del sitio: allí están tus notas.
 
 ---
@@ -95,7 +97,7 @@ Para comprender los componentes, el flujo de datos, los diagramas y la mecánica
 - `INCIDENCIAS.md` — Seguimiento de errores y sugerencias sin datos personales.
 - `ARQUITECTURA.md` — Arquitectura, diagramas, decisiones y convenciones de desarrollo y comentarios.
 - `ROADMAP.md` — Hoja de ruta técnica, auditoría y planificación evolutiva del proyecto.
-- `tests/run.sh` y `tests/harness.html` — Suite automatizada de pruebas de regresión en Chrome headless.
+- `tests/run.sh`, `tests/harness.html` y `tests/cdp-run.mjs` — Suite automatizada de pruebas de regresión en Chrome headless; el ejecutor CDP opcional usa Node 24 para esperar el final real de la suite.
 
 ### Ejecución en entorno local
 Para probar la aplicación localmente (incluyendo la subida de imágenes con `crypto.subtle` y el Service Worker, que requieren un contexto seguro `localhost` o `HTTPS`):
@@ -114,7 +116,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`. Levanta un servidor temporal y ejecuta los 54 casos de `tests/harness.html`. La versión v18 aprobó 54/54 en Chrome con tiempo real normal y reducido; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento y conexiones. El ejecutor con reloj virtual tiene antecedentes de esperas intermitentes, registrados en el roadmap. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
+Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `tests/cdp-run.mjs` en tiempo real y espera a que el harness marque `DONE`. Levanta un servidor temporal y ejecuta los 57 casos de `tests/harness.html`. La candidata v19 aprobó 57/57 en Chrome con tiempo real; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento, conexiones y tres comprobaciones nuevas del rediseño (estructura, móvil y temas). El ejecutor alternativo con reloj virtual conserva antecedentes de esperas intermitentes. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
 
 ---
 
