@@ -1,5 +1,10 @@
 # Historial de cambios
 
+## 2026-11-03 — Contacto por WhatsApp en el footer
+- Nueva tarjeta de WhatsApp en la columna de contacto, junto al correo: enlace directo a `wa.me/59892663680`, número visible `092 663 680` y subtítulo con formato internacional `+598 92 663 680`.
+- Botón «Copiar» con el mismo fallback de portapapeles del resto de las tarjetas; copia `+598 92 663 680`. Textos y `aria-label` traducidos en ES/EN.
+- Pruebas del footer ampliadas para enlace, formato uruguayo, copiado y traducción. Caché `checklist-v20`. Sin cambios de datos, almacenamiento ni exportación/importación.
+
 ## 2026-10-30 — Rediseño editorial (publicado y verificado)
 - Header sticky de dos filas: marca serif, estado mono, CTA lima y barra de herramientas con búsqueda, vistas, idioma, tema, GitHub, exportar/importar y plantillas. En móvil, la barra se desplaza horizontalmente sin ocultar etiquetas.
 - Lienzo del tablero con grilla de puntos, resplandores tenues, wordmark gigante «GATO» y motivos flotantes; mismo tratamiento en Cuadrícula y Mapa, sin capturar punteros ni alterar tarjetas, conexiones o arrastre.

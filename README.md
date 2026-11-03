@@ -125,6 +125,7 @@ Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `t
 Checklist Gato es un proyecto independiente, gratuito y de código abierto:
 - **Colaboraciones voluntarias:** Al pie de la aplicación encontrás las opciones (Ko-fi, PayPal, referido de Starlink y cuenta Prex `35502`).
 - **Reportar errores, sugerencias o comentarios:** Podés escribir directamente al desarrollador a **`mmartinez23bio@hotmail.com`** (con enlace directo y botón para copiar el correo en el footer).
+- **Contacto de negocio por WhatsApp:** **`092 663 680`** (formato internacional **`+598 92 663 680`**). El footer incluye enlace directo al chat y botón para copiar el número.
 
 ## 📄 Licencia
 

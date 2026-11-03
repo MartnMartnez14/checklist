@@ -475,10 +475,12 @@
     assert(cd.documentElement.lang === "en", "html lang esperado en, fue: " + cd.documentElement.lang);
     assert(cd.getElementById("app-title").textContent === "Checklist Cat", "título EN incorrecto");
     assert(cd.querySelector("#new-note .btn-label").textContent === "New list", "botón New list no tradujo");
+    assert(/Business contact only/.test(cd.getElementById("whatsapp-sub").textContent), "subtítulo WhatsApp EN no tradujo");
     assert(localStorage.getItem("checklist-lang") === "en", "checklist-lang no persistió 'en'");
     langBtn.click();
     assert(langBtn.textContent.trim() === "ES", "no volvió a ES");
     assert(cd.getElementById("app-title").textContent === "Checklist Gato", "no volvió a Checklist Gato");
+    assert(/Contacto exclusivo del negocio/.test(cd.getElementById("whatsapp-sub").textContent), "subtítulo WhatsApp ES no volvió");
 
     // Check de bloque de Feedback / Contacto (mmartinez23bio@hotmail.com).
     var fbTitle = cd.getElementById("feedback-title");
@@ -487,6 +489,27 @@
     assert(fbTitle && fbMail && fbCopy, "faltan elementos del bloque de feedback en el footer");
     assert(fbMail.textContent.trim() === "mmartinez23bio@hotmail.com", "correo visible incorrecto: " + fbMail.textContent);
     assert(/^mailto:mmartinez23bio@hotmail\.com/i.test(fbMail.href), "href mailto incorrecto: " + fbMail.href);
+
+    // Check de tarjeta de WhatsApp (contacto de negocio, formato Uruguay).
+    var waLink = cd.getElementById("whatsapp-link");
+    var waTitle = cd.getElementById("whatsapp-title");
+    var waSub = cd.getElementById("whatsapp-sub");
+    var waCopy = cd.getElementById("copy-whatsapp");
+    assert(waLink && waTitle && waSub && waCopy, "faltan elementos de la tarjeta de WhatsApp");
+    assert(waLink.href === "https://wa.me/59892663680", "URL WhatsApp inesperada: " + waLink.href);
+    assert(waLink.getAttribute("target") === "_blank", "falta target=_blank en WhatsApp");
+    var waRel = waLink.getAttribute("rel") || "";
+    assert(/noopener/.test(waRel) && /noreferrer/.test(waRel), "rel incompleto en WhatsApp: " + waRel);
+    assert(waTitle.textContent.trim() === "WhatsApp: 092 663 680", "título WhatsApp incorrecto: " + waTitle.textContent);
+    assert(/\+598 92 663 680/.test(waSub.textContent), "falta formato internacional en subtítulo WhatsApp: " + waSub.textContent);
+    copyCalled = false;
+    waCopy.click();
+    await sleep(80);
+    var waLabel = cd.querySelector("#copy-whatsapp .btn-label");
+    if (stubbed) {
+      assert(copyCalled, "clipboard.writeText no fue llamado desde WhatsApp");
+      assert(/Copiado/.test(waLabel.textContent), "label WhatsApp no dice Copiado: " + waLabel.textContent);
+    }
 
     // Check de bloque desplegable "Próximos pasos" (CAT-07).
     var rmDetails = cd.getElementById("roadmap-details");
