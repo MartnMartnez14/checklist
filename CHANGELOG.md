@@ -6,6 +6,8 @@
 - Las listas completas muestran un sello de pata decorativo, calculado al renderizar: no se guarda en los datos ni en los respaldos, y las listas bloqueadas no lo muestran.
 - Con movimiento reducido no hay bucles, resortes ni salto; el gato y el sello aparecen sin animación.
 - Ajustes visuales: íconos y texto centrados en los botones del header, el correo del footer se corta antes de la arroba, la búsqueda ocupa su propia fila entre 701 y 1060 px, «Ocultar con PIN» pierde protagonismo y el foco de títulos y tareas queda en una sola línea inferior.
+- Pantallas anchas: la búsqueda queda a la izquierda y las herramientas debajo de «Nueva lista», el aviso del header se centra, las columnas del footer siguen el ancho del wordmark y los gatos se ubican respecto de él. «Ordenar mapa» y «Deshacer orden» usan el mismo estilo que el resto de la barra.
+- Footer: «Próximos pasos» pasa a una fila de ancho completo, con tres columnas al abrirse, para no estirar la tercera columna. Los cuatro botones «Copiar» quedan iguales, con ícono y misma altura. En móvil, el ícono de WhatsApp vuelve a la fila de su texto y el wordmark ya no se corta de los lados.
 - Pruebas nuevas `gato-vacio` y `note-stamp`. Caché `checklist-v21`. Sin cambios de esquema, almacenamiento ni exportación/importación.
 
 ## 2026-11-03 — Contacto por WhatsApp en el footer

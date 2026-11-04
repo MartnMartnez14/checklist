@@ -971,6 +971,48 @@
   @media (min-width: 701px) and (max-width: 1060px) {
     .header-tools .search-box { flex: 1 1 100%; max-width: none; }
   }
+  @media (min-width: 901px) {
+    .header-main { grid-template-columns: 1fr auto 1fr; }
+  }
+  @media (min-width: 1061px) {
+    .header-tools .search-box + .seg { margin-left: auto; }
+  }
+  #arrange-map, #undo-map {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .09em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* Las columnas siguen el ancho del wordmark, que deja de crecer a 190 px de letra. */
+  .footer-top, .footer-legal, .roadmap-details { max-width: max(1200px, min(84vw, 1478px)); }
+  .roadmap-details { position: relative; z-index: 1; margin: clamp(24px,3vw,36px) auto 0; }
+  .roadmap-details + .footer-legal { margin-top: 0; }
+  .roadmap-grid { margin-bottom: 18px; }
+  @media (min-width: 901px) {
+    .roadmap-grid { grid-template-columns: repeat(3, 1fr); gap: clamp(24px,4vw,56px); }
+  }
+  .support-copy {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    max-width: 60%;
+  }
+  @media (min-width: 641px) {
+    .footer-brand { height: clamp(96px, 12.5vw, 200px); }
+  }
+  @media (max-width: 640px) {
+    .feedback-actions .support-card > span { flex: 1 1 calc(100% - 40px); }
+    .footer-wordmark { font-size: 11vw; }
+  }
+  @media (min-width: 1760px) {
+    .support-text { max-width: 46ch; }
+    .footer-cat.cat-a { left: calc(50% - 739px + 107px); }
+    .footer-cat.cat-b { right: calc(50% - 739px + 157px); }
+  }
   .note:not(.has-bg) .note-title:focus-visible,
   .note:not(.has-bg) .item-text:focus-visible { outline: none; }
   .note:not(.locked-note):not(.has-bg) .visual-lock-controls { margin: 0 0 4px; }
@@ -1249,7 +1291,7 @@
         <div class="support-card support-prex support-mercado">
           <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
           <span><strong>Mercado Pago · UYU</strong><small id="mercado-sub">Cuenta: 1006269736963</small><small>Martin Martinez Garcia</small></span>
-          <button type="button" class="btn support-copy" id="copy-mercado" aria-label="Copiar cuenta de Mercado Pago"><span class="btn-label" id="copy-mercado-label">Copiar</span></button>
+          <button type="button" class="btn support-copy" id="copy-mercado" aria-label="Copiar cuenta de Mercado Pago"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg><span class="btn-label" id="copy-mercado-label">Copiar</span></button>
         </div>
       </div>
     </div>
@@ -1284,34 +1326,35 @@
         </div>
       </div>
       <button type="button" class="btn" id="cat-help" aria-haspopup="dialog">🐾 Ayuda del gato</button>
-      <details class="roadmap-details" id="roadmap-details">
-        <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
-        <div class="roadmap-grid">
-          <div class="roadmap-col">
-            <h3 id="rm-dev-title">✅ Disponible</h3>
-            <ul>
-              <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
-              <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
-            </ul>
-          </div>
-          <div class="roadmap-col">
-            <h3 id="rm-soon-title">🔜 Próximamente</h3>
-            <ul>
-              <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
-              <li id="rm-soon-2">Controles de zoom del mapa y validación de arrastre y zoom en Android real.</li>
-            </ul>
-          </div>
-          <div class="roadmap-col">
-            <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
-            <ul>
-              <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
-              <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
-            </ul>
-          </div>
-        </div>
-      </details>
     </div>
   </div>
+
+  <details class="roadmap-details" id="roadmap-details">
+    <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
+    <div class="roadmap-grid">
+      <div class="roadmap-col">
+        <h3 id="rm-dev-title">✅ Disponible</h3>
+        <ul>
+          <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
+          <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
+        </ul>
+      </div>
+      <div class="roadmap-col">
+        <h3 id="rm-soon-title">🔜 Próximamente</h3>
+        <ul>
+          <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
+          <li id="rm-soon-2">Controles de zoom del mapa y validación de arrastre y zoom en Android real.</li>
+        </ul>
+      </div>
+      <div class="roadmap-col">
+        <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
+        <ul>
+          <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
+          <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
 
   <div class="footer-legal">
     <div class="oss-seal">
