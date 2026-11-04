@@ -645,7 +645,10 @@
     color: var(--muted);
   }
   .seg-btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg-btn { align-items: center; }
   .seg-label { line-height: 1; }
+  .header-main .btn, .header-tools .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; }
+  .header-main .btn-label, .header-tools .btn-label { line-height: 1; }
   .header-tools :focus-visible { outline-color: var(--link); }
 
   @media (max-width: 900px) {
