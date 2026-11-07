@@ -3,7 +3,8 @@
 **Proyecto:** Checklist Gato (ES) / Checklist Cat (EN)  
 **Sitio web:** https://checklistgato.com  
 **Estado:** imagen completa y texto automático publicados y verificados el 2026-10-27 en main/https://checklistgato.com/; caché `checklist-v18`, commit funcional `f09727b`. Suite local: 54/54 normal y reducido; web pública: 54/54 normal. Transición local v17 → v18 y recarga offline pública verificadas. Límites de fotos complejas y pruebas físicas en el cierre.<br>
-**Rediseño editorial publicado — 2026-10-30:** header Builderstable de dos filas, lienzo Buzz y footer Turion publicados en main/https://checklistgato.com/; caché `checklist-v19`, commit funcional `a5f5def`, 57/57 PASS local y público, recarga offline v19 verificada.
+**Rediseño editorial publicado — 2026-10-30:** header Builderstable de dos filas, lienzo Buzz y footer Turion publicados en main/https://checklistgato.com/; caché `checklist-v19`, commit funcional `a5f5def`, 57/57 PASS local y público, recarga offline v19 verificada.<br>
+**Contacto de WhatsApp publicado — 2026-11-03:** tarjeta de contacto por WhatsApp en el footer (`wa.me/59892663680`, número `092 663 680` / `+598 92 663 680` y botón Copiar ES/EN) publicada en main; caché `checklist-v20`, commit funcional `50c8bd9`, suite `57/57 PASS`.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -35,7 +36,7 @@ Checklist Gato es una aplicación web (PWA) de organización personal que permit
 ## 2. DIAGNÓSTICO Y AUDITORÍA TÉCNICA DEL ESTADO ACTUAL (BASE v1.0)
 
 ### 2.1 Estado funcional y validación
-Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrome y tiempo real normal. La versión publicada anterior tenía 48 casos aprobados también con movimiento reducido. El ejecutor con reloj virtual tiene esperas intermitentes documentadas en el cierre de integración; no equivale a validación Android física.
+Suite actual de 57 casos; 57 aprobados localmente y en la web pública con Chrome y tiempo real normal (caché `checklist-v20`, verificado el 2026-11-03). Versiones anteriores: 54 casos en v18 y 50 en v16. El ejecutor con reloj virtual tiene esperas intermitentes documentadas en el cierre de integración; no equivale a validación Android física.
 - **Arquitectura cero-dependencias:** HTML5, CSS moderno (variables CSS, `color-mix`, `conic-gradient`) y JavaScript vanilla en `index.html`.
 - **Gestión de listas y elementos:**
   - Creación, edición y borrado de listas y elementos.
@@ -60,7 +61,7 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
   - Exportación en JSON incluyendo notas e imágenes codificadas en Base64.
   - Importación con validación estructural, descarga automática de copia de seguridad previa y dos modos: **Fusionar (idempotente)** y **Reemplazar**.
 - **PWA e infraestructura:**
-  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v16`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
+  - Instalable (`manifest.json`, iconos 192/512) y funcional sin conexión (`sw.js` con caché `checklist-v20`, estrategia *network-first* para el documento HTML y *cache-first* para recursos estáticos).
   - Dominio personalizado `https://checklistgato.com` (DNS en Hostinger apuntando a GitHub Pages con `CNAME` y HTTPS activo).
   - **Descubrimiento y metadatos:** `description`, `canonical`, OpenGraph (título, descripción, URL e imagen absoluta), Twitter Card y `manifest.json` enriquecido (`lang`, `description`, `categories`), listos para compartir el enlace con vista previa.
 - **Seguridad XSS:**
@@ -90,11 +91,11 @@ Suite actual de 50 casos; 50 aprobados localmente y en la web pública con Chrom
 | ID | Funcionalidad / Etapa | Prioridad | Complejidad | Estado Actual |
 |---|---|---|---|---|
 | **CAT-01** | Respaldos de datos (Exportar/Importar JSON + Fusión) | **P1** | Media | **Hecho** (`mergeNotes` refinado con metadatos y enlaces locales) |
-| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché pública: `checklist-v19`; distribución desde `main`) |
+| **CAT-02** | PWA offline-first (`manifest.json` + `sw.js`) | **P2** | Baja | **Hecho** (caché pública: `checklist-v20`; distribución desde `main`) |
 | **CAT-03** | Conexiones entre listas (Manuales + Tags + Vista Mapa) | **P2** | Media-Alta | **Hecho** (Operativo; pendiente optimización para cientos de tags) |
 | **CAT-04** | Blindaje de persistencia (`try/catch` en `save`, `.gitignore`) | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
 | **CAT-05** | Confirmaciones en acciones destructivas (incl. "Borrar completados") | **P1** | Baja | **Hecho (Etapa 1 / Backlog v1.1)** |
-| **CAT-06** | Sistema de Feedback por correo en el footer (`mmartinez23bio@hotmail.com`) | **P1/P2** | Baja | **Hecho (Etapa 3 / Backlog Paso 4.B)** |
+| **CAT-06** | Sistema de Feedback y contacto en el footer (`mmartinez23bio@hotmail.com` + WhatsApp `+598 92 663 680`) | **P1/P2** | Baja | **Hecho (Etapa 3 / Backlog Paso 4.B + v20)** |
 | **CAT-07** | Sección pública «🐾 Próximos pasos» dentro de la app | **P2** | Baja | **Hecho (Sección 5 / Backlog Paso 4.C)** |
 | **CAT-08** | Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`) | **P2** | Media | **Hecho (Etapa 4 / Backlog Paso 4)** |
 | **CAT-09** | Optimización y rendimiento a gran escala (100 a 10.000 listas) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2)** |
@@ -128,7 +129,7 @@ Garantizar que Checklist Gato sea impecable realizando las funciones que ya ofre
 - **1.1 Protección de almacenamiento:** Capturar errores de cuota (`QuotaExceededError`) en `localStorage` e `IndexedDB`, ofreciendo al usuario exportar un respaldo inmediato si la memoria del navegador se llena.
 - **1.2 Confirmaciones seguras:** ✅ Publicado (ver cierre 2026-10-25). Borrar lista, completados y conexión usa `openDialog`, Cancelar inicialmente enfocado, Escape y cierre desde el fondo sin cambios; foco recuperado tras confirmar. Test `delete-dialogs`.
 - **1.3 Refinamiento de Fusión (`mergeNotes`):** Preservar enlaces entrantes hacia notas locales existentes y contemplar cambios de estilo/color en notas sin `updatedAt`.
-- **1.4 Ampliación de tests (`tests/harness.html`):** Suite de 50 casos: vista previa y transiciones, base anterior, PIN visual, importación/fusión, ordenamiento/Deshacer, cancelaciones de arrastre y viewport visual. Las comprobaciones automatizadas no equivalen a una auditoría con lector de pantalla ni a pruebas en dispositivos físicos.
+- **1.4 Ampliación de tests (`tests/harness.html`):** Suite de 57 casos: rediseño editorial, contacto de footer, imágenes con texto automático, vista previa y transiciones, base anterior, PIN visual, importación/fusión, ordenamiento/Deshacer, cancelaciones de arrastre y viewport visual. Las comprobaciones automatizadas no equivalen a una auditoría con lector de pantalla ni a pruebas en dispositivos físicos.
 
 ---
 
@@ -157,7 +158,7 @@ Permitir que una persona construya desde una simple checklist hasta un espacio e
 ### ETAPA 3 — Sistema de Feedback (Prioridad: ALTA — P1/P2)
 Agregar un mecanismo sencillo, privado y directo para que los usuarios compartan su experiencia.
 - **3.1 Ubicación:** Sección discreta en el pie de página (`footer`), debajo del bloque de donaciones y apoyo al proyecto.
-- **3.2 Correo confirmado:** `mmartinez23bio@hotmail.com` (mediante enlace `mailto:` accesible y opción de copiar correo para reportar bugs, sugerencias o comentarios al desarrollador).
+- **3.2 Correo y WhatsApp confirmados:** `mmartinez23bio@hotmail.com` (mediante enlace `mailto:` accesible y opción de copiar correo para reportar bugs, sugerencias o comentarios al desarrollador) y tarjeta de WhatsApp `092 663 680` / `+598 92 663 680` (`https://wa.me/59892663680` con botón de copiado rápido).
 - **3.3 Texto oficial en español:**
   > **💌 Ayudanos a mejorar Checklist Gato**  
   > «Checklist Gato es un proyecto independiente que continúa creciendo. Si encontraste un error, tenés alguna sugerencia o simplemente querés compartir tu experiencia, podés escribirme.  
@@ -326,7 +327,7 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - **Fecha y hora de creación** visible en cada nota (respetando notas antiguas sin fecha).
 - Pie de página **«Apoyar el proyecto»** (Ko-fi, PayPal, Starlink como enlace de referido y cuenta Prex con botón de copiado rápido).
 - Modo **Mapa** con arrastre robusto en móvil y teclado, y bordes coloreados por conexión (sólido o multicolor).
-- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 48 casos; ver resultados y límites de ejecución en el cierre de integración del 2026-10-25.
+- Harness de pruebas automatizadas en Chrome headless (`tests/run.sh` y `tests/harness.html`) con 57 casos (v20); ver resultados y límites de ejecución en los cierres de integración.
 - Atajos de teclado (`N`, `G`, `M`, `/`, `?`), progreso discreto por lista y buscador global insensible a acentos.
 - Plantillas rápidas bilingües (Compras, Estudios, Proyectos, Hábitos, Viajes y Organización personal) con contenido actualizado (Pomodoro, hábitos saludables, equipaje y organización).
 - **Editor ampliado por ítem:** modal accesible para leer y editar textos largos, con foco atrapado y Escape.
@@ -360,7 +361,7 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - **Regla de oro respetada:** jamás traduce ni altera el contenido escrito por el usuario (títulos, ítems, etiquetas).
 
 ### ✅ PASO 4.B — Contacto / Feedback al desarrollador en el `footer` *(Completado — CAT-06 / Etapa 3)*
-- Añadido debajo de las donaciones en el `footer` el bloque «Ayudanos a mejorar Checklist Gato» / «Help us improve Checklist Cat» con enlace `mailto:mmartinez23bio@hotmail.com`, botón de copiado rápido (`#copy-email`) y soporte completo Español / Inglés.
+- Añadido debajo de las donaciones en el `footer` el bloque «Ayudanos a mejorar Checklist Gato» / «Help us improve Checklist Cat» con enlace `mailto:mmartinez23bio@hotmail.com`, botón de copiado rápido (`#copy-email`), tarjeta de WhatsApp (`wa.me/59892663680`, número `092 663 680` / `+598 92 663 680` y botón `#copy-whatsapp`) y soporte completo Español / Inglés.
 
 ### ✅ PASO 4.C — Cierre de tareas fáciles pendientes *(Completado — CAT-04, CAT-05, CAT-07 / Etapa 1 y Sección 5)*
 - **CAT-04:** Protección de cuota en `save()` y `migrate()` con `try/catch` y diálogo `notifyQuotaExceeded()` para descargar respaldo inmediato si `localStorage` se llena.
@@ -584,3 +585,9 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Verificación visual en 1440, 768, 390 y 320 px, temas claro/oscuro, tablero vacío, tarjetas y footer completo. Sin Android físico, Safari, lector de pantalla ni auditoría WCAG integral. La legibilidad sobre fotografías complejas conserva los límites ya registrados.
 - Publicado desde `codex/diseno-editorial` → `codex/dev-offline` → `main` por fast-forward, con commit funcional `a5f5def3f963102bd8a65d6dd8e804f38c65d201` y [Pages 41112613399](https://github.com/MartnMartnez14/checklist/actions/runs/41112613399) completado. El cambio pendiente CAT-28 se incorporó al ROADMAP antes del commit y se conservó un stash de respaldo.
 - Web pública: caché `checklist-v19`, `manifest.json` con colores nuevos, header/footer visibles, harness 57/57 y recarga offline desde la caché v19. Capturas públicas a 1440 y 390 px en ambos temas. Sin force push ni cambios de esquema.
+
+### Contacto de WhatsApp en el footer — 2026-11-03 (publicado)
+- Nueva tarjeta de WhatsApp en la columna de contacto junto al correo electrónico: enlace directo a `https://wa.me/59892663680`, número visible `092 663 680` y subtítulo con formato internacional `+598 92 663 680`.
+- Botón «Copiar» (`#copy-whatsapp`) con el mismo fallback de portapapeles del resto de las tarjetas; copia `+598 92 663 680`. Textos y `aria-label` traducidos en ES/EN.
+- Pruebas del footer ampliadas en `tests/harness.html` para verificar enlace, formato uruguayo, copiado y traducción.
+- Caché del Service Worker actualizada a `checklist-v20` (commit `50c8bd9` en `main`). Sin cambios en esquema de datos, almacenamiento ni exportación/importación.
