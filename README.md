@@ -116,7 +116,7 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `tests/cdp-run.mjs` en tiempo real y espera a que el harness marque `DONE`. Levanta un servidor temporal y ejecuta los 57 casos de `tests/harness.html`. La versión v19 publicada aprobó 57/57 en Chrome local y 57/57 en la web pública con tiempo real; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento, conexiones y tres comprobaciones nuevas del rediseño (estructura, móvil y temas). El ejecutor alternativo con reloj virtual conserva antecedentes de esperas intermitentes. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
+Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `tests/cdp-run.mjs` en tiempo real y espera a que el harness marque `DONE`. Levanta un servidor temporal y ejecuta los 59 casos de `tests/harness.html`. La versión v19 publicada aprobó 57/57 en Chrome local y 57/57 en la web pública con tiempo real; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento, conexiones y tres comprobaciones nuevas del rediseño (estructura, móvil y temas). El ejecutor alternativo con reloj virtual conserva antecedentes de esperas intermitentes. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
 
 ---
 

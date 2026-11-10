@@ -645,7 +645,10 @@
     color: var(--muted);
   }
   .seg-btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .seg-btn { align-items: center; }
   .seg-label { line-height: 1; }
+  .header-main .btn, .header-tools .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; }
+  .header-main .btn-label, .header-tools .btn-label { line-height: 1; }
   .header-tools :focus-visible { outline-color: var(--link); }
 
   @media (max-width: 900px) {
@@ -963,6 +966,166 @@
   @media (prefers-reduced-motion: reduce) {
     .board-decor span, .footer-cat { animation: none !important; }
   }
+
+  /* --- Ajustes de jerarquía --- */
+  @media (min-width: 701px) and (max-width: 1060px) {
+    .header-tools .search-box { flex: 1 1 100%; max-width: none; }
+  }
+  @media (min-width: 901px) {
+    .header-main { grid-template-columns: 1fr auto 1fr; }
+  }
+  @media (min-width: 1061px) {
+    .header-tools .search-box + .seg { margin-left: auto; }
+  }
+  #arrange-map, #undo-map {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: .09em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  /* Las columnas siguen el ancho del wordmark, que deja de crecer a 190 px de letra. */
+  .footer-top, .footer-legal, .roadmap-details { max-width: max(1200px, min(84vw, 1478px)); }
+  .roadmap-details { position: relative; z-index: 1; margin: clamp(24px,3vw,36px) auto 0; }
+  .roadmap-details + .footer-legal { margin-top: 0; }
+  .roadmap-grid { margin-bottom: 18px; }
+  @media (min-width: 901px) {
+    .roadmap-grid { grid-template-columns: repeat(3, 1fr); gap: clamp(24px,4vw,56px); }
+  }
+  .support-copy {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    max-width: 60%;
+  }
+  @media (max-width: 640px) {
+    .feedback-actions .support-card > span { flex: 1 1 calc(100% - 40px); }
+    .footer-wordmark { font-size: 11vw; }
+  }
+  @media (min-width: 1760px) {
+    .support-text { max-width: 46ch; }
+    .footer-cat.cat-a { left: calc(50% - 739px + 107px); }
+    .footer-cat.cat-b { right: calc(50% - 739px + 157px); }
+  }
+  .note:not(.has-bg) .note-title:focus-visible,
+  .note:not(.has-bg) .item-text:focus-visible { outline: none; }
+  .note:not(.locked-note):not(.has-bg) .visual-lock-controls { margin: 0 0 4px; }
+  .note:not(.locked-note):not(.has-bg) .visual-lock-controls .btn {
+    min-height: 28px;
+    padding: 3px 6px;
+    border-color: transparent;
+    background: transparent;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .note:not(.locked-note):not(.has-bg) .visual-lock-controls .btn:hover { background: var(--hover); color: inherit; }
+  .note:not(.locked-note):not(.has-bg) .visual-lock-controls .btn .i { width: 13px; height: 13px; margin: 0 0 0 5px; vertical-align: -2px; }
+  @media (pointer: coarse) {
+    .note:not(.locked-note):not(.has-bg) .visual-lock-controls .btn { min-height: 36px; }
+  }
+
+  /* --- Gato del tablero vacío --- */
+  .empty.empty-gato { margin-top: clamp(20px, 5vh, 44px); }
+  .gato-wrap {
+    position: relative;
+    display: block;
+    width: clamp(170px, 30vw, 240px);
+    margin: 0 auto 10px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .gato { display: block; width: 100%; height: auto; overflow: visible; }
+  .gato-sombra { fill: var(--text); opacity: .10; }
+  .gato-auricular { fill: #20252c; }
+  :root[data-theme="dark"] .gato-auricular { fill: #414957; }
+  .gato-respira { transform-origin: 120px 184px; }
+  .gato-oreja { transform-origin: 84px 74px; }
+  .gato-ojos path { fill: none; stroke: #7ee8c4; stroke-linecap: round; stroke-linejoin: round; }
+  .gato-ojo-dormido { stroke-width: 7; opacity: .75; }
+  .gato-ojo-tilde { stroke-width: 10; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .gato-wrap.despierto .gato-ojo-dormido { opacity: 0; }
+  .gato-wrap.despierto .gato-ojo-tilde { stroke-dashoffset: 0; }
+  .gato-wrap.despierto .gato-zzz { opacity: 0; }
+  .gato-zzz { font-family: var(--font-mono); font-weight: 700; fill: var(--muted); }
+  .gato-dicho {
+    position: absolute;
+    top: 2%;
+    right: -6%;
+    padding: 3px 9px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--card);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: var(--shadow-1);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .gato-dicho.ver { opacity: 1; }
+  .gato-saltarin {
+    position: fixed;
+    z-index: 15;
+    margin: 0;
+    transform-origin: 50% 100%;
+    pointer-events: none;
+  }
+  .note-stamp {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    margin-left: auto;
+    color: var(--link);
+    opacity: .55;
+    transform: rotate(-14deg);
+    pointer-events: none;
+  }
+  .note.has-bg .note-stamp { color: var(--on-image); opacity: .85; filter: drop-shadow(0 0 1px var(--image-outline)); }
+  .note-stamp .i { display: block; width: 100%; height: 100%; fill: currentColor; stroke: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .gato-respira { animation: gato-respira 3.4s ease-in-out infinite; }
+    .gato-wrap.despierto .gato-respira { animation-duration: 1.6s; }
+    .gato-oreja { animation: gato-oreja 11s ease-in-out infinite; }
+    .gato-ojo-dormido { transition: opacity 120ms ease; }
+    .gato-ojo-tilde { transition: stroke-dashoffset 220ms ease-out; }
+    .gato-zzz { transition: opacity 120ms ease; }
+    .gato-zzz text { animation: gato-zzz 3.6s ease-in-out infinite; opacity: 0; }
+    .gato-zzz text:nth-child(2) { animation-delay: 1.2s; }
+    .gato-zzz text:nth-child(3) { animation-delay: 2.4s; }
+    .gato-dicho.ver { animation: gato-dicho 260ms cubic-bezier(.3,1.6,.6,1); }
+    .note-stamp.stamp-in { animation: note-stamp 340ms cubic-bezier(.3,1.5,.6,1); }
+    @keyframes gato-respira {
+      0%, 100% { transform: scale(1, 1); }
+      50% { transform: scale(.992, 1.022); }
+    }
+    @keyframes gato-oreja {
+      0%, 91%, 97%, 100% { transform: rotate(0); }
+      94% { transform: rotate(-9deg); }
+    }
+    @keyframes gato-zzz {
+      0% { opacity: 0; transform: translate(0, 6px); }
+      25% { opacity: .75; }
+      100% { opacity: 0; transform: translate(10px, -22px); }
+    }
+    @keyframes gato-dicho {
+      from { opacity: 0; transform: translateY(8px) scale(.8); }
+      to { opacity: 1; transform: none; }
+    }
+    @keyframes note-stamp {
+      from { opacity: 0; transform: rotate(4deg) scale(2.6); }
+      70% { opacity: 1; transform: rotate(-14deg) scale(.88); }
+      to { transform: rotate(-14deg) scale(1); }
+    }
+  }
 </style>
 </head>
 <body>
@@ -1030,6 +1193,54 @@
   </div>
 </header>
 
+<template id="gato-tpl">
+  <svg class="gato" viewBox="0 0 240 200" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="gato-casco" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fffaf6"/><stop offset=".62" stop-color="#fbeee8"/><stop offset="1" stop-color="#e6cdc6"/></linearGradient>
+      <linearGradient id="gato-visor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b303a"/><stop offset="1" stop-color="#12151b"/></linearGradient>
+      <radialGradient id="gato-brillo"><stop offset="0" stop-color="#7ee8c4" stop-opacity=".2"/><stop offset="1" stop-color="#7ee8c4" stop-opacity="0"/></radialGradient>
+    </defs>
+    <ellipse class="gato-sombra" cx="120" cy="188" rx="76" ry="8"/>
+    <g class="gato-rig">
+      <g class="gato-respira">
+        <g class="gato-oreja-r"><g class="gato-oreja">
+          <path d="M50 104C38 70 42 34 62 30 82 28 112 52 126 76Z" fill="url(#gato-casco)"/>
+          <path d="M62 90C56 66 58 46 68 44 80 44 98 60 106 74Z" fill="#f0a098"/>
+        </g></g>
+        <g transform="matrix(-1 0 0 1 240 0)">
+          <g class="gato-oreja-r"><g class="gato-oreja">
+            <path d="M50 104C38 70 42 34 62 30 82 28 112 52 126 76Z" fill="url(#gato-casco)"/>
+            <path d="M62 90C56 66 58 46 68 44 80 44 98 60 106 74Z" fill="#f0a098"/>
+          </g></g>
+          <rect class="gato-auricular" x="20" y="104" width="30" height="56" rx="15"/>
+          <ellipse class="gato-auricular" cx="24" cy="132" rx="7" ry="19" stroke="#7ee8c4" stroke-width="4"/>
+        </g>
+        <rect class="gato-auricular" x="20" y="104" width="30" height="56" rx="15"/>
+        <ellipse class="gato-auricular" cx="24" cy="132" rx="7" ry="19" stroke="#7ee8c4" stroke-width="4"/>
+        <path d="M120 60C178 60 206 96 206 132 206 170 170 184 120 184 70 184 34 170 34 132 34 96 62 60 120 60Z" fill="url(#gato-casco)"/>
+        <path d="M120 82C162 82 188 98 192 128 194 154 170 164 120 164 70 164 46 154 48 128 52 98 78 82 120 82Z" fill="url(#gato-visor)"/>
+        <ellipse cx="120" cy="124" rx="68" ry="34" fill="url(#gato-brillo)"/>
+        <g fill="none" stroke="#2b303a" stroke-width="3" stroke-linecap="round">
+          <path d="M38 150 50 154M44 165 55 163M202 150 190 154M196 165 185 163"/>
+        </g>
+        <g class="gato-ojos">
+          <path class="gato-ojo-dormido" d="M74 124Q91 137 108 124"/>
+          <path class="gato-ojo-dormido" d="M132 124Q149 137 166 124"/>
+          <path class="gato-ojo-tilde" pathLength="1" d="M74 122 87 136 108 108"/>
+          <path class="gato-ojo-tilde" pathLength="1" d="M132 122 145 136 166 108"/>
+        </g>
+        <path d="M117 139H123L120 142.5Z" fill="#fff6f1"/>
+        <path d="M111 144Q115.5 151 120 144 124.5 151 129 144" fill="none" stroke="#fff6f1" stroke-width="3" stroke-linecap="round"/>
+      </g>
+    </g>
+    <g class="gato-zzz">
+      <text x="186" y="60" font-size="15">z</text>
+      <text x="198" y="46" font-size="20">z</text>
+      <text x="212" y="28" font-size="25">z</text>
+    </g>
+  </svg>
+</template>
+
 <div class="board">
   <div class="board-wordmark" aria-hidden="true">GATO</div>
   <div class="board-decor" aria-hidden="true">
@@ -1077,7 +1288,7 @@
         <div class="support-card support-prex support-mercado">
           <svg class="i" aria-hidden="true" focusable="false"><use href="#i-card"/></svg>
           <span><strong>Mercado Pago · UYU</strong><small id="mercado-sub">Cuenta: 1006269736963</small><small>Martin Martinez Garcia</small></span>
-          <button type="button" class="btn support-copy" id="copy-mercado" aria-label="Copiar cuenta de Mercado Pago"><span class="btn-label" id="copy-mercado-label">Copiar</span></button>
+          <button type="button" class="btn support-copy" id="copy-mercado" aria-label="Copiar cuenta de Mercado Pago"><svg class="i" aria-hidden="true" focusable="false"><use href="#i-copy"/></svg><span class="btn-label" id="copy-mercado-label">Copiar</span></button>
         </div>
       </div>
     </div>
@@ -1090,7 +1301,7 @@
           <div class="support-card support-prex">
             <svg class="i" aria-hidden="true" focusable="false"><use href="#i-mail"/></svg>
             <span>
-              <a id="feedback-mailto" class="oss-link" href="mailto:mmartinez23bio@hotmail.com?subject=Checklist%20Gato%20-%20Comentarios">mmartinez23bio@hotmail.com</a>
+              <a id="feedback-mailto" class="oss-link" href="mailto:mmartinez23bio@hotmail.com?subject=Checklist%20Gato%20-%20Comentarios">mmartinez23bio<wbr>@hotmail.com</a>
               <small id="feedback-sub">Reportar errores, sugerencias o comentarios</small>
             </span>
             <button type="button" class="btn support-copy" id="copy-email" aria-label="Copiar correo de contacto">
@@ -1112,34 +1323,35 @@
         </div>
       </div>
       <button type="button" class="btn" id="cat-help" aria-haspopup="dialog">🐾 Ayuda del gato</button>
-      <details class="roadmap-details" id="roadmap-details">
-        <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
-        <div class="roadmap-grid">
-          <div class="roadmap-col">
-            <h3 id="rm-dev-title">✅ Disponible</h3>
-            <ul>
-              <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
-              <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
-            </ul>
-          </div>
-          <div class="roadmap-col">
-            <h3 id="rm-soon-title">🔜 Próximamente</h3>
-            <ul>
-              <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
-              <li id="rm-soon-2">Controles de zoom del mapa y validación de arrastre y zoom en Android real.</li>
-            </ul>
-          </div>
-          <div class="roadmap-col">
-            <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
-            <ul>
-              <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
-              <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
-            </ul>
-          </div>
-        </div>
-      </details>
     </div>
   </div>
+
+  <details class="roadmap-details" id="roadmap-details">
+    <summary class="roadmap-summary" id="roadmap-summary">🐾 Próximos pasos (Hoja de ruta)</summary>
+    <div class="roadmap-grid">
+      <div class="roadmap-col">
+        <h3 id="rm-dev-title">✅ Disponible</h3>
+        <ul>
+          <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
+          <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
+        </ul>
+      </div>
+      <div class="roadmap-col">
+        <h3 id="rm-soon-title">🔜 Próximamente</h3>
+        <ul>
+          <li id="rm-soon-1">Optimización de rendimiento para tableros con cientos o miles de listas.</li>
+          <li id="rm-soon-2">Controles de zoom del mapa y validación de arrastre y zoom en Android real.</li>
+        </ul>
+      </div>
+      <div class="roadmap-col">
+        <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
+        <ul>
+          <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
+          <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
 
   <div class="footer-legal">
     <div class="oss-seal">
@@ -1303,6 +1515,8 @@
       gripHelp: "Pulsa las flechas para mover; con Mayús, más distancia.",
       emptyStrong: "Sin listas todavía",
       emptyHint: 'Pulsa "+ Nueva lista" para empezar.',
+      catPokes: ["¡Miau!", "¿Mm?", "Prrr", "¡Ey!"],
+      catEnough: "¡Dejame dormir!",
       untitled: "Sin título",
       untitledList: "Lista sin título",
       noteTitleAria: "Título de la lista",
@@ -1486,6 +1700,8 @@
       gripHelp: "Press arrow keys to move; hold Shift for larger steps.",
       emptyStrong: "No lists yet",
       emptyHint: 'Click "+ New list" to get started.',
+      catPokes: ["Meow!", "Hm?", "Purr", "Hey!"],
+      catEnough: "Let me sleep!",
       untitled: "Untitled",
       untitledList: "Untitled list",
       noteTitleAria: "List title",
@@ -2910,12 +3126,114 @@
     if (s) s.value = "";
   }
 
+  // ---------- Gato del tablero vacío ----------
+  // Decorativo: el texto de al lado sigue explicando qué hacer.
+  // El toque suma velocidad a unos resortes, así los clics se acumulan sin dejarlo a medio camino.
+  function crearGato() {
+    const svg = document.getElementById("gato-tpl").content.firstElementChild.cloneNode(true);
+    const dicho = el("span", { className: "gato-dicho", "aria-hidden": "true" });
+    const wrap = el("span", { className: "gato-wrap" }, [svg, dicho]);
+    const rig = svg.querySelector(".gato-rig");
+    const orejas = svg.querySelectorAll(".gato-oreja-r");
+    const ojos = svg.querySelector(".gato-ojos");
+    const resorte = (k, d) => ({ x: 0, v: 0, t: 0, k, d });
+    const aplastar = resorte(260, 11), giro = resorte(130, 10), oreja = resorte(90, 6);
+    const resortes = [aplastar, giro, oreja];
+    let frame = 0, last = 0, calor = 0, ultimoToque = 0, turno = 0, dormir = 0, callar = 0;
+
+    function cuadro(now) {
+      frame = 0;
+      if (!wrap.isConnected) return;
+      const h = Math.min((now - last) / 1000, .034) / 2;
+      last = now;
+      // La oreja sigue la velocidad del cuerpo, no su posición.
+      oreja.t = Math.max(-30, Math.min(30, -giro.v * .16));
+      for (let n = 0; n < 2; n++) {
+        for (const s of resortes) { s.v += (-(s.x - s.t) * s.k - s.v * s.d) * h; s.x += s.v * h; }
+      }
+      const sq = Math.max(-.3, Math.min(.3, aplastar.x));
+      const rot = Math.max(-24, Math.min(24, giro.x));
+      rig.setAttribute("transform", `translate(120 184) rotate(${rot}) scale(${1 + sq * .82} ${1 - sq}) translate(-120 -184)`);
+      orejas.forEach(o => o.setAttribute("transform", `rotate(${oreja.x} 84 74)`));
+      ojos.setAttribute("transform", `translate(${Math.max(-6, Math.min(6, rot * .5))} 0)`);
+      if (resortes.some(s => Math.abs(s.x - s.t) > .002 || Math.abs(s.v) > .02)) {
+        frame = requestAnimationFrame(cuadro);
+      } else {
+        rig.removeAttribute("transform");
+        orejas.forEach(o => o.removeAttribute("transform"));
+        ojos.removeAttribute("transform");
+      }
+    }
+
+    svg.addEventListener("pointerdown", e => {
+      const now = performance.now();
+      calor = Math.max(0, calor - (now - ultimoToque) / 1000 * .45) + 1;
+      ultimoToque = now;
+      wrap.classList.add("despierto");
+      const dichos = tr("catPokes");
+      dicho.textContent = calor >= 5 ? tr("catEnough") : dichos[turno++ % dichos.length];
+      dicho.classList.remove("ver");
+      void dicho.offsetWidth;
+      dicho.classList.add("ver");
+      clearTimeout(callar);
+      callar = setTimeout(() => dicho.classList.remove("ver"), 1100);
+      clearTimeout(dormir);
+      dormir = setTimeout(() => wrap.classList.remove("despierto"), 5000);
+      if (reducedFeedback.matches) return;
+      const caja = svg.getBoundingClientRect();
+      const lado = Math.max(-1, Math.min(1, (e.clientX - caja.left - caja.width / 2) / (caja.width / 2)));
+      giro.v += lado * 170;
+      aplastar.v = Math.min(aplastar.v + 6, 6.5);
+      if (!frame) { last = now; frame = requestAnimationFrame(cuadro); }
+    });
+    return wrap;
+  }
+
+  function lugarDelGato() {
+    return notes.length ? null : document.querySelector("#notes .gato")?.getBoundingClientRect() || null;
+  }
+
+  // Al crear la primera lista: se despierta, salta hasta la tarjeta y le da un cabezazo.
+  // Va por encima sin capturar punteros, así que no le quita el foco a quien está escribiendo.
+  function saltoDelGato(desde, nota) {
+    if (!desde || !nota || reducedFeedback.matches || !nota.animate) return;
+    const gato = crearGato();
+    gato.classList.add("despierto", "gato-saltarin");
+    gato.setAttribute("aria-hidden", "true");
+    gato.style.left = desde.left + "px";
+    gato.style.top = desde.top + "px";
+    gato.style.width = desde.width + "px";
+    document.body.append(gato);
+    const tarjeta = nota.getBoundingClientRect();
+    const s = Math.min(.5, 110 / desde.width), alto = desde.height;
+    const dx = tarjeta.left + tarjeta.width / 2 - (desde.left + desde.width / 2);
+    // Las orejas empiezan un 15 % por debajo del borde del dibujo; el golpe llega aplastado.
+    const dy = tarjeta.bottom - 2 + alto * s * .82 * .85 - desde.bottom;
+    const paso = (x, y, sx, sy, offset, easing) => ({ transform: `translate(${x}px,${y}px) scale(${sx},${sy})`, offset, easing });
+    gato.animate([
+      paso(0, 0, 1, 1, 0, "ease-out"),
+      paso(0, 0, 1.08, .86, .12, "ease-out"),
+      paso(dx * .5, Math.min(dy, 0) - 50, .74, .86, .36, "ease-in"),
+      paso(dx, dy, s * 1.12, s * .82, .54, "ease-out"),
+      paso(dx, dy + 18, s, s, .68, "ease-in-out"),
+      { ...paso(dx, dy + 6, s * 1.03, s * .95, .8, "ease-in"), opacity: 1 },
+      { ...paso(dx, dy + 70, s, s, 1), opacity: 0 }
+    ], { duration: 1000, fill: "both" }).finished.catch(() => {}).finally(() => gato.remove());
+    nota.animate([
+      { transform: "translateY(0)", easing: "ease-out" },
+      { transform: "translateY(-9px)", easing: "ease-in" },
+      { transform: "translateY(2px)", easing: "ease-out" },
+      { transform: "translateY(0)" }
+    ], { duration: 280, delay: 530 });
+  }
+
   function render(focusId) {
     const root = document.getElementById("notes");
     computeTagCounts();
     const visible = visibleNotes();
     if (notes.length === 0) {
-      root.replaceChildren(el("p", { className: "empty" }, [
+      root.replaceChildren(el("p", { className: "empty empty-gato" }, [
+        crearGato(),
         el("strong", { textContent: tr("emptyStrong") }),
         document.createTextNode(tr("emptyHint"))
       ]));
@@ -2972,9 +3290,18 @@
     ]);
   }
 
+  // Sello de pata de una lista completa; solo adorno, el avance ya lo anuncia la barra.
+  function renderStamp(note) {
+    if (!note.items.length || note.items.some(i => !i.done)) return null;
+    return el("span", { className: "note-stamp", "aria-hidden": "true" }, [icon("i-paw")]);
+  }
+
   // Reemplaza/inserta la barra sin re-renderizar la tarjeta (conserva el foco).
   function syncProgress(note, section) {
     if (!section) return;
+    const stamp = renderStamp(note), curStamp = section.querySelector(".note-stamp");
+    if (stamp && !curStamp) section.querySelector(".visual-lock-controls")?.append(stamp);
+    else if (!stamp && curStamp) curStamp.remove();
     const fresh = renderProgress(note);
     const cur = section.querySelector(".note-progress");
     if (cur) { if (fresh) cur.replaceWith(fresh); else cur.remove(); return; }
@@ -3120,7 +3447,8 @@
           unlockedVisual.delete(note); openPopId = null; invalidateLayoutUndo(); render("unlock-"+note.id);
         }
       }, [icon("i-lock")]),
-      ...(note.visualLock ? [el("button", {type:"button",className:"btn",textContent:tr("removePin"),onclick:()=>removeVisualPin(note)})] : [])
+      ...(note.visualLock ? [el("button", {type:"button",className:"btn",textContent:tr("removePin"),onclick:()=>removeVisualPin(note)})] : []),
+      ...[renderStamp(note)].filter(Boolean)
     ]);
     const children = [
       el("div", { className: "note-head" }, [grip, title, pinBtn, styleBtn, connectBtn, delNote]),
@@ -3247,6 +3575,7 @@
         item.done = e.target.checked; touch(note); save(); render();
         const fresh = document.querySelector('.note[data-id="' + CSS.escape(note.id) + '"] .item[data-item-id="' + CSS.escape(item.id) + '"]');
         fresh?.querySelector('input[type="checkbox"]')?.focus();
+        if (item.done) document.querySelector('.note[data-id="' + CSS.escape(note.id) + '"] .note-stamp')?.classList.add("stamp-in");
         if (item.done && !matchMedia("(prefers-reduced-motion: reduce)").matches && fresh) {
           fresh.classList.add("just-completed");
           fresh.addEventListener("animationend", () => fresh.classList.remove("just-completed"), {once:true});
@@ -3512,10 +3841,13 @@
     clearSearch();
     const note = normalizeNote({ id: uid(), title: "", items: [], showDone: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
     if (viewMode === "map") { const k = notes.length; note.pos = { x: 24 + (k % 6) * 28, y: 24 + (k % 6) * 28 }; }
+    const gato = lugarDelGato();
     notes.unshift(note);
     save();
     render("title-" + note.id);
-    fadeFeedback(document.getElementById("title-" + note.id)?.closest(".note"));
+    const card = document.getElementById("title-" + note.id)?.closest(".note");
+    fadeFeedback(card);
+    saltoDelGato(gato, card);
   }
 
   async function openTemplates() {
@@ -3533,10 +3865,13 @@
       showDone: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
     });
     if (viewMode === "map") { const k = notes.length; note.pos = { x: 24 + (k % 6) * 28, y: 24 + (k % 6) * 28 }; }
+    const gato = lugarDelGato();
     notes.unshift(note);
     save();
     render("title-" + note.id);
-    fadeFeedback(document.getElementById("title-" + note.id)?.closest(".note"));
+    const card = document.getElementById("title-" + note.id)?.closest(".note");
+    fadeFeedback(card);
+    saltoDelGato(gato, card);
   }
   document.getElementById("templates").addEventListener("click", openTemplates);
 

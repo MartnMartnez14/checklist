@@ -1540,6 +1540,51 @@
     await sleep(120);
   }
 
+  async function t_gato_vacio() {
+    await boot([]);
+    resetLanguage();
+    var empty = cd.querySelector("#notes .empty");
+    var wrap = empty && empty.querySelector(".gato-wrap");
+    assert(wrap, "falta el gato en el tablero vacío");
+    assert(/Sin listas todav/.test(empty.textContent), "el gato no debe quitar el texto");
+    var svg = wrap.querySelector("svg");
+    assert(svg.getAttribute("aria-hidden") === "true", "el gato debe ser decorativo");
+    assert(!wrap.classList.contains("despierto"), "el gato debe empezar dormido");
+    var rect = svg.getBoundingClientRect();
+    for (var i = 0; i < 6; i++) svg.dispatchEvent(new cw.PointerEvent("pointerdown", { bubbles: true, clientX: rect.right - 4, clientY: rect.top + 40 }));
+    assert(wrap.classList.contains("despierto"), "el toque no lo despertó");
+    assert(wrap.querySelector(".gato-dicho").textContent.length > 0, "el toque no dijo nada");
+    assert(await waitFor(() => !wrap.querySelector(".gato-rig").hasAttribute("transform"), 5000), "los resortes no volvieron a reposo");
+    cd.getElementById("new-note").click();
+    assert(!cd.querySelector("#notes .gato"), "el gato debe irse al crear una lista");
+    assert(cd.activeElement && /^title-/.test(cd.activeElement.id), "el salto no debe quitar el foco del título");
+    assert(cw.getComputedStyle(cd.activeElement).borderBottomColor !== "rgba(0, 0, 0, 0)", "el título enfocado debe seguir marcado");
+    assert(await waitFor(() => !cd.querySelector(".gato-saltarin"), 2500), "el gato del salto quedó en el DOM");
+    var card = cd.querySelector(".note");
+    assert(!card.getAnimations().length, "la tarjeta quedó animada");
+  }
+
+  async function t_note_stamp() {
+    await boot([note("a", "Lista", ["uno", "dos"], {})]);
+    var card = () => cd.querySelector('[data-id="a"]');
+    var boxes = () => card().querySelectorAll('.item input[type="checkbox"]:not(:checked)');
+    assert(!card().querySelector(".note-stamp"), "sello antes de completar");
+    boxes()[0].click();
+    await sleep(30);
+    assert(!card().querySelector(".note-stamp"), "sello con tareas pendientes");
+    boxes()[0].click();
+    await sleep(30);
+    var stamp = card().querySelector(".visual-lock-controls .note-stamp");
+    assert(stamp && stamp.getAttribute("aria-hidden") === "true", "falta el sello al completar");
+    var del = card().querySelector(".note-head .icon-btn:last-child");
+    assert(stamp.offsetTop >= del.offsetTop + del.offsetHeight - 1, "el sello no debe tapar los botones");
+    assert(cw.getComputedStyle(stamp).pointerEvents === "none", "el sello no debe capturar punteros");
+    card().querySelector('.item input[type="checkbox"]:checked').click();
+    await sleep(30);
+    assert(!card().querySelector(".note-stamp"), "el sello debe irse al desmarcar");
+    assert(!stored()[0].stamp, "el sello no se guarda en los datos");
+  }
+
   // ---------------------------------------------------------------- runner
   var tests = [
     ["merge-metadata-newer", t_probe_merge_metadata_newer],
@@ -1598,7 +1643,9 @@
     ["image-visibility-backup", t_image_visibility_backup],
     ["redesign-structure", t_redesign_structure],
     ["redesign-mobile", t_redesign_mobile],
-    ["redesign-theme", t_redesign_theme]
+    ["redesign-theme", t_redesign_theme],
+    ["gato-vacio", t_gato_vacio],
+    ["note-stamp", t_note_stamp]
   ];
 
   var watchdog = setTimeout(function () {
