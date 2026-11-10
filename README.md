@@ -5,7 +5,9 @@
 - **Aplicación web:** [https://checklistgato.com](https://checklistgato.com/)
 - **Código fuente (100 % Open Source y auditable):** [https://github.com/MartnMartnez14/checklist](https://github.com/MartnMartnez14/checklist)
 
-**Publicación actual — 2026-11-03:** tarjeta de contacto de WhatsApp en el footer (`wa.me/59892663680`, visible como `092 663 680` / `+598 92 663 680` y botón Copiar ES/EN), sobre el rediseño editorial publicado el `2026-10-30` (header de dos filas inspirado en Builderstable, lienzo con grilla de puntos y wordmark gigante al estilo Buzz, y footer en columnas con wordmark recortado y gatos flotantes al estilo Turion). Se conservan ambos temas, los 10 colores de lista y todos los datos. Caché `checklist-v20` (commit `50c8bd9`); rediseño editorial en commit `a5f5def` ([despliegue Pages completado](https://github.com/MartnMartnez14/checklist/actions/runs/41112613399)). 57/57 pruebas locales y 57/57 en la web pública con tiempo real. Evidencia y límites en ROADMAP.md.
+**Publicación actual — 2026-11-10:** tercera vista **Calendario** (`CAT-18`) con almanaque mensual literal, fondo dinámico con estética editorial/laboratorio (trama *dither* + retícula técnica calibrada para Modo Día y Modo Noche), imágenes de fondo en casillas (con selección aleatoria si hay múltiples imágenes el mismo día), píldoras y pop-up interactivo por día con visualización de conexiones por etiquetas/manuales y marcado de tareas en vivo. Caché `checklist-v22`; suite automatizada `58/58 PASS` en Chrome con tiempo real. Evidencia y detalles en [ROADMAP.md](ROADMAP.md) y [CHANGELOG.md](CHANGELOG.md).
+
+**Antecedente de publicación — 2026-11-03:** tarjeta de contacto de WhatsApp en el footer (`wa.me/59892663680`, visible como `092 663 680` / `+598 92 663 680` y botón Copiar ES/EN), sobre el rediseño editorial publicado el `2026-10-30` (header de dos filas inspirado en Builderstable, lienzo con grilla de puntos y wordmark gigante al estilo Buzz, y footer en columnas con wordmark recortado y gatos flotantes al estilo Turion). Caché `checklist-v20` (commit `50c8bd9`); rediseño editorial en commit `a5f5def` ([despliegue Pages completado](https://github.com/MartnMartnez14/checklist/actions/runs/41112613399)). 57/57 pruebas locales y 57/57 en la web pública con tiempo real.
 
 **Antecedente de publicación — 2026-10-27:** imagen completa de fondo con letras negras/blancas automáticas y contorno fino, sin paneles ni mezcla de color; caché `checklist-v18`. Sin imagen se conserva el estilo de color. [Despliegue completado](https://github.com/MartnMartnez14/checklist/actions/runs/40575181195); 54/54 pruebas locales normal y reducido y 54/54 en la web pública con tiempo normal. Recarga offline verificada con imágenes de prueba.
 
@@ -47,16 +49,17 @@ Dado que no hay un servidor intermediario, el traslado de información entre tus
   - **Reordenamiento intuitivo:** Arrastrá cada tarea desde su asa lateral `≡` con el ratón o pantalla táctil, o reordenala con el teclado (`↑` / `↓` sobre el asa; con `Shift` se mueve de a 3 posiciones).
   - **Fecha y hora de creación:** Visible en la parte superior de cada nota en horario local (respetando notas antiguas sin inventarles fecha).
   - **Progreso por lista:** Barra discreta y contador `completados/total` en cada tarjeta con elementos.
-  - **Atajos de teclado:** `N` nueva lista, `G` vista cuadrícula, `M` vista mapa, `/` buscar y `?` para ver la ayuda (se desactivan mientras escribís).
+  - **Atajos de teclado:** `N` nueva lista, `G` vista cuadrícula, `M` vista mapa, `C` vista calendario, `/` buscar y `?` para ver la ayuda (se desactivan mientras escribís).
   - **Buscador global:** Filtrá al instante por título, tarea o etiqueta, sin importar mayúsculas ni acentos (`Escape` limpia el filtro).
   - **Plantillas rápidas:** Creá listas de Compras, Estudios, Proyectos, Hábitos, Viajes u Organización personal con ítems de ejemplo editables (incluye Pomodoro, hábitos saludables y checklist de viaje).
   - **Editor ampliado:** Abrí cualquier ítem largo en un modal cómodo para leerlo y editarlo sin perder el contexto.
   - **Listas fijadas:** Fijá hasta 3 listas para que queden siempre primero; las fijadas lucen un borde holográfico tipo carta legendaria (con versión estática si reducís el movimiento).
-- **Dos modos de visualización:**
-  - **Vista Cuadrícula:** Tablero organizado automáticamente en columnas adaptables.
-  - **Vista Mapa:** Lienzo libre donde podés arrastrar y ubicar cada lista donde quieras (con ratón, pantalla táctil o flechas del teclado).
-  - **Ordenar mapa:** agrupa listas conectadas manualmente o por etiquetas, con al menos 40 px entre tarjetas y 64 px entre grupos. Conserva su tamaño legible; desplazate para recorrer todo el tablero. Se desactiva durante búsquedas y arrastres.
-  - **Deshacer orden:** restaura las posiciones anteriores durante la sesión; deja de estar disponible al editar listas, cambiar tamaños o mover tarjetas.
+- **Tres modos de visualización:**
+  - **Vista Cuadrícula (`G`):** Tablero organizado automáticamente en columnas adaptables.
+  - **Vista Mapa (`M`):** Lienzo libre donde podés arrastrar y ubicar cada lista donde quieras (con ratón, pantalla táctil o flechas del teclado).
+    - **Ordenar mapa:** agrupa listas conectadas manualmente o por etiquetas, con al menos 40 px entre tarjetas y 64 px entre grupos. Conserva su tamaño legible; desplazate para recorrer todo el tablero. Se desactiva durante búsquedas y arrastres.
+    - **Deshacer orden:** restaura las posiciones anteriores durante la sesión; deja de estar disponible al editar listas, cambiar tamaños o mover tarjetas.
+  - **Vista Calendario (`C`):** Almanaque mensual literal con fondo dinámico y estructura editorial de laboratorio (adaptado a Modo Día y Modo Noche), estadísticas del mes, casillas diarias con píldoras de color/imagen, barra de progreso diaria y pop-up interactivo al hacer clic en cualquier día (con marcado de tareas en vivo, imágenes de fondo, conexiones por etiquetas/manuales y botón para crear una nueva lista en esa fecha).
 - **Conexiones entre listas (Grafo estilo Obsidian):**
   - **Manuales:** Tocá el ícono de cadena en una lista y luego hacé clic en otra para unirlas con una flecha curva interactiva.
   - **Automáticas por etiquetas (`tags`):** Si dos o más listas comparten una etiqueta (ej. `proyecto`, `compras`), se conectan automáticamente con línea punteada del color de esa etiqueta.
@@ -116,14 +119,14 @@ El proyecto cuenta con una batería de pruebas end-to-end que se ejecuta en un n
 bash tests/run.sh
 ```
 
-Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `tests/cdp-run.mjs` en tiempo real y espera a que el harness marque `DONE`. Levanta un servidor temporal y ejecuta los 57 casos de `tests/harness.html`. La versión v19 publicada aprobó 57/57 en Chrome local y 57/57 en la web pública con tiempo real; incluye imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento, conexiones y tres comprobaciones nuevas del rediseño (estructura, móvil y temas). El ejecutor alternativo con reloj virtual conserva antecedentes de esperas intermitentes. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
+Requiere `google-chrome` y `python3`; si hay Node 24 disponible, `run.sh` usa `tests/cdp-run.mjs` en tiempo real y espera a que el harness marque `DONE`. Levanta un servidor temporal y ejecuta los 58 casos de `tests/harness.html`. La versión v22 aprueba 58/58 en Chrome local con tiempo real; incluye la nueva vista Calendario (`calendar-view`), imágenes claras/oscuras, mixtas, transparentes y dañadas, PIN visual, importación, ordenamiento, conexiones, las tres comprobaciones del rediseño editorial (estructura, móvil y temas) y la tarjeta de contacto por WhatsApp. El ejecutor alternativo con reloj virtual conserva antecedentes de esperas intermitentes. Estas pruebas no equivalen a validación física en Android ni auditoría WCAG integral.
 
 ---
 
 ## ❤️ Apoyar el proyecto y contacto
 
 Checklist Gato es un proyecto independiente, gratuito y de código abierto:
-- **Colaboraciones voluntarias:** Al pie de la aplicación encontrás las opciones (Ko-fi, PayPal, referido de Starlink y cuenta Prex `35502`).
+- **Colaboraciones voluntarias:** Al pie de la aplicación encontrás las opciones (Ko-fi, PayPal, referido de Starlink, cuenta Prex `35502` y cuenta de Mercado Pago).
 - **Reportar errores, sugerencias o comentarios:** Podés escribir directamente al desarrollador a **`mmartinez23bio@hotmail.com`** (con enlace directo y botón para copiar el correo en el footer).
 - **Contacto de negocio por WhatsApp:** **`092 663 680`** (formato internacional **`+598 92 663 680`**). El footer incluye enlace directo al chat y botón para copiar el número.
 

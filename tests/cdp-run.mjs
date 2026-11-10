@@ -1,6 +1,12 @@
+// ============================================================
+// ARNÉS DE PRUEBAS AUTOMATIZADAS (CDP / CHROME DEVTOOLS PROTOCOL)
+// ============================================================
 // Ejecutor en tiempo real para tests/harness.html.
-// Espera a que el harness marque document.title = "DONE" y vuelca el DOM.
-// Usa solo Node 24+ (fetch y WebSocket globales), sin dependencias npm.
+// Lanza una instancia de google-chrome en modo headless aislado con un perfil temporal,
+// establece conexión vía WebSocket sobre Chrome DevTools Protocol (CDP),
+// sondea la finalización de los casos (document.title === "DONE") y vuelca el DOM
+// generado a un archivo HTML temporal para su análisis por tests/run.sh.
+// Diseño técnico: cero dependencias externas de npm (Node 24+ nativo).
 import { spawn } from "node:child_process";
 import { mkdtemp, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";

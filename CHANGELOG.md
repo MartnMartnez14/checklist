@@ -1,5 +1,12 @@
 # Historial de cambios
 
+## 2026-11-10 — Tercera vista «Calendario» con almanaque mensual, fondo dinámico y pop-up diario (CAT-18)
+- **Tercera vista en la barra superior (`#view-calendar`, atajo `C`):** incorpora un almanaque mensual literal de 7 columnas (lunes a domingo) junto a Cuadrícula y Mapa, con persistencia en `localStorage` (`checklist-view`), navegación por mes (`◀`, `Hoy`, `▶`), estadísticas del mes y acceso a listas antiguas sin fecha.
+- **Estética editorial de laboratorio y fondo dinámico (`.cal-almanac` / `.cal-ambient`):** retícula técnica tipo *blueprint* con miras de calibración (`+`), trama *dither / halftone*, tres halos ambientales en movimiento suave (`@keyframes cal-ambient-drift`), marca de agua del mes/año y encabezados indexados (`01 LUN`..`07 DOM`), calibrados tanto para Modo Día (cálido y luminoso) como para Modo Noche (baja luminancia y descanso visual) y respetando `prefers-reduced-motion`.
+- **Imágenes de fondo y selección aleatoria en celdas diarias:** las casillas del día (`.cal-day.has-bg`), las píldoras (`.cal-pill.has-bg`) y las tarjetas del pop-up (`.cal-popup-card.has-bg`) muestran las imágenes de fondo de las listas con contraste de texto automático (`--image-ink`). Cuando un día tiene varias listas con diferentes imágenes, la celda del calendario selecciona una al azar en cada renderizado.
+- **Pop-up interactivo por día (`openCalendarDayDialog`):** al hacer clic en cualquier día se abre un modal con las listas de esa fecha, permitiendo tildar/destildar tareas en vivo sin perder el fondo de imagen, visualizar conexiones por etiquetas/manuales mediante bordes `.has-edge`, insignias `.cal-rel-chip` y curvas SVG laterales (`.cal-popup-links`), abrir la lista en el tablero o crear una nueva lista asignada a ese día.
+- **Saneamiento de DOM y Service Worker:** el helper `el()` filtra hijos nulos o booleanos falsos para evitar nodos de texto `"null"`. Caché actualizada a `checklist-v22`; suite automatizada ampliada a `58/58 PASS` (`calendar-view`).
+
 ## 2026-11-03 — Contacto por WhatsApp en el footer
 - Nueva tarjeta de WhatsApp en la columna de contacto, junto al correo: enlace directo a `wa.me/59892663680`, número visible `092 663 680` y subtítulo con formato internacional `+598 92 663 680`.
 - Botón «Copiar» con el mismo fallback de portapapeles del resto de las tarjetas; copia `+598 92 663 680`. Textos y `aria-label` traducidos en ES/EN.

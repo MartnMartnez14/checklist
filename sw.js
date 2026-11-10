@@ -1,10 +1,28 @@
-const CACHE = "checklist-v20";
-const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./cat-day.png", "./cat-night.png"];
+// ============================================================
+// SERVICE WORKER: ADMINISTRACIÓN DE CACHÉ OFFLINE Y CICLO DE VIDA
+// ============================================================
+// Estrategia híbrida:
+// 1. Documento HTML (navegación): Network-first con fallback a caché (garantiza versión fresca al estar online).
+// 2. Recursos estáticos (assets): Cache-first con actualización en segundo plano vía fetch.
+// 3. Purga administrativa: al activarse una nueva versión (v22), se eliminan automáticamente cachés obsoletas.
 
+const CACHE = "checklist-v22";
+const ASSETS = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./cat-day.png",
+  "./cat-night.png"
+];
+
+// Instalación: precarga de activos esenciales y activación inmediata (skipWaiting).
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
 });
 
+// Activación: purga de cachés anteriores y toma de control de clientes activos (clients.claim).
 self.addEventListener("activate", e => {
   e.waitUntil(
     caches.keys()
@@ -13,6 +31,7 @@ self.addEventListener("activate", e => {
   );
 });
 
+// Intercepción de solicitudes de red (fetch):
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
 

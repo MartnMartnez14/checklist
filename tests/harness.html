@@ -1540,6 +1540,113 @@
     await sleep(120);
   }
 
+  async function t_calendar_view() {
+    var d1 = new Date(2026, 10, 10, 10, 30, 0).toISOString();
+    var d2 = new Date(2026, 10, 15, 16, 0, 0).toISOString();
+    var n1 = note("c1", "Compras del mes", ["Leche", "Café"], { createdAt: d1, color: 2, tags: ["hogar"] });
+    n1.items[0].done = true;
+    var n2 = note("c2", "Proyecto secreto", ["Clave"], {
+      createdAt: d1,
+      visualLock: { version: 1, salt: "00112233445566778899aabbccddeeff", verifier: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef" }
+    });
+    var n3 = note("c3", "Limpieza general", [], { createdAt: d1, tags: ["hogar"] });
+    var n4 = note("c4", "Entrega final", ["Revisar"], { createdAt: d2 });
+    await boot([n1, n2, n3, n4]);
+    resetLanguage();
+
+    // Cargar imágenes de fondo en c1 y c3 para verificar que cada píldora tiene su imagen y la celda elige aleatoriamente una de las disponibles.
+    cd.querySelector('.note[data-id="c1"] .note-design').click();
+    await sleep(30);
+    var png = new cw.Blob([Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII="), function (c) { return c.charCodeAt(0); })], { type: "image/png" });
+    var file = cd.querySelector(".pop input[type=file]"), dt = new cw.DataTransfer();
+    dt.items.add(new cw.File([png], "cal-bg.png", { type: "image/png" }));
+    file.files = dt.files;
+    file.dispatchEvent(new cw.Event("change", { bubbles: true }));
+    assert(await waitFor(function () { return stored().find(function (n) { return n.id === "c1"; }).bgId; }, 5000), "no se guardó imagen en c1");
+
+    cd.querySelector('.note[data-id="c3"] .note-design').click();
+    await sleep(30);
+    var file3 = cd.querySelector(".pop input[type=file]"), dt3 = new cw.DataTransfer();
+    dt3.items.add(new cw.File([png], "cal-bg-3.png", { type: "image/png" }));
+    file3.files = dt3.files;
+    file3.dispatchEvent(new cw.Event("change", { bubbles: true }));
+    assert(await waitFor(function () { return stored().find(function (n) { return n.id === "c3"; }).bgId; }, 5000), "no se guardó imagen en c3");
+
+    var calBtn = cd.getElementById("view-calendar");
+    assert(calBtn, "falta el botón #view-calendar");
+    assert(calBtn.getAttribute("aria-keyshortcuts") === "C", "falta aria-keyshortcuts C");
+    calBtn.click();
+    await sleep(60);
+
+    var main = cd.getElementById("notes");
+    assert(main.classList.contains("calendar-mode"), "no activó la clase calendar-mode");
+    assert(calBtn.getAttribute("aria-pressed") === "true", "aria-pressed en view-calendar incorrecto");
+    assert(localStorage.getItem(VIEW_KEY) === "calendar", "no persistió la vista calendar en localStorage");
+
+    var almanac = cd.querySelector(".cal-almanac");
+    assert(almanac, "no se renderizó el almanaque .cal-almanac");
+    assert(almanac.querySelector(".cal-ambient") && almanac.querySelectorAll(".cal-ambient-orb").length === 3,
+      "falta el fondo dinámico .cal-ambient en el calendario");
+    assert(almanac.querySelector(".cal-kicker"), "falta el indicador técnico .cal-kicker en el calendario");
+    assert(!/\bnull\b/.test(almanac.textContent), "aparece texto literal 'null' en el almanaque: " + almanac.textContent);
+    assert(cd.querySelectorAll(".cal-weekday").length === 7, "debe haber 7 encabezados de día de semana");
+    var days = cd.querySelectorAll(".cal-day");
+    assert(days.length >= 28 && days.length % 7 === 0, "cuadrícula de días inválida: " + days.length);
+
+    var day10 = cd.querySelector('.cal-day[data-date="2026-11-10"]');
+    assert(day10 && day10.classList.contains("has-notes"), "el día 2026-11-10 debe tener notas");
+    var pills10 = day10.querySelectorAll(".cal-pill");
+    assert(pills10.length === 3, "el día 10 debe mostrar 3 píldoras: " + pills10.length);
+    assert(day10.textContent.includes("Compras del mes"), "falta título de nota abierta en píldora");
+    assert(!day10.textContent.includes("Proyecto secreto"), "se filtró título de nota con PIN en el calendario");
+
+    // Verificar que la imagen de fondo se aplica tanto a la celda del día (eligiendo entre c1 y c3) como a las píldoras de c1 y c3.
+    var pillC1 = day10.querySelector('.cal-pill[data-note-id="c1"]');
+    var pillC3 = day10.querySelector('.cal-pill[data-note-id="c3"]');
+    assert(await waitFor(function () { return pillC1.classList.contains("has-bg") && pillC3.classList.contains("has-bg") && day10.classList.contains("has-bg"); }, 5000),
+      "la imagen de fondo no se aplicó a las píldoras o celda del calendario");
+    assert(day10.dataset.bgNoteId === "c1" || day10.dataset.bgNoteId === "c3",
+      "la celda del día no eligió aleatoriamente entre las notas con imagen: " + day10.dataset.bgNoteId);
+
+    // Al hacer clic en el día 10 se abre el pop-up con sus listas, imagen de fondo y conexiones por tags.
+    day10.click();
+    await sleep(80);
+    var scrim = cd.querySelector(".dialog-scrim");
+    assert(scrim, "hacer clic en un día no abrió el pop-up");
+    assert(!/\bnull\b/.test(scrim.textContent), "aparece texto literal 'null' en el pop-up: " + scrim.textContent);
+    var cards = scrim.querySelectorAll(".cal-popup-card");
+    assert(cards.length === 3, "el pop-up debe mostrar las 3 listas del día 10");
+    assert(scrim.textContent.includes("Compras del mes"), "falta la lista abierta en el pop-up");
+    assert(!scrim.textContent.includes("Proyecto secreto"), "se filtró título bloqueado en el pop-up");
+    assert(!scrim.textContent.includes("Clave"), "se filtró ítem bloqueado en el pop-up");
+
+    var popupCardC1 = scrim.querySelector('.cal-popup-card[data-id="c1"]');
+    assert(await waitFor(function () { return popupCardC1.classList.contains("has-bg"); }, 5000),
+      "la tarjeta c1 en el pop-up no mostró su imagen de fondo (.has-bg)");
+    assert(popupCardC1.classList.contains("has-edge"), "la tarjeta c1 en el pop-up no mostró borde de conexión (.has-edge)");
+    assert(scrim.querySelectorAll(".cal-rel-chip").length >= 2, "faltan chips de relación por tag en el pop-up");
+    assert(scrim.querySelectorAll(".cal-popup-links .edge-line").length === 1, "falta curva SVG de conexión entre c1 y c3 en el pop-up");
+
+    // Marcar la segunda tarea desde el pop-up actualiza el progreso sin perder la imagen.
+    var chks = popupCardC1.querySelectorAll('input[type="checkbox"]');
+    assert(chks.length === 2, "deben verse los 2 checkboxes de c1 en el pop-up");
+    chks[1].click();
+    await sleep(40);
+    assert(stored().find(function (n) { return n.id === "c1"; }).items[1].done === true, "el checkbox del pop-up no guardó el cambio");
+    assert(popupCardC1.classList.contains("has-bg"), "al tildar tarea se perdió .has-bg en la tarjeta del pop-up");
+
+    // Cerrar pop-up y probar navegación de meses.
+    cd.dispatchEvent(new cw.KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await sleep(40);
+    assert(!cd.querySelector(".dialog-scrim"), "Escape no cerró el pop-up del día");
+
+    var titleBefore = cd.getElementById("cal-month-title").textContent;
+    cd.getElementById("cal-prev").click();
+    await sleep(40);
+    var titleAfter = cd.getElementById("cal-month-title").textContent;
+    assert(titleAfter !== titleBefore, "el botón mes anterior no cambió el mes");
+  }
+
   // ---------------------------------------------------------------- runner
   var tests = [
     ["merge-metadata-newer", t_probe_merge_metadata_newer],
@@ -1598,7 +1705,8 @@
     ["image-visibility-backup", t_image_visibility_backup],
     ["redesign-structure", t_redesign_structure],
     ["redesign-mobile", t_redesign_mobile],
-    ["redesign-theme", t_redesign_theme]
+    ["redesign-theme", t_redesign_theme],
+    ["calendar-view", t_calendar_view]
   ];
 
   var watchdog = setTimeout(function () {

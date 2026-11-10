@@ -1,6 +1,6 @@
 # Arquitectura y flujo de desarrollo de Checklist Gato
 
-Documento de referencia para comprender y mantener el proyecto. Revisado el 2026-10-26. Distingue el comportamiento actual de las decisiones pendientes del [roadmap](ROADMAP.md).
+Documento de referencia para comprender y mantener el proyecto. Revisado el 2026-11-10 (estado publicado `checklist-v22`). Distingue el comportamiento actual de las decisiones pendientes del [roadmap](ROADMAP.md).
 
 ## 1. Arquitectura actual
 
@@ -18,7 +18,7 @@ Checklist Gato es una PWA estática, sin backend propio, cuentas ni sincronizaci
 | PIN visual actual | Verificador con sal, contenido sin cifrar y desbloqueo en memoria; no equivale a protección criptográfica |
 | Uso offline | `sw.js`: red primero para documentos, con respaldo en caché; caché primero para recursos estáticos |
 | Instalación y dominio | `manifest.json`, iconos y `CNAME` |
-| Regresión | `tests/run.sh` y `tests/harness.html`, ejecutados con Python y Chrome headless |
+| Regresión | `tests/run.sh`, `tests/harness.html` y `tests/cdp-run.mjs`, ejecutados con Python, Node 24+ (CDP) y Chrome headless |
 
 Estas son responsabilidades lógicas dentro del archivo principal; no se presentan como módulos físicos separados ni se prescribe dividirlo ahora.
 
@@ -203,3 +203,19 @@ Los tokens de color y las pilas tipográficas locales viven en `:root` y `:root[
 La suite pasa a 57 casos. `tests/run.sh` usa `tests/cdp-run.mjs` (Node 24) para esperar el `DONE` real del harness y evitar falsos negativos de decodificación de imágenes del reloj virtual; si Node no está disponible, conserva el ejecutor anterior con `--virtual-time-budget`. Resultado local: 57/57 PASS.
 
 La publicación siguió `codex/diseno-editorial` → `codex/dev-offline` → `main` por fast-forward, con commit funcional `a5f5def3f963102bd8a65d6dd8e804f38c65d201` y [Pages 41112613399](https://github.com/MartnMartnez14/checklist/actions/runs/41112613399). El harness público aprobó 57/57; se verificaron la caché `checklist-v19`, el manifest, las capturas 1440/390 px en ambos temas y una recarga offline con `navigator.onLine === false`. Sin cambios de esquema, force push ni validación en Android físico, Safari o lector de pantalla.
+
+## Contacto de WhatsApp y mantenimiento administrativo — 2026-11-03 / 2026-11-09
+
+El 2026-11-03 se incorporó en la columna de contacto del footer la tarjeta de WhatsApp (`wa.me/59892663680`, visible como `092 663 680` / `+598 92 663 680` y botón `#copy-whatsapp` con traducción ES/EN), actualizando la caché del Service Worker a `checklist-v20` (commit funcional `50c8bd9` y sincronización documental `f710e29`) y ampliando las aserciones del footer en `tests/harness.html` (`57/57 PASS`).
+
+El 2026-11-09 se ejecutó un cierre de mantenimiento administrativo y documental:
+- **Comentarios técnicos de mantenibilidad:** consolidados en `index.html` (persistencia en `localStorage`, manejo defensivo de cuotas, recolector de basura `gcImages` en `IndexedDB`, interoperabilidad Schema v2 y secuencia de arranque), `sw.js` (ciclo de vida y estrategia híbrida de caché) y `tests/cdp-run.mjs` (arnés CDP en tiempo real sin dependencias externas).
+- **Higiene de worktrees y ramas de tarea:** verificada la integración completa en `main` de los tres worktrees históricos (`pin-mapa`, `estilo-legibilidad` y `diseno-editorial`), se retiraron dichos directorios de trabajo obsoletos y sus ramas temporales locales, conservando limpios y sincronizados el worktree principal (`main`) y el de integración (`codex/dev-offline`).
+- **Etiquetado de versiones (`git tag`):** creados los tags anotados de referencia histórica (`v1.0` a `v1.3`) conforme a la Etapa 8.2 del roadmap (`CAT-11`).
+
+## Tercera vista «Calendario» (`CAT-18`) — 2026-11-10
+
+Se añade la vista `calendar` (`#view-calendar`, tecla `C`) junto a `grid` y `map`:
+- **Renderizado (`renderCalendar`):** construye un almanaque mensual `.cal-almanac` de 7 columnas (lunes a domingo) agrupando las notas visibles por su clave local `YYYY-MM-DD` derivada de `createdAt` (con acceso opcional a notas sin fecha). Incluye una capa ambiental `.cal-ambient` con tres halos animados (`@keyframes cal-ambient-drift`), trama *dither / halftone* y retícula técnica (`--cal-grid-line`, `--cal-dither`, `--cal-crosshair`) adaptada a los temas `light` y `dark`.
+- **Imágenes y pop-up diario (`openCalendarDayDialog`, `drawPopupLinks`):** `applyBackground` se reutiliza en `.cal-pill`, `.cal-day` (eligiendo una imagen aleatoria cuando coexisten varias notas con imagen el mismo día) y `.cal-popup-card`. El pop-up diario permite marcar tareas en vivo, respeta la privacidad de `visualLock` y dibuja conexiones manuales y por etiquetas entre notas del mismo día mediante bordes `.has-edge`, insignias `.cal-rel-chip` y curvas SVG laterales en `.cal-popup-links`.
+- **Caché y pruebas:** `sw.js` actualiza `CACHE` a `checklist-v22` y `tests/harness.html` incorpora el caso `calendar-view` (`58/58 PASS`).

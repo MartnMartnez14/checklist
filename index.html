@@ -64,6 +64,15 @@
     --font-display: ui-serif, Georgia, "Times New Roman", serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --footer-a: #f4f1e8; --footer-b: #e9e0f7; --footer-c: #f3ead9;
+    --cal-surface: rgba(255, 253, 247, 0.86);
+    --cal-grid-line: rgba(23, 24, 18, 0.075);
+    --cal-dither: rgba(23, 24, 18, 0.055);
+    --cal-orb-1: rgba(200, 240, 75, 0.24);
+    --cal-orb-2: rgba(147, 102, 213, 0.14);
+    --cal-orb-3: rgba(255, 196, 112, 0.16);
+    --cal-cell-bg: rgba(255, 253, 247, 0.68);
+    --cal-cell-active: rgba(255, 253, 247, 0.92);
+    --cal-crosshair: rgba(23, 24, 18, 0.24);
     --t-fast: 120ms ease; --t-med: 180ms ease;
   }
   :root[data-theme="dark"] {
@@ -83,6 +92,15 @@
     --shadow-2: 0 8px 20px rgba(0,0,0,.45), 0 18px 44px rgba(0,0,0,.35);
     --shadow-pop: 0 10px 34px rgba(0,0,0,.55);
     --footer-a: #0d0e0c; --footer-b: #1c1526; --footer-c: #0d0e0c;
+    --cal-surface: rgba(18, 20, 16, 0.86);
+    --cal-grid-line: rgba(242, 240, 230, 0.06);
+    --cal-dither: rgba(242, 240, 230, 0.04);
+    --cal-orb-1: rgba(212, 255, 95, 0.07);
+    --cal-orb-2: rgba(147, 102, 213, 0.09);
+    --cal-orb-3: rgba(71, 229, 188, 0.055);
+    --cal-cell-bg: rgba(15, 17, 13, 0.66);
+    --cal-cell-active: rgba(24, 27, 21, 0.88);
+    --cal-crosshair: rgba(242, 240, 230, 0.20);
   }
   * { box-sizing: border-box; }
   body {
@@ -160,6 +178,84 @@
     gap: 18px; padding: clamp(16px,3vw,32px); align-items: start;
   }
   main.map-mode{display:block;gap:0;padding:0;position:relative;width:var(--canvas-w,100%);height:var(--canvas-h,100%);}
+  main.calendar-mode{display:block;max-width:1240px;margin:0 auto;padding:clamp(16px,3vw,32px);}
+  .cal-almanac{position:relative;overflow:hidden;isolation:isolate;background:var(--cal-surface);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-2);padding:clamp(16px,2.4vw,28px);}
+  /* Trama dither + retícula técnica tipo Research Lab / Memelord */
+  .cal-almanac::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(to right,var(--cal-grid-line) 1px,transparent 1px),linear-gradient(to bottom,var(--cal-grid-line) 1px,transparent 1px),radial-gradient(var(--cal-dither) 1px,transparent 0);background-size:44px 44px,44px 44px,4px 4px;}
+  /* Marcas de calibración en las 4 esquinas del almanaque */
+  .cal-almanac::after{content:"";position:absolute;inset:8px;z-index:0;pointer-events:none;border:1px dashed color-mix(in srgb,var(--line) 55%,transparent);border-radius:calc(var(--radius-lg) - 6px);opacity:.65;}
+  .cal-ambient{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+  .cal-ambient-orb{position:absolute;border-radius:50%;filter:blur(44px);will-change:transform;}
+  .cal-ambient-orb.orb-a{width:420px;height:420px;left:-8%;top:-14%;background:radial-gradient(circle,var(--cal-orb-1) 0%,transparent 70%);animation:cal-ambient-drift 18s ease-in-out infinite alternate;}
+  .cal-ambient-orb.orb-b{width:380px;height:380px;right:-6%;bottom:-16%;background:radial-gradient(circle,var(--cal-orb-2) 0%,transparent 70%);animation:cal-ambient-drift 22s ease-in-out infinite alternate-reverse;}
+  .cal-ambient-orb.orb-c{width:310px;height:310px;left:38%;top:24%;background:radial-gradient(circle,var(--cal-orb-3) 0%,transparent 72%);animation:cal-ambient-drift 15s ease-in-out infinite alternate;}
+  @keyframes cal-ambient-drift{0%{transform:translate3d(0,0,0) scale(1);}50%{transform:translate3d(26px,-18px,0) scale(1.08);}100%{transform:translate3d(-22px,20px,0) scale(.95);}}
+  .cal-ambient-stamp{position:absolute;right:20px;bottom:-18px;font-family:var(--font-mono);font-size:clamp(68px,11vw,148px);font-weight:700;letter-spacing:-.05em;line-height:.85;color:var(--watermark);user-select:none;white-space:nowrap;}
+  .cal-header{position:relative;z-index:1;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);}
+  .cal-title-block{min-width:0;}
+  .cal-kicker{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .cal-live-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 32%,transparent);animation:cal-dot-pulse 3s ease-in-out infinite;}
+  @keyframes cal-dot-pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.55;transform:scale(.85);}}
+  .cal-month-title{font-family:var(--font-display);font-size:clamp(22px,2.6vw,32px);font-weight:600;letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1.1;color:var(--text);}
+  .cal-stats{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+  .cal-stat-badge{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:color-mix(in srgb,var(--card) 82%,transparent);border:1px solid var(--line);border-radius:var(--radius-pill);padding:3px 9px;}
+  .cal-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .cal-nav .btn{padding:6px 11px;font-size:12.5px;background:color-mix(in srgb,var(--card) 82%,transparent);}
+  .cal-weekdays{position:relative;z-index:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:6px;}
+  .cal-weekday{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:5px 8px;border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:var(--radius-sm);background:color-mix(in srgb,var(--card) 65%,transparent);}
+  .cal-weekday-idx{opacity:.52;font-size:9px;}
+  .cal-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;}
+  .cal-day{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;text-align:left;min-height:114px;padding:8px 8px 11px;background:var(--cal-cell-bg);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:1px solid var(--line);border-radius:var(--radius-md);color:var(--text);font:inherit;cursor:pointer;position:relative;overflow:hidden;transition:border-color var(--t-fast),box-shadow var(--t-fast),transform var(--t-fast),background var(--t-fast);}
+  .cal-day::after{content:"+";position:absolute;right:5px;bottom:4px;font-family:var(--font-mono);font-size:10px;line-height:1;color:var(--cal-crosshair);pointer-events:none;z-index:1;}
+  .cal-day.has-bg::before{content:"";position:absolute;inset:0;background-image:var(--bg-img,none);background-size:cover;background-position:center;opacity:.32;pointer-events:none;z-index:0;}
+  .cal-day:hover{border-color:var(--accent);box-shadow:var(--shadow-1);transform:translateY(-1px);background:var(--cal-cell-active);}
+  .cal-day.is-outside{opacity:.42;background:transparent;}
+  .cal-day.has-notes{background:var(--cal-cell-active);box-shadow:var(--shadow-1);}
+  .cal-day.is-today{border-color:var(--link);box-shadow:inset 0 0 0 1px var(--link);}
+  .cal-day-top{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:6px;width:100%;position:relative;z-index:1;}
+  .cal-day-num{font-family:var(--font-mono);font-size:12px;font-weight:700;line-height:1;padding:3px 6px;border-radius:var(--radius-sm);color:var(--text);background:color-mix(in srgb,var(--card) 82%,transparent);}
+  .cal-day.is-today .cal-day-num{background:var(--accent);color:var(--accent-ink);}
+  .cal-day-count{font-family:var(--font-mono);font-size:10px;color:var(--muted);background:color-mix(in srgb,var(--card) 82%,transparent);padding:2px 5px;border-radius:var(--radius-sm);}
+  .cal-day-pills{display:flex;flex-direction:column;gap:4px;width:100%;flex:1;min-width:0;position:relative;z-index:1;}
+  .cal-pill{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:3px 6px;border-radius:5px;font-size:11px;font-weight:600;line-height:1.2;background:var(--pill-bg,var(--hover));color:var(--pill-ink,var(--text));border-left:3px solid var(--pill-border,var(--accent));overflow:hidden;}
+  .cal-pill.has-bg{background-image:var(--bg-img,none);background-size:cover;background-position:center;color:var(--image-ink,#ffffff);border-left-color:var(--image-ink,var(--accent));padding:5px 7px;box-shadow:var(--shadow-1);text-shadow:-1px 0 var(--image-outline),1px 0 var(--image-outline),0 -1px var(--image-outline),0 1px var(--image-outline),-.6px -.6px var(--image-outline),.6px -.6px var(--image-outline),-.6px .6px var(--image-outline),.6px .6px var(--image-outline);}
+  .cal-pill-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1;}
+  .cal-pill-meta{font-family:var(--font-mono);font-size:9.5px;opacity:.88;flex:none;}
+  .cal-more{font-family:var(--font-mono);font-size:10px;color:var(--muted);padding:1px 4px;}
+  .cal-day-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--line);z-index:1;}
+  .cal-day-bar-fill{height:100%;background:var(--accent);}
+  .dialog:has(.cal-popup-body){max-width:580px;}
+  .cal-popup-body{display:flex;flex-direction:column;gap:12px;margin-top:10px;position:relative;padding-left:14px;}
+  .cal-popup-links{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:1;}
+  .cal-popup-card{position:relative;z-index:2;background-color:var(--bg);background-image:linear-gradient(var(--tint,transparent),var(--tint,transparent));border:1px solid var(--line);border-radius:var(--radius-md);padding:12px 14px;box-shadow:var(--shadow-1);display:flex;flex-direction:column;gap:8px;color:var(--card-ink,var(--text));}
+  .cal-popup-card.has-edge::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:var(--edge-w);background:var(--edge-paint);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;pointer-events:none;z-index:0;}
+  .cal-popup-card.has-bg{background-image:var(--bg-img,none);background-size:cover;background-position:center;color:var(--image-ink,#ffffff);--accent:var(--image-ink,#ffffff);--letter-halo:-1px 0 var(--image-outline),1px 0 var(--image-outline),0 -1px var(--image-outline),0 1px var(--image-outline),-.6px -.6px var(--image-outline),.6px -.6px var(--image-outline),-.6px .6px var(--image-outline),.6px .6px var(--image-outline);}
+  .cal-popup-card.has-bg :is(.cal-popup-title,.cal-popup-time,.cal-popup-item span,.cal-popup-empty,.note-progress-text,.tag-chip,.cal-rel-chip){color:var(--image-ink,#ffffff);text-shadow:var(--letter-halo);}
+  .cal-popup-card.has-bg .tag-chip,.cal-popup-card.has-bg .cal-rel-chip{background:transparent;border-color:var(--image-ink,#ffffff);box-shadow:0 0 0 1px var(--image-outline);}
+  .cal-popup-card.has-bg .cal-popup-foot .btn{background:var(--card);color:var(--text);border-color:var(--line);}
+  .cal-popup-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .cal-popup-title{font-size:15px;font-weight:650;margin:0;color:inherit;word-break:break-word;}
+  .cal-popup-time{font-family:var(--font-mono);font-size:10.5px;opacity:.75;flex:none;}
+  .cal-rel-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .cal-rel-chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:var(--radius-pill);border:1px dashed var(--rel-c,var(--edge-tag));color:var(--text);background:color-mix(in srgb,var(--card) 84%,transparent);}
+  .cal-rel-chip.is-manual{border-style:solid;}
+  .cal-rel-dot{width:7px;height:7px;border-radius:50%;background:var(--rel-c,var(--edge-tag));flex:none;}
+  .cal-popup-items{display:flex;flex-direction:column;gap:5px;max-height:180px;overflow-y:auto;padding-right:4px;}
+  .cal-popup-item{display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.35;cursor:pointer;color:inherit;}
+  .cal-popup-item input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);margin:2px 0 0;flex:none;cursor:pointer;}
+  .cal-popup-item.done span{text-decoration:line-through;opacity:.68;}
+  .cal-popup-empty{font-size:12.5px;opacity:.72;margin:0;font-style:italic;}
+  .cal-popup-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:8px;margin-top:2px;}
+  @media (max-width:700px){
+    .cal-weekdays,.cal-grid{gap:4px;}
+    .cal-weekday{justify-content:center;padding:4px 2px;}
+    .cal-weekday-idx{display:none;}
+    .cal-day{min-height:76px;padding:5px 5px 8px;}
+    .cal-day-num{font-size:11px;padding:2px 4px;}
+    .cal-day-count,.cal-pill-meta{display:none;}
+    .cal-pill{padding:2px 4px;font-size:10px;}
+  }
+
   main.map-mode .note{position:absolute;width:var(--note-w);margin:0;}
   main.map-mode .note-grip{display:inline-flex;}
   .board.map{background-image:radial-gradient(1200px 600px at 50% -10%,var(--bg-glow),transparent 70%),radial-gradient(var(--dot) 1px,transparent 1px);background-size:auto,26px 26px;}
@@ -973,6 +1069,7 @@
   <symbol id="i-grip" viewBox="0 0 24 24"><path d="M8 7h8M8 12h8M8 17h8"/></symbol>
   <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="9" r="2.4"/><circle cx="10" cy="18" r="2.4"/><path d="M8 7l7 1M7.6 8.6l1.8 7M16.6 11l-5 5.4"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><circle cx="8" cy="14" r="1"/><circle cx="12" cy="14" r="1"/><circle cx="16" cy="14" r="1"/><circle cx="8" cy="18" r="1"/><circle cx="12" cy="18" r="1"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M5 19h14"/></symbol>
   <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 21V9M7 14l5-5 5 5M5 5h14"/></symbol>
@@ -1012,6 +1109,7 @@
     <div class="seg" id="view-group" role="group" aria-label="Vista del tablero">
       <button class="seg-btn" id="view-grid" type="button" aria-pressed="true" aria-label="Vista cuadrícula" aria-keyshortcuts="G"><svg class="i" aria-hidden="true"><use href="#i-grid"/></svg><span class="seg-label" id="view-grid-label">Cuadrícula</span></button>
       <button class="seg-btn" id="view-map" type="button" aria-pressed="false" aria-label="Vista mapa" aria-keyshortcuts="M"><svg class="i" aria-hidden="true"><use href="#i-map"/></svg><span class="seg-label" id="view-map-label">Mapa</span></button>
+      <button class="seg-btn" id="view-calendar" type="button" aria-pressed="false" aria-label="Vista calendario" aria-keyshortcuts="C"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg><span class="seg-label" id="view-calendar-label">Calendario</span></button>
     </div>
     <button class="btn lang-toggle" id="lang-toggle" type="button" aria-label="Cambiar idioma a inglés" title="Español / English">ES</button>
     <button class="btn theme-toggle" id="theme-toggle" type="button" aria-label="Activar modo oscuro" aria-pressed="false">
@@ -1118,8 +1216,8 @@
           <div class="roadmap-col">
             <h3 id="rm-dev-title">✅ Disponible</h3>
             <ul>
-              <li id="rm-dev-1">PIN visual, ayuda local y orden automático del mapa con Deshacer.</li>
-              <li id="rm-dev-2">Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.</li>
+              <li id="rm-dev-1">Tres vistas (Cuadrícula, Mapa y Calendario con almanaque y pop-up diario), PIN visual y ayuda local.</li>
+              <li id="rm-dev-2">Restablecer estilo, vista previa, imágenes de fondo con contraste automático y orden del mapa con Deshacer.</li>
             </ul>
           </div>
           <div class="roadmap-col">
@@ -1133,7 +1231,7 @@
             <h3 id="rm-ideas-title">💡 Ideas a futuro</h3>
             <ul>
               <li id="rm-ideas-1">Visor «Mapa estelar» (modo universo de nodos y conexiones).</li>
-              <li id="rm-ideas-2">Calendario e IA opcional, sujetos a evaluación.</li>
+              <li id="rm-ideas-2">Cifrado completo por contraseña e IA opcional, sujetos a evaluación.</li>
             </ul>
           </div>
         </div>
@@ -1223,8 +1321,23 @@
       viewGroup: "Vista del tablero",
       viewGrid: "Vista cuadrícula",
       viewMap: "Vista mapa",
+      viewCalendar: "Vista calendario",
       viewGridShort: "Cuadrícula",
       viewMapShort: "Mapa",
+      viewCalendarShort: "Calendario",
+      calPrevMonth: "Mes anterior",
+      calNextMonth: "Mes siguiente",
+      calToday: "Hoy",
+      calWeekdays: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+      calMonthStats: (lists, done, total, days) => `${lists} ${lists === 1 ? "lista" : "listas"} · ${done}/${total} tareas · ${days} ${days === 1 ? "día activo" : "días activos"}`,
+      calDayCount: n => `${n} ${n === 1 ? "lista" : "listas"}`,
+      calMoreLists: n => `+${n} más`,
+      calDaySummary: (lists, done, total) => lists ? `${lists} ${lists === 1 ? "lista incorporada" : "listas incorporadas"} · ${done}/${total} tareas completadas` : "No hay listas registradas en esta fecha.",
+      calNoTasks: "Sin tareas todavía",
+      calOpenList: "Abrir en tablero",
+      calNewOnDay: "+ Nueva lista en este día",
+      calUndatedBtn: n => `Sin fecha (${n})`,
+      calUndatedTitle: "Listas sin fecha de creación",
       langAria: "Cambiar idioma a inglés",
       themeLight: "Activar modo claro",
       themeDark: "Activar modo oscuro",
@@ -1282,16 +1395,16 @@
       copiedWhatsappAnnounceFail: "No se pudo copiar, el número es +598 92 663 680",
       roadmapSummary: "🐾 Próximos pasos (Hoja de ruta)",
       rmDevTitle: "✅ Disponible",
-      rmDev1: "PIN visual, ayuda local y orden automático del mapa con Deshacer.",
-      rmDev2: "Restablecer estilo, vista previa, mejor legibilidad y transiciones suaves.",
+      rmDev1: "Tres vistas (Cuadrícula, Mapa y Calendario con almanaque y pop-up diario), PIN visual y ayuda local.",
+      rmDev2: "Restablecer estilo, vista previa, imágenes de fondo con contraste automático y orden del mapa con Deshacer.",
       rmSoonTitle: "🔜 Próximamente",
       rmSoon1: "Optimización de rendimiento para tableros con cientos o miles de listas.",
       rmSoon2: "Controles de zoom del mapa y validación de arrastre y zoom en Android real.",
       rmIdeasTitle: "💡 Ideas a futuro",
       rmIdeas1: "Visor «Mapa estelar» (modo universo de nodos y conexiones).",
-      rmIdeas2: "Calendario e IA opcional, sujetos a evaluación.",
+      rmIdeas2: "Cifrado completo por contraseña e IA opcional, sujetos a evaluación.",
       shortcutsTitle: "Atajos de teclado",
-      shortcutsMsg: "N — nueva lista\nG — vista cuadrícula\nM — vista mapa\n/ — buscar\n? — esta ayuda",
+      shortcutsMsg: "N — nueva lista\nG — vista cuadrícula\nM — vista mapa\nC — vista calendario\n/ — buscar\n? — esta ayuda",
       listProgressAria: (done, total) => `${done} de ${total} elementos completados`,
       quotaTitle: "Almacenamiento lleno",
       quotaMsg: "La memoria local del navegador alcanzó su límite y no se pudieron guardar los últimos cambios.\nPodés descargar una copia de seguridad ahora para no perder tus datos.",
@@ -1350,6 +1463,7 @@
       stats: (n, e) => `${n} ${n === 1 ? "lista" : "listas"} · ${e} ${e === 1 ? "conexión" : "conexiones"}`,
       selectTarget: "Selecciona la lista de destino…",
       viewMapAnnounce: "Vista mapa. Usa el asa para mover cada lista.",
+      viewCalendarAnnounce: "Vista calendario. Listas ordenadas por fecha de creación.",
       viewGridAnnounce: "Vista cuadrícula",
       listMovedTo: (x, y) => `Lista movida a ${x}, ${y}`,
       movedTo: (x, y) => `Movida a ${x}, ${y}`,
@@ -1406,8 +1520,23 @@
       viewGroup: "Board view",
       viewGrid: "Grid view",
       viewMap: "Map view",
+      viewCalendar: "Calendar view",
       viewGridShort: "Grid",
       viewMapShort: "Map",
+      viewCalendarShort: "Calendar",
+      calPrevMonth: "Previous month",
+      calNextMonth: "Next month",
+      calToday: "Today",
+      calWeekdays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+      calMonthStats: (lists, done, total, days) => `${lists} ${lists === 1 ? "list" : "lists"} · ${done}/${total} tasks · ${days} active ${days === 1 ? "day" : "days"}`,
+      calDayCount: n => `${n} ${n === 1 ? "list" : "lists"}`,
+      calMoreLists: n => `+${n} more`,
+      calDaySummary: (lists, done, total) => lists ? `${lists} ${lists === 1 ? "list added" : "lists added"} · ${done}/${total} tasks completed` : "No lists recorded on this date.",
+      calNoTasks: "No tasks yet",
+      calOpenList: "Open on board",
+      calNewOnDay: "+ New list on this day",
+      calUndatedBtn: n => `Undated (${n})`,
+      calUndatedTitle: "Lists without creation date",
       langAria: "Switch language to Spanish",
       themeLight: "Activate light mode",
       themeDark: "Activate dark mode",
@@ -1465,16 +1594,16 @@
       copiedWhatsappAnnounceFail: "Could not copy, the number is +598 92 663 680",
       roadmapSummary: "🐾 What's next (Roadmap)",
       rmDevTitle: "✅ Available",
-      rmDev1: "Visual PIN, local help, and automatic map arrangement with Undo.",
-      rmDev2: "Reset style, preview, improved readability and subtle transitions.",
+      rmDev1: "Three views (Grid, Map, and Calendar almanac with daily pop-up), visual PIN, and local help.",
+      rmDev2: "Reset style, preview, background images with auto-contrast, and map arrangement with Undo.",
       rmSoonTitle: "🔜 Coming soon",
       rmSoon1: "Performance optimization for boards with hundreds or thousands of lists.",
       rmSoon2: "Map zoom controls and validation of drag and zoom on a real Android device.",
       rmIdeasTitle: "💡 Future ideas",
       rmIdeas1: "Star Map viewer (universe mode for nodes and connections).",
-      rmIdeas2: "Calendar and optional AI, subject to evaluation.",
+      rmIdeas2: "Full password encryption and optional AI, subject to evaluation.",
       shortcutsTitle: "Keyboard shortcuts",
-      shortcutsMsg: "N — new list\nG — grid view\nM — map view\n/ — search\n? — this help",
+      shortcutsMsg: "N — new list\nG — grid view\nM — map view\nC — calendar view\n/ — search\n? — this help",
       listProgressAria: (done, total) => `${done} of ${total} items completed`,
       quotaTitle: "Storage full",
       quotaMsg: "Browser local storage reached its limit and recent changes could not be saved.\nYou can download a backup copy now so you don't lose your data.",
@@ -1533,6 +1662,7 @@
       stats: (n, e) => `${n} ${n === 1 ? "list" : "lists"} · ${e} ${e === 1 ? "connection" : "connections"}`,
       selectTarget: "Select destination list…",
       viewMapAnnounce: "Map view. Use the handle to move each list.",
+      viewCalendarAnnounce: "Calendar view. Lists sorted by creation date.",
       viewGridAnnounce: "Grid view",
       listMovedTo: (x, y) => `List moved to ${x}, ${y}`,
       movedTo: (x, y) => `Moved to ${x}, ${y}`,
@@ -1574,7 +1704,10 @@
   const VIEW_KEY = "checklist-view";
   let viewMode = "grid";
   let query = "";                 // filtro activo del buscador
-  try { viewMode = localStorage.getItem(VIEW_KEY) === "map" ? "map" : "grid"; } catch (e) {}
+  try {
+    const stored = localStorage.getItem(VIEW_KEY);
+    viewMode = (stored === "map" || stored === "calendar") ? stored : "grid";
+  } catch (e) {}
 
   function uid() {
     return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
@@ -1660,6 +1793,13 @@
     return list;
   }
 
+  // ============================================================
+  // ADMINISTRACIÓN DE DATOS LOCALES: PERSISTENCIA Y CUOTAS
+  // ============================================================
+  // Checklist Gato sigue una arquitectura 100% offline-first y privada.
+  // El estado principal reside en memoria y se sincroniza en localStorage (KEY).
+  // Los fondos (imágenes/GIFs) se almacenan desacoplados en IndexedDB.
+
   function load() {
     try { return (JSON.parse(localStorage.getItem(KEY)) || []).map(normalizeNote); }
     catch { return []; }
@@ -1667,6 +1807,11 @@
 
   let gcTimer = null;
   let quotaWarnOpen = false;
+
+  // Manejo defensivo de cuota excedida en localStorage:
+  // Si el navegador deniega la escritura por límite de almacenamiento,
+  // se muestra un aviso modal prioritario que permite exportar un respaldo JSON
+  // inmediato con los datos vigentes en memoria, evitando pérdidas o cierres abruptos.
   async function notifyQuotaExceeded() {
     if (quotaWarnOpen) return;
     quotaWarnOpen = true;
@@ -1686,6 +1831,8 @@
     finally { quotaWarnOpen = false; }
   }
 
+  // Guarda las notas en localStorage y planifica la recolección de basura de imágenes.
+  // preserveLayout evita invalidar el deshacer de disposición en el modo Mapa.
   function save(preserveLayout = false) {
     if (!preserveLayout) invalidateLayoutUndo();
     try {
@@ -1706,7 +1853,7 @@
       else if (k in n) n[k] = v;
       else n.setAttribute(k, v);
     }
-    n.append(...children);
+    n.append(...children.filter(c => c != null && c !== false));
     return n;
   }
 
@@ -1982,6 +2129,7 @@
     if (footerWordmark) footerWordmark.textContent = tr("appName").toUpperCase();
     setTxt("view-grid-label", "viewGridShort");
     setTxt("view-map-label", "viewMapShort");
+    setTxt("view-calendar-label", "viewCalendarShort");
     setTxt("export-label", "exportBtn");
     setTxt("import-label", "importBtn");
     setTxt("new-note-label", "newNoteBtn");
@@ -2032,6 +2180,8 @@
     if (vGrid) vGrid.setAttribute("aria-label", tr("viewGrid"));
     const vMap = document.getElementById("view-map");
     if (vMap) vMap.setAttribute("aria-label", tr("viewMap"));
+    const vCal = document.getElementById("view-calendar");
+    if (vCal) vCal.setAttribute("aria-label", tr("viewCalendar"));
     const lBtn = document.getElementById("lang-toggle");
     if (lBtn) {
       lBtn.textContent = lang.toUpperCase();
@@ -2175,6 +2325,10 @@
     revokeImageURL(id);
   }
 
+  // Recolector de basura (GC) de imágenes huérfanas en IndexedDB:
+  // Compara las claves guardadas en el almacén "checklist-media" con los bgId
+  // referenciados actualmente por las notas en memoria. Elimina registros no utilizados
+  // y revoca sus URLs locales de objeto para liberar memoria del navegador.
   async function gcImages() {
     try {
       const db = await openDB();
@@ -2267,6 +2421,32 @@
         sec.style.removeProperty("--edge-c1");
       }
       applyBackground(sec, note);
+    });
+    document.querySelectorAll(".cal-pill[data-note-id]").forEach(pill => {
+      const note = notes.find(n => n.id === pill.dataset.noteId);
+      if (note) applyBackground(pill, note);
+    });
+    document.querySelectorAll(".cal-day[data-bg-note-id]").forEach(day => {
+      const note = notes.find(n => n.id === day.dataset.bgNoteId);
+      if (note) applyBackground(day, note);
+    });
+    document.querySelectorAll(".cal-popup-card[data-id]").forEach(card => {
+      const note = notes.find(n => n.id === card.dataset.id);
+      if (!note || isVisuallyLocked(note)) return;
+      card.style.setProperty("--tint", tintFor(note));
+      card.style.setProperty("--card-ink", accentFor(note));
+      const hues = incident.get(note.id) || [];
+      const paint = borderPaint(hues);
+      if (paint) {
+        card.classList.add("has-edge");
+        card.style.setProperty("--edge-paint", paint);
+        card.style.setProperty("--edge-c1", connColor(hues[0]));
+      } else {
+        card.classList.remove("has-edge");
+        card.style.removeProperty("--edge-paint");
+        card.style.removeProperty("--edge-c1");
+      }
+      applyBackground(card, note);
     });
   }
 
@@ -2573,17 +2753,18 @@
 
   function setView(mode, persist) {
     finishActiveDrags();
-    const next = mode === "map" ? "map" : "grid";
+    const next = (mode === "map" || mode === "calendar") ? mode : "grid";
     if (next === "map" && viewMode !== "map") { initMapPositions(); save(); }
     const changed = next !== viewMode;
     viewMode = next;
     if (persist) { try { localStorage.setItem(VIEW_KEY, viewMode); } catch (e) {} }
-    const g = document.getElementById("view-grid"), mp = document.getElementById("view-map");
+    const g = document.getElementById("view-grid"), mp = document.getElementById("view-map"), cal = document.getElementById("view-calendar");
     if (g) g.setAttribute("aria-pressed", String(viewMode === "grid"));
     if (mp) mp.setAttribute("aria-pressed", String(viewMode === "map"));
+    if (cal) cal.setAttribute("aria-pressed", String(viewMode === "calendar"));
     render();
     if (changed) fadeFeedback(document.querySelector(".board"));
-    announce(viewMode === "map" ? tr("viewMapAnnounce") : tr("viewGridAnnounce"));
+    announce(viewMode === "map" ? tr("viewMapAnnounce") : (viewMode === "calendar" ? tr("viewCalendarAnnounce") : tr("viewGridAnnounce")));
   }
 
   // El agrupador recorre un grafo bipartito listas/etiquetas: no materializa
@@ -2910,11 +3091,480 @@
     if (s) s.value = "";
   }
 
+  let calYear = null;
+  let calMonth = null;
+
+  function dateKeyFromLocal(d) {
+    if (!(d instanceof Date) || isNaN(d.getTime())) return null;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  function noteDateKey(note) {
+    if (!note || !note.createdAt) return null;
+    return dateKeyFromLocal(new Date(note.createdAt));
+  }
+
+  function formatCalendarMonthTitle(year, month) {
+    try {
+      const txt = new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-ES", { month: "long", year: "numeric" })
+        .format(new Date(year, month, 1));
+      return txt.toUpperCase();
+    } catch (e) {
+      return `${month + 1}/${year}`;
+    }
+  }
+
+  function formatCalendarFullDate(d) {
+    try {
+      const txt = new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-ES", {
+        weekday: "long", day: "numeric", month: "long", year: "numeric"
+      }).format(d);
+      return txt.charAt(0).toUpperCase() + txt.slice(1);
+    } catch (e) {
+      return dateKeyFromLocal(d) || "";
+    }
+  }
+
+  function createNoteOnDate(targetDate) {
+    clearSearch();
+    const now = new Date();
+    const isSameDay = targetDate && dateKeyFromLocal(targetDate) === dateKeyFromLocal(now);
+    const createdIso = (!targetDate || isSameDay)
+      ? now.toISOString()
+      : new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 12, 0, 0).toISOString();
+    const note = normalizeNote({
+      id: uid(), title: "", items: [], showDone: true,
+      createdAt: createdIso, updatedAt: now.toISOString()
+    });
+    notes.unshift(note);
+    save();
+    setView("grid", true);
+    render("title-" + note.id);
+    fadeFeedback(document.getElementById("title-" + note.id)?.closest(".note"));
+  }
+
+  function drawPopupLinks(body, list, edges) {
+    const svg = body.querySelector(".cal-popup-links");
+    if (!svg || !body.isConnected) return;
+    const dayIds = new Set(list.filter(n => !isVisuallyLocked(n)).map(n => n.id));
+    const dayEdges = edges.filter(e => dayIds.has(e.a) && dayIds.has(e.b));
+    if (!dayEdges.length) { svg.replaceChildren(); return; }
+    const bodyRect = body.getBoundingClientRect();
+    const groups = [];
+    dayEdges.forEach((edge, idx) => {
+      const cardA = body.querySelector(`.cal-popup-card[data-id="${CSS.escape(edge.a)}"]`);
+      const cardB = body.querySelector(`.cal-popup-card[data-id="${CSS.escape(edge.b)}"]`);
+      if (!cardA || !cardB) return;
+      const rA = cardA.getBoundingClientRect();
+      const rB = cardB.getBoundingClientRect();
+      const y1 = rA.top - bodyRect.top + rA.height / 2;
+      const y2 = rB.top - bodyRect.top + rB.height / 2;
+      const xAnchor = 14;
+      const span = Math.abs(y2 - y1);
+      const bow = Math.min(12 + idx * 4, Math.max(10, span * 0.22));
+      const xCtrl = Math.max(1, xAnchor - bow);
+      const d = `M ${xAnchor} ${y1} C ${xCtrl} ${y1}, ${xCtrl} ${y2}, ${xAnchor} ${y2}`;
+      const color = connColor(edge.hue);
+      const cls = "edge " + (edge.type === "m" ? "edge-manual" : "edge-tag");
+      const g = svgEl("g", { class: cls });
+      g.style.setProperty("--edge-c", color);
+      g.append(
+        svgEl("path", { d, class: "edge-line" }),
+        svgEl("circle", { class: "edge-anchor", cx: String(xAnchor), cy: String(y1), r: "3" }),
+        svgEl("circle", { class: "edge-anchor", cx: String(xAnchor), cy: String(y2), r: "3" })
+      );
+      groups.push(g);
+    });
+    svg.replaceChildren(...groups);
+  }
+
+  async function openCalendarDayDialog(dateKey, cellDate) {
+    const isUndated = dateKey === "undated";
+    const dayNotes = () => visibleNotes().filter(n => isUndated ? !noteDateKey(n) : noteDateKey(n) === dateKey);
+    const title = isUndated ? tr("calUndatedTitle") : formatCalendarFullDate(cellDate);
+    const summaryEl = el("p", { className: "cal-popup-summary" });
+    const body = el("div", { className: "cal-popup-body" });
+
+    const closeCurrentDialog = () => {
+      const scrim = body.closest(".dialog-scrim");
+      if (scrim) {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+      }
+    };
+
+    const updateSummaryText = () => {
+      const list = dayNotes();
+      let doneCount = 0, totalCount = 0;
+      list.forEach(n => {
+        if (isVisuallyLocked(n)) return;
+        const items = n.items || [];
+        totalCount += items.length;
+        doneCount += items.filter(i => i.done).length;
+      });
+      summaryEl.textContent = tr("calDaySummary")(list.length, doneCount, totalCount);
+    };
+
+    const rebuildPopup = () => {
+      const list = dayNotes();
+      updateSummaryText();
+      body.replaceChildren();
+
+      if (!list.length) {
+        body.append(el("p", { className: "cal-popup-empty", textContent: tr("calNoTasks") }));
+        return;
+      }
+
+      const { edges, incident } = connectionModel();
+      const svgLinks = svgEl("svg", { class: "cal-popup-links", "aria-hidden": "true" });
+      body.append(svgLinks);
+
+      list.forEach(note => {
+        if (isVisuallyLocked(note)) {
+          const lockedCard = el("div", { className: "cal-popup-card locked-note", "data-id": note.id }, [
+            el("div", { className: "cal-popup-head" }, [
+              el("h3", { className: "cal-popup-title", textContent: "🔒 " + tr("lockedTitle") })
+            ]),
+            el("p", { className: "cal-popup-empty", textContent: tr("lockedHint") }),
+            el("div", { className: "cal-popup-foot" }, [
+              el("button", {
+                type: "button", className: "btn pop-btn", textContent: tr("unlock"),
+                onclick: async () => {
+                  closeCurrentDialog();
+                  await unlockVisualNote(note);
+                }
+              })
+            ])
+          ]);
+          body.append(lockedCard);
+          return;
+        }
+
+        const card = el("div", { className: "cal-popup-card" + (note.pinned ? " pinned" : ""), "data-id": note.id });
+        card.style.setProperty("--tint", tintFor(note));
+        card.style.setProperty("--card-ink", accentFor(note));
+
+        const hues = incident.get(note.id) || [];
+        const paint = borderPaint(hues);
+        if (paint) {
+          card.classList.add("has-edge");
+          card.style.setProperty("--edge-paint", paint);
+          card.style.setProperty("--edge-c1", connColor(hues[0]));
+        }
+        applyBackground(card, note);
+
+        const d = note.createdAt ? new Date(note.createdAt) : null;
+        const timeStr = (d && !isNaN(d.getTime()))
+          ? `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
+          : "";
+
+        card.append(el("div", { className: "cal-popup-head" }, [
+          el("h3", { className: "cal-popup-title", textContent: (note.pinned ? "📌 " : "") + displayNoteTitle(note) }),
+          timeStr ? el("span", { className: "cal-popup-time", textContent: timeStr }) : null
+        ]));
+
+        // Etiquetas y relaciones con otras listas (por tag compartido o enlace manual).
+        if ((note.tags || []).length) {
+          card.append(el("div", { className: "tag-chips" }, note.tags.map(tag => {
+            const chip = el("span", { className: "tag-chip", textContent: "#" + tag });
+            chip.style.setProperty("--tag-h", String(tagHue(tag)));
+            return chip;
+          })));
+        }
+
+        const relChips = [];
+        edges.forEach(edge => {
+          if (edge.a !== note.id && edge.b !== note.id) return;
+          const otherId = edge.a === note.id ? edge.b : edge.a;
+          const other = notes.find(n => n.id === otherId);
+          if (!other || isVisuallyLocked(other)) return;
+          const sharedTags = (note.tags || []).filter(t => (other.tags || []).includes(t));
+          const label = edge.type === "m"
+            ? `🔗 ${displayNoteTitle(other)}`
+            : `#${sharedTags[0] || "tag"} ↔ ${displayNoteTitle(other)}`;
+          const chip = el("span", {
+            className: "cal-rel-chip" + (edge.type === "m" ? " is-manual" : ""),
+            "data-rel-target": other.id
+          }, [
+            el("span", { className: "cal-rel-dot" }),
+            el("span", { textContent: label })
+          ]);
+          chip.style.setProperty("--rel-c", connColor(edge.hue));
+          relChips.push(chip);
+        });
+        if (relChips.length) {
+          card.append(el("div", { className: "cal-rel-row" }, relChips));
+        }
+
+        const items = note.items || [];
+        if (items.length) {
+          const done = items.filter(i => i.done).length;
+          const pct = Math.round((done / items.length) * 100);
+          const progFill = el("div", { className: "note-progress-fill", style: "width:" + pct + "%" });
+          const progText = el("span", { className: "note-progress-text", textContent: `${done}/${items.length}` });
+          card.append(el("div", { className: "note-progress" }, [
+            el("div", { className: "note-progress-track" }, [progFill]),
+            progText
+          ]));
+
+          const itemsWrap = el("div", { className: "cal-popup-items" });
+          items.forEach(item => {
+            const chk = el("input", { type: "checkbox", checked: !!item.done });
+            const rowLabel = el("label", { className: "cal-popup-item" + (item.done ? " done" : "") }, [
+              chk,
+              el("span", { textContent: item.text || tr("untitled") })
+            ]);
+            chk.addEventListener("change", () => {
+              item.done = chk.checked;
+              rowLabel.classList.toggle("done", item.done);
+              const nowDone = (note.items || []).filter(i => i.done).length;
+              const nowPct = Math.round((nowDone / note.items.length) * 100);
+              progFill.style.width = nowPct + "%";
+              progText.textContent = `${nowDone}/${note.items.length}`;
+              touch(note);
+              save();
+              render();
+              updateSummaryText();
+            });
+            itemsWrap.append(rowLabel);
+          });
+          card.append(itemsWrap);
+        } else {
+          card.append(el("p", { className: "cal-popup-empty", textContent: tr("calNoTasks") }));
+        }
+
+        card.append(el("div", { className: "cal-popup-foot" }, [
+          el("button", {
+            type: "button", className: "btn pop-btn", textContent: tr("calOpenList"),
+            onclick: () => {
+              closeCurrentDialog();
+              setView("grid", true);
+              render("title-" + note.id);
+            }
+          })
+        ]));
+
+        body.append(card);
+      });
+
+      requestAnimationFrame(() => drawPopupLinks(body, list, edges));
+    };
+
+    rebuildPopup();
+
+    const buttons = [];
+    if (!isUndated) {
+      buttons.push({ label: tr("calNewOnDay"), value: "new", primary: true });
+    }
+    buttons.push({ label: tr("closeBtn"), value: null });
+
+    const action = await openDialog({
+      title,
+      content: [summaryEl, body],
+      buttons
+    });
+    if (action === "new" && !isUndated) {
+      createNoteOnDate(cellDate);
+    }
+  }
+
+  function renderCalendar() {
+    const root = document.getElementById("notes");
+    const visible = visibleNotes();
+    const now = new Date();
+    const todayKey = dateKeyFromLocal(now);
+
+    if (calYear == null || calMonth == null) {
+      const currentMonthPrefix = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-`;
+      const hasInCurrentMonth = visible.some(n => (noteDateKey(n) || "").startsWith(currentMonthPrefix));
+      const dated = visible.filter(n => noteDateKey(n)).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      if (!hasInCurrentMonth && dated.length) {
+        const latest = new Date(dated[0].createdAt);
+        calYear = latest.getFullYear();
+        calMonth = latest.getMonth();
+      } else {
+        calYear = now.getFullYear();
+        calMonth = now.getMonth();
+      }
+    }
+
+    const byDate = new Map();
+    const undated = [];
+    visible.forEach(n => {
+      const k = noteDateKey(n);
+      if (!k) { undated.push(n); return; }
+      if (!byDate.has(k)) byDate.set(k, []);
+      byDate.get(k).push(n);
+    });
+
+    const monthPrefix = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-`;
+    let monthLists = 0, monthDone = 0, monthTotal = 0, activeDays = 0;
+    for (const [k, list] of byDate.entries()) {
+      if (!k.startsWith(monthPrefix)) continue;
+      activeDays++;
+      monthLists += list.length;
+      list.forEach(n => {
+        if (isVisuallyLocked(n)) return;
+        const items = n.items || [];
+        monthTotal += items.length;
+        monthDone += items.filter(i => i.done).length;
+      });
+    }
+
+    const nav = el("div", { className: "cal-nav" }, [
+      undated.length ? el("button", {
+        type: "button", className: "btn btn-secondary", id: "cal-undated",
+        textContent: tr("calUndatedBtn")(undated.length),
+        onclick: () => openCalendarDayDialog("undated", null)
+      }) : null,
+      el("button", {
+        type: "button", className: "btn btn-secondary", id: "cal-prev",
+        "aria-label": tr("calPrevMonth"), textContent: "◀",
+        onclick: () => {
+          calMonth--;
+          if (calMonth < 0) { calMonth = 11; calYear--; }
+          render();
+        }
+      }),
+      el("button", {
+        type: "button", className: "btn btn-secondary", id: "cal-today",
+        textContent: tr("calToday"),
+        onclick: () => {
+          calYear = now.getFullYear();
+          calMonth = now.getMonth();
+          render();
+        }
+      }),
+      el("button", {
+        type: "button", className: "btn btn-secondary", id: "cal-next",
+        "aria-label": tr("calNextMonth"), textContent: "▶",
+        onclick: () => {
+          calMonth++;
+          if (calMonth > 11) { calMonth = 0; calYear++; }
+          render();
+        }
+      })
+    ]);
+
+    const mm = String(calMonth + 1).padStart(2, "0");
+    const ambient = el("div", { className: "cal-ambient", "aria-hidden": "true" }, [
+      el("span", { className: "cal-ambient-orb orb-a" }),
+      el("span", { className: "cal-ambient-orb orb-b" }),
+      el("span", { className: "cal-ambient-orb orb-c" }),
+      el("span", { className: "cal-ambient-stamp", textContent: `${mm}//${calYear}` })
+    ]);
+
+    const header = el("div", { className: "cal-header" }, [
+      el("div", { className: "cal-title-block" }, [
+        el("div", { className: "cal-kicker" }, [
+          el("span", { className: "cal-live-dot", "aria-hidden": "true" }),
+          el("span", { textContent: `${tr("viewCalendar")} // ${calYear}.${mm}` })
+        ]),
+        el("h2", { className: "cal-month-title", id: "cal-month-title", textContent: formatCalendarMonthTitle(calYear, calMonth) }),
+        el("div", { className: "cal-stats" }, [
+          el("span", { className: "cal-stat-badge", id: "cal-month-stats", textContent: tr("calMonthStats")(monthLists, monthDone, monthTotal, activeDays) })
+        ])
+      ]),
+      nav
+    ]);
+
+    const weekdaysRow = el("div", { className: "cal-weekdays" },
+      (tr("calWeekdays") || []).map((w, idx) => el("div", { className: "cal-weekday" }, [
+        el("span", { className: "cal-weekday-idx", "aria-hidden": "true", textContent: String(idx + 1).padStart(2, "0") }),
+        el("span", { textContent: w })
+      ]))
+    );
+
+    const firstDay = new Date(calYear, calMonth, 1);
+    const startOffset = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+    const grid = el("div", { className: "cal-grid", role: "grid", "aria-label": formatCalendarMonthTitle(calYear, calMonth) });
+    for (let i = 0; i < totalCells; i++) {
+      const cellDate = new Date(calYear, calMonth, 1 - startOffset + i);
+      const key = dateKeyFromLocal(cellDate);
+      const isOutside = cellDate.getMonth() !== calMonth;
+      const isToday = key === todayKey;
+      const dayNotes = byDate.get(key) || [];
+
+      const cls = ["cal-day"];
+      if (isOutside) cls.push("is-outside");
+      if (isToday) cls.push("is-today");
+      if (dayNotes.length) cls.push("has-notes");
+
+      const pillsWrap = el("div", { className: "cal-day-pills" });
+      let dayDone = 0, dayTotal = 0;
+      dayNotes.forEach(n => {
+        if (isVisuallyLocked(n)) return;
+        const items = n.items || [];
+        dayTotal += items.length;
+        dayDone += items.filter(it => it.done).length;
+      });
+
+      dayNotes.slice(0, 3).forEach(n => {
+        const locked = isVisuallyLocked(n);
+        const pill = el("div", { className: "cal-pill", "data-note-id": n.id });
+        if (!locked && n.color != null && PALETTE[n.color]) {
+          pill.style.setProperty("--pill-border", PALETTE[n.color].bg);
+          pill.style.setProperty("--pill-bg", tintFor(n));
+          pill.style.setProperty("--pill-ink", accentFor(n));
+        }
+        const label = locked ? ("🔒 " + tr("lockedTitle")) : ((n.pinned ? "📌 " : "") + displayNoteTitle(n));
+        const items = locked ? [] : (n.items || []);
+        const done = items.filter(it => it.done).length;
+        pill.append(el("span", { className: "cal-pill-title", textContent: label }));
+        if (items.length) {
+          pill.append(el("span", { className: "cal-pill-meta", textContent: `${done}/${items.length}` }));
+        }
+        if (!locked && n.bgId) {
+          applyBackground(pill, n);
+        }
+        pillsWrap.append(pill);
+      });
+
+      if (dayNotes.length > 3) {
+        pillsWrap.append(el("span", { className: "cal-more", textContent: tr("calMoreLists")(dayNotes.length - 3) }));
+      }
+
+      const dayPct = dayTotal > 0 ? Math.round((dayDone / dayTotal) * 100) : 0;
+      const cellBtn = el("button", {
+        type: "button",
+        className: cls.join(" "),
+        "data-date": key,
+        "aria-label": `${formatCalendarFullDate(cellDate)} (${tr("calDayCount")(dayNotes.length)})`,
+        onclick: () => openCalendarDayDialog(key, cellDate)
+      }, [
+        el("div", { className: "cal-day-top" }, [
+          el("span", { className: "cal-day-num", textContent: String(cellDate.getDate()).padStart(2, "0") }),
+          dayNotes.length ? el("span", { className: "cal-day-count", textContent: tr("calDayCount")(dayNotes.length) }) : null
+        ]),
+        pillsWrap,
+        dayTotal > 0 ? el("div", { className: "cal-day-bar" }, [
+          el("div", { className: "cal-day-bar-fill", style: "width:" + dayPct + "%" })
+        ]) : null
+      ]);
+
+      const bgNotes = dayNotes.filter(n => n.bgId && !isVisuallyLocked(n));
+      if (bgNotes.length) {
+        const bgNote = bgNotes[Math.floor(Math.random() * bgNotes.length)];
+        cellBtn.dataset.bgNoteId = bgNote.id;
+        applyBackground(cellBtn, bgNote);
+      }
+
+      grid.append(cellBtn);
+    }
+
+    const almanac = el("section", { className: "cal-almanac" }, [ambient, header, weekdaysRow, grid]);
+    root.replaceChildren(almanac);
+  }
+
   function render(focusId) {
     const root = document.getElementById("notes");
     computeTagCounts();
     const visible = visibleNotes();
-    if (notes.length === 0) {
+    if (viewMode === "calendar") {
+      renderCalendar();
+    } else if (notes.length === 0) {
       root.replaceChildren(el("p", { className: "empty" }, [
         el("strong", { textContent: tr("emptyStrong") }),
         document.createTextNode(tr("emptyHint"))
@@ -2929,6 +3579,7 @@
     }
     if (viewMode === "map" && visible.some(n => !n.pos)) { initMapPositions(); save(); }
     root.classList.toggle("map-mode", viewMode === "map");
+    root.classList.toggle("calendar-mode", viewMode === "calendar");
     if (viewMode === "map") {
       root.querySelectorAll(".note").forEach(sec => {
         const n = notes.find(x => x.id === sec.dataset.id);
@@ -3495,6 +4146,7 @@
   });
   document.getElementById("view-grid").addEventListener("click", () => setView("grid", true));
   document.getElementById("view-map").addEventListener("click", () => setView("map", true));
+  document.getElementById("view-calendar").addEventListener("click", () => setView("calendar", true));
   document.getElementById("arrange-map").addEventListener("click", arrangeMap);
   document.getElementById("undo-map").addEventListener("click", undoMapArrangement);
 
@@ -3514,6 +4166,7 @@
     if (viewMode === "map") { const k = notes.length; note.pos = { x: 24 + (k % 6) * 28, y: 24 + (k % 6) * 28 }; }
     notes.unshift(note);
     save();
+    if (viewMode === "calendar") setView("grid", true);
     render("title-" + note.id);
     fadeFeedback(document.getElementById("title-" + note.id)?.closest(".note"));
   }
@@ -3573,6 +4226,7 @@
     else if (e.key === "n" || e.key === "N") { e.preventDefault(); createNote(); }
     else if (e.key === "g" || e.key === "G") { e.preventDefault(); setView("grid", true); }
     else if (e.key === "m" || e.key === "M") { e.preventDefault(); setView("map", true); }
+    else if (e.key === "c" || e.key === "C") { e.preventDefault(); setView("calendar", true); }
     else if (e.key === "/") { e.preventDefault(); document.getElementById("search")?.focus(); }
   });
 
@@ -3671,7 +4325,15 @@
     }
   });
 
-  // ---------- Export / Import ----------
+  // ============================================================
+  // ADMINISTRACIÓN DE DATOS: EXPORTACIÓN, IMPORTACIÓN Y RESPALDOS
+  // ============================================================
+  // Soporte de interoperabilidad y respaldos mediante Schema v2:
+  // - Schema v1: Array plano de notas (compatibilidad histórica).
+  // - Schema v2: Envoltorio { app, schema, exportedAt, notes, images } con imágenes en Base64.
+  // La importación siempre realiza una descarga de respaldo previa del estado actual
+  // antes de modificar los datos locales, garantizando protección total contra pérdida accidental.
+
   function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
       const fr = new FileReader();
@@ -3887,7 +4549,11 @@
     }
   });
 
-  // ---------- Migración / arranque ----------
+  // ============================================================
+  // MIGRACIÓN Y SECUENCIA DE ARRANQUE
+  // ============================================================
+  // Asegura la disponibilidad de IndexedDB para fondos multimedia y verifica
+  // la persistencia de las notas normalizadas en localStorage.
   async function migrate() {
     try { await openDB(); }
     catch (e) { console.warn("IndexedDB no disponible:", e); }
@@ -3905,6 +4571,7 @@
   render();
   document.getElementById("view-grid").setAttribute("aria-pressed", String(viewMode === "grid"));
   document.getElementById("view-map").setAttribute("aria-pressed", String(viewMode === "map"));
+  document.getElementById("view-calendar").setAttribute("aria-pressed", String(viewMode === "calendar"));
   migrate();
 </script>
 </body>

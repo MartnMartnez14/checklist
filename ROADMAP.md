@@ -4,7 +4,8 @@
 **Sitio web:** https://checklistgato.com  
 **Estado:** imagen completa y texto automático publicados y verificados el 2026-10-27 en main/https://checklistgato.com/; caché `checklist-v18`, commit funcional `f09727b`. Suite local: 54/54 normal y reducido; web pública: 54/54 normal. Transición local v17 → v18 y recarga offline pública verificadas. Límites de fotos complejas y pruebas físicas en el cierre.<br>
 **Rediseño editorial publicado — 2026-10-30:** header Builderstable de dos filas, lienzo Buzz y footer Turion publicados en main/https://checklistgato.com/; caché `checklist-v19`, commit funcional `a5f5def`, 57/57 PASS local y público, recarga offline v19 verificada.<br>
-**Contacto de WhatsApp publicado — 2026-11-03:** tarjeta de contacto por WhatsApp en el footer (`wa.me/59892663680`, número `092 663 680` / `+598 92 663 680` y botón Copiar ES/EN) publicada en main; caché `checklist-v20`, commit funcional `50c8bd9`, suite `57/57 PASS`.
+**Contacto de WhatsApp publicado — 2026-11-03:** tarjeta de contacto por WhatsApp en el footer (`wa.me/59892663680`, número `092 663 680` / `+598 92 663 680` y botón Copiar ES/EN) publicada en main; caché `checklist-v20`, commit funcional `50c8bd9`, suite `57/57 PASS`.<br>
+**Vista Calendario publicada — 2026-11-10 (`CAT-18`):** tercera vista en la barra superior (`#view-calendar`, atajo `C`) con almanaque mensual literal, fondo dinámico con estética editorial/laboratorio (trama *dither* + retícula técnica para Modo Día y Modo Noche), imágenes de fondo con selección aleatoria cuando un día tiene varias imágenes, y pop-up diario interactivo con conexiones por etiquetas/manuales; caché `checklist-v22`, suite `58/58 PASS`.
 **Objetivo:** Consolidación, mantenimiento, evolución progresiva y expansión internacional.
 
 ---
@@ -66,8 +67,8 @@ Suite actual de 57 casos; 57 aprobados localmente y en la web pública con Chrom
   - **Descubrimiento y metadatos:** `description`, `canonical`, OpenGraph (título, descripción, URL e imagen absoluta), Twitter Card y `manifest.json` enriquecido (`lang`, `description`, `categories`), listos para compartir el enlace con vista previa.
 - **Seguridad XSS:**
   - Creación de nodos DOM exclusivamente mediante `el()` / `svgEl()` y `textContent` (cero uso de `innerHTML` con datos del usuario).
-- **Sección «Apoyar el proyecto» y Sello Open Source:**
-  - Footer con enlaces seguros (`rel="noopener noreferrer"`) a Ko-fi, PayPal, referido de Starlink, copia rápida de cuenta Prex (`35502`) y sello Open Source con acceso al repositorio en `header` y `footer`.
+- **Sección «Apoyar el proyecto», Contacto y Sello Open Source:**
+  - Footer en tres columnas con enlaces seguros (`rel="noopener noreferrer"`) a Ko-fi, PayPal y referido de Starlink, copia rápida de cuentas Prex (`35502`) y Mercado Pago, contacto por correo (`mmartinez23bio@hotmail.com`) y WhatsApp (`+598 92 663 680`), y sello Open Source con acceso al repositorio en `header` y `footer`.
 
 ### 2.2 Hallazgos técnicos resueltos en esta iteración (v1.1)
 1. **Manejo de cuota en `localStorage` (`save()` y `migrate()`):** *(Resuelto)* `localStorage.setItem` envuelto en bloques `try/catch` que abren un diálogo claro (`notifyQuotaExceeded()`) ofreciendo descargar un respaldo JSON inmediato sin romper la ejecución.
@@ -100,14 +101,14 @@ Suite actual de 57 casos; 57 aprobados localmente y en la web pública con Chrom
 | **CAT-08** | Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`) | **P2** | Media | **Hecho (Etapa 4 / Backlog Paso 4)** |
 | **CAT-09** | Optimización y rendimiento a gran escala (100 a 10.000 listas) | **P1/P2** | Media-Alta | **Pendiente (Etapa 2)** |
 | **CAT-10** | Mejoras de personalización, microinteracciones y Modo Mapa | **P2/P3** | Media | **Parcialmente implementado:** restablecer estilo, contraste y realce publicados; vista previa y transiciones publicadas; gradientes pendientes |
-| **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho** (README y CHANGELOG; tags Git pendientes de lanzamientos autorizados) |
+| **CAT-11** | Documentación ampliada (README orientado a confianza/privacidad), `CHANGELOG` y tags Git | **P2** | Baja | **Hecho** (README, CHANGELOG, ARQUITECTURA y tags Git `v1.0`–`v1.3` creados) |
 | **CAT-12** | Buscador / filtro rápido de listas, notas y etiquetas | **P3** | Baja-Media | **Hecho (Paso 8)** |
 | **CAT-13** | Visor "Mapa estelar" (3.ª vista modo universo) | **P3** | Alta | **Idea (Etapa 3.3 / 10.E)** |
 | **CAT-14** | Plantillas, atajos de teclado y estadísticas discretas | **P3/P4** | Baja-Media | **Hecho: atajos, progreso, plantillas y editor ampliado (Pasos 7-8 y Etapa 5.4)** |
 | **CAT-15** | Distribución en Google Play / Sincronización Cloud / IA | **P4** | Alta | **Idea futura (Etapas 7.1 y 10.F/G)** |
 | **CAT-16** | Sello Open Source + enlace al repositorio (footer + ícono en header) | **P2** | Baja | **Hecho (Etapa 11 / Backlog Paso 1)** |
 | **CAT-17** | Etiquetas visibles en botones «Importar» / «Exportar» en móvil | **P2** | Baja | **Hecho (Etapa 5 / Backlog Paso 3)** |
-| **CAT-18** | Tercera vista: **Calendario** (junto a Cuadrícula y Mapa) | **P3** | Media-Alta | **Pendiente de diseño (Etapa 10.H / Backlog Paso 5)** |
+| **CAT-18** | Tercera vista: **Calendario** (junto a Cuadrícula y Mapa) | **P3** | Media-Alta | **Hecho (Etapa 10.H / Backlog Paso 5; almanaque mensual + pop-up por día)** |
 | **CAT-19** | Metadatos SEO / OpenGraph y manifest PWA enriquecido | **P3** | Baja | **Hecho (Etapa 9 / Backlog Paso 6)** |
 | **CAT-20** | Contraseña / PIN manual por lista (contenido oculto hasta desbloquear) | **P3/P4** | Media (bloqueo visual) / Alta (cifrado real) | **Fase 1 implementada; fase 2 pendiente, decisión registrada (Etapa 10.I)** |
 | **CAT-21** | Arrastre táctil robusto en Android (zoom/pellizco, puntero trabado) | **P1/P2** | Media-Alta | **Endurecimiento publicado; validación Android real pendiente (Etapa 2.7 / 7.2)** |
@@ -119,6 +120,7 @@ Suite actual de 57 casos; 57 aprobados localmente y en la web pública con Chrom
 | **CAT-27** | Visibilidad y opacidad de imágenes de fondo | **P2** | Media | **Publicado y verificado (Etapa 5.2)** |
 | **CAT-28** | Ajuste moderado de legibilidad sobre imágenes en PC | **P2** | Por evaluar | **En evaluación (Etapa 5.1)** |
 | **CAT-29** | Rediseño editorial: header Builderstable, lienzo Buzz y footer Turion | **P2** | Media | **Publicado y verificado (2026-10-30); 57/57 PASS local y público; caché v19** |
+| **CAT-30** | Reordenamiento táctil de ítems dentro de una lista con el asa (`≡`) en móvil | **P2** | Baja-Media | **Pendiente de diagnóstico y testeo en celular (Etapa 2.9)** |
 
 ---
 
@@ -152,6 +154,10 @@ Permitir que una persona construya desde una simple checklist hasta un espacio e
   - **Criterios futuros de aceptación:** tarjetas y conexiones permanecen alineadas al acercar y alejar; el arrastre y el orden automático continúan funcionando; los controles solo aparecen en Mapa y siguen accesibles al desplazarse. Comprobar en navegador móvil y PWA instalada, además de verificar que no haya regresiones en PC.
   - **Relación con CAT-21:** el reporte aporta evidencia de uso real, pero no confirma todos los escenarios anteriores de captura de punteros, arrastre y zoom. CAT-21 permanece abierta.
   - **Estado de este registro:** solo documentación de la propuesta; sin cambios funcionales, commits ni publicación.
+- **2.9 Reordenamiento táctil de ítems dentro de una lista en móvil (CAT-30; relacionado con CAT-21):**
+  - **Reporte del usuario — 2026-11-09:** al intentar mover las tareas/notas internas dentro de una lista usando el icono de las tres líneas/flechitas (`.item-drag` / `≡`) en el celular, el control queda trabado o no desplaza el elemento.
+  - **Alcance y prioridad:** impacto acotado (baja urgencia, para abordar más adelante). Requiere prueba focalizada del ciclo de eventos táctiles (`pointerdown`/`pointermove`/`touch-action` sobre `.item-drag`) en vista móvil y en dispositivo real, verificando si existe interferencia con el desplazamiento vertical de la página o captura de puntero.
+  - **Estado de este registro:** documentado en el roadmap y en `INCIDENCIAS.md` para futura revisión y testeo; sin cambios funcionales en esta sesión.
 
 ---
 
@@ -225,10 +231,10 @@ Consolidar la ventaja competitiva de ser una herramienta 100% local y privada.
 ### ETAPA 8 — Repositorio, Documentación y Versionado (Prioridad: MEDIA-ALTA — P2)
 - **8.1 Documentación clara:** Mantener `README.md` y `ROADMAP.md` sincronizados con las funciones reales, instrucciones de uso local, arquitectura de privacidad y guía de pruebas.
 - **8.2 Estrategia de versiones sugerida (Git tags):**
-  - `v1.0` — Versión inicial pública operativa (`checklistgato.com`).
-  - `v1.1` — Consolidación, estabilidad, confirmaciones unificadas, sección de Feedback y «Próximos pasos».
-  - `v1.2` — Optimización de rendimiento para listas a gran escala y mejoras de experiencia.
-  - `v1.3` — Internacionalización Español / Inglés (`Checklist Gato` / `Checklist Cat`).
+  - `v1.0` (`dbdbdf7`) — Versión inicial pública operativa (`checklistgato.com`).
+  - `v1.1` (`e8620cb`) — Consolidación, estabilidad, confirmaciones, sección de Feedback, «Próximos pasos» e internacionalización ES/EN inicial (`Checklist Gato` / `Checklist Cat`).
+  - `v1.2` (`649a366`) — PIN visual por lista, ayuda local del gato, confirmaciones accesibles unificadas y orden automático del mapa con Deshacer (`checklist-v13`).
+  - `v1.3` (`50c8bd9`) — Rediseño editorial (Builderstable/Buzz/Turion), imagen de fondo completa con contraste automático, Mercado Pago y tarjeta de contacto por WhatsApp (`checklist-v20`).
   - `v2.0` — Evolución mayor (ej. Visor "Mapa estelar" o nuevas capacidades de organización), únicamente cuando esté plenamente justificada.
 
 ---
@@ -368,10 +374,10 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - **CAT-05 y Etapa 1.3:** Confirmación añadida en «Borrar completados» y refinamiento de `mergeNotes()` / `noteSignature()` para preservar enlaces hacia listas locales y detectar cambios de estilo en notas sin `updatedAt`.
 - **CAT-07:** Panel desplegable `<details id="roadmap-details">` («🐾 Próximos pasos» / «🐾 What's next») en el `footer` con las 3 columnas de evolución en Español e Inglés.
 
-### PASO 5 — Tercera vista «Calendario» *(Media-Alta — CAT-18 / Etapa 10.H)*
-- Nueva 3.ª opción en el selector de vistas del `header` (junto a *Cuadrícula* y *Mapa*).
-- Ver y organizar listas o tareas por fecha (aprovechando `createdAt` o una fecha asignada), sin sobrecargar ni desvirtuar la esencia de un checklist.
-- Diseñar un boceto previo antes de implementar.
+### ✅ PASO 5 — Tercera vista «Calendario» *(Completado — CAT-18 / Etapa 10.H)*
+- Nueva 3.ª opción en el selector de vistas del `header` (`#view-calendar`, atajo `C`, junto a *Cuadrícula* y *Mapa*).
+- Almanaque mensual literal de 7 columnas (Lun a Dom) con estadísticas del mes (listas, tareas completadas y días activos), navegación entre meses (`◀`, `Hoy`, `▶`) y píldoras de color y progreso dentro de cada día.
+- Pop-up minimalista e interactivo al hacer clic en cualquier día: permite ver todas las listas incorporadas en esa fecha, marcar/desmarcar tareas en vivo, abrir la lista en el tablero o crear una nueva lista en ese día (respetando la privacidad del PIN visual). Verificado con el test `calendar-view` (`PASS=58 FAIL=0`).
 
 ### ✅ PASO 6 — Metadatos SEO / OpenGraph *(Completado — CAT-19 / Etapa 9)*
 - `index.html`: `description`, `canonical`, OpenGraph completo (`og:type`, `og:site_name`, `og:url`, `og:title`, `og:description`, `og:image` absoluta con dimensiones y `og:locale`) y Twitter Card.
@@ -411,6 +417,7 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 | **9.12** | **CAT-26** | Botones flotantes + / − para zoom en modo Mapa | Por evaluar | P2 | **Pendiente; relacionado con CAT-21 y CAT-25** |
 | **9.13** | **CAT-27** | Visibilidad y control independiente de opacidad de imágenes | Media | P2 | **Publicado y verificado** |
 | **9.14** | **CAT-28** | Ajuste leve de contraste de letras sobre imágenes en PC, conservando el aspecto móvil | Por evaluar | P2 | **En evaluación; sin implementar** |
+| **9.15** | **CAT-30** | Corregir y testear arrastre táctil de ítems dentro de una lista (`≡`) en móvil | Baja-Media | P2 | **Pendiente: reportado el 2026-11-09 para revisión futura** |
 
 ### ✅ Cerrado en esta iteración (2026-10)
 - **CAT-24:** plantillas ES/EN con Pomodoro 25/10, explicación al espejo, hábitos saludables, equipaje y organización personal.
@@ -591,3 +598,16 @@ Para cada actualización futura sobre este roadmap se seguirá el ciclo:
 - Botón «Copiar» (`#copy-whatsapp`) con el mismo fallback de portapapeles del resto de las tarjetas; copia `+598 92 663 680`. Textos y `aria-label` traducidos en ES/EN.
 - Pruebas del footer ampliadas en `tests/harness.html` para verificar enlace, formato uruguayo, copiado y traducción.
 - Caché del Service Worker actualizada a `checklist-v20` (commit `50c8bd9` en `main`). Sin cambios en esquema de datos, almacenamiento ni exportación/importación.
+
+### Mantenimiento administrativo y documental — 2026-11-09
+- **Comentarios técnicos consolidados:** bloques explicativos en `index.html` (persistencia local, manejo de cuota excedida, recolector de basura `gcImages` en `IndexedDB`, respaldos Schema v2 y arranque), `sw.js` (ciclo de vida y estrategia híbrida de caché `v20`) y `tests/cdp-run.mjs` (ejecutor CDP en tiempo real con Node 24+).
+- **Sincronización documental a `v20`:** actualizados `ARQUITECTURA.md`, `README.md` y `ROADMAP.md` para reflejar el estado `checklist-v20`, Mercado Pago, tarjeta de WhatsApp y el arnés `tests/cdp-run.mjs`.
+- **Tags de versión en Git (`CAT-11` / Etapa 8.2):** creados los tags anotados `v1.0` (`dbdbdf7`), `v1.1` (`e8620cb`), `v1.2` (`649a366`) y `v1.3` (`50c8bd9`).
+- **Higiene de worktrees:** tras comprobar que todo el código de los tres worktrees históricos (`pin-mapa`, `estilo-legibilidad` y `diseno-editorial`) ya se encuentra integrado y publicado en `main`, se retiraron dichos worktrees obsoletos y sus ramas temporales locales, manteniendo activos y limpios `main` y `codex/dev-offline`.
+- **Nuevo reporte registrado (`CAT-30`):** documentado en la Tabla Maestra (§3), Etapa 2.9, Backlog (§9.15) e `INCIDENCIAS.md` el fallo reportado en móvil al intentar mover ítems dentro de una lista con el asa (`≡`), para su testeo y resolución futura sin urgencia inmediata.
+
+### Tercera vista «Calendario» con almanaque mensual, fondo dinámico y pop-up diario (`CAT-18`) — 2026-11-10
+- **Almanaque mensual literal (`#view-calendar`, atajo `C`):** nueva vista junto a Cuadrícula y Mapa que organiza las listas en una cuadrícula de 7 columnas (lunes a domingo) según su fecha local `createdAt`, con cabecera de estadísticas del mes, navegación `◀` / `Hoy` / `▶` y botón para listas antiguas sin fecha.
+- **Estética editorial de laboratorio y fondo dinámico (`.cal-almanac` / `.cal-ambient`):** combina retícula técnica tipo *blueprint*, miras de calibración (`+`), trama *dither / halftone*, tres halos ambientales animados (`@keyframes cal-ambient-drift`) y marca de agua técnica del mes/año, con paletas diferenciadas para Modo Día (cálido y luminoso) y Modo Noche (oscuro profundo y descansado para la vista) y soporte para `prefers-reduced-motion`.
+- **Imágenes de fondo y conexiones en el pop-up diario (`openCalendarDayDialog`):** soporte completo de `applyBackground` en casillas (`.cal-day.has-bg`, eligiendo aleatoriamente una imagen cuando varias listas del mismo día tienen fondo), píldoras (`.cal-pill.has-bg`) y tarjetas del pop-up (`.cal-popup-card.has-bg`), más visualización de relaciones por etiquetas y enlaces manuales dentro del pop-up (`.has-edge`, `.cal-rel-chip` y curvas SVG `.cal-popup-links`).
+- **Saneamiento y regresión:** filtro de valores nulos/falsos en `el()`, actualización de caché a `checklist-v22` en `sw.js` y nuevo test automatizado `calendar-view` en `tests/harness.html` (`PASS=58 FAIL=0`).
