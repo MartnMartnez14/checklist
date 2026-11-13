@@ -1706,7 +1706,53 @@
     ["redesign-structure", t_redesign_structure],
     ["redesign-mobile", t_redesign_mobile],
     ["redesign-theme", t_redesign_theme],
-    ["calendar-view", t_calendar_view]
+  async function t_map_zoom_and_mobile() {
+    await boot([
+      note("z1", "Lista 1", ["Uno"], { links: ["z2"], pos: { x: 24, y: 24 } }),
+      note("z2", "Lista 2", ["Dos"], { pos: { x: 364, y: 24 } }),
+      note("z3", "Lista 3", ["Tres"], { links: ["z1"], pos: { x: 24, y: 220 } })
+    ]);
+    resetLanguage();
+    try {
+      iframe.style.width = "375px";
+      await sleep(50);
+
+      var zoomBox = cd.getElementById("map-zoom-controls");
+      assert(zoomBox && zoomBox.hidden, "controles de zoom visibles fuera de Mapa");
+
+      cd.getElementById("view-calendar").click();
+      await sleep(30);
+      assert(zoomBox.hidden, "controles de zoom visibles en Calendario");
+
+      cd.getElementById("view-map").click();
+      await sleep(50);
+      assert(!zoomBox.hidden, "controles de zoom ocultos en Mapa");
+      assert(cd.documentElement.scrollWidth <= 376, "desborde horizontal en Mapa móvil: " + cd.documentElement.scrollWidth);
+
+      cd.getElementById("arrange-map").click();
+      await sleep(50);
+      var xs = stored().map(function (n) { return n.pos.x; });
+      assert(xs.some(function (x) { return x > 200; }), "el grafo en móvil se apiló en 1 sola columna: " + JSON.stringify(xs));
+
+      cd.getElementById("map-zoom-out").click();
+      await sleep(30);
+      assert(cd.getElementById("map-zoom-reset").textContent === "85%", "zoom out esperado 85%, obtuvo " + cd.getElementById("map-zoom-reset").textContent);
+
+      cd.getElementById("map-zoom-fit").click();
+      await sleep(30);
+      assert(cd.getElementById("map-zoom-reset").textContent !== "100%", "fit no ajustó el zoom en móvil");
+
+      cd.getElementById("map-zoom-reset").click();
+      await sleep(30);
+      assert(cd.getElementById("map-zoom-reset").textContent === "100%", "reset no volvió a 100%");
+    } finally {
+      iframe.style.width = "1000px";
+      await sleep(40);
+    }
+  }
+
+    ["calendar-view", t_calendar_view],
+    ["map-zoom-and-mobile", t_map_zoom_and_mobile]
   ];
 
   var watchdog = setTimeout(function () {

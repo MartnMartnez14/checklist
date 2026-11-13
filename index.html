@@ -258,7 +258,56 @@
 
   main.map-mode .note{position:absolute;width:var(--note-w);margin:0;}
   main.map-mode .note-grip{display:inline-flex;}
-  .board.map{background-image:radial-gradient(1200px 600px at 50% -10%,var(--bg-glow),transparent 70%),radial-gradient(var(--dot) 1px,transparent 1px);background-size:auto,26px 26px;}
+  .board.map{
+    width:100%;
+    height:calc(100vh - 120px);
+    min-height:460px;
+    overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+    background-image:radial-gradient(1200px 600px at 50% -10%,var(--bg-glow),transparent 70%),radial-gradient(var(--dot) 1px,transparent 1px);
+    background-size:auto,26px 26px;
+  }
+  .map-stage{position:relative;}
+  .map-canvas{position:relative;transform-origin:0 0;}
+  .board.map .map-canvas{transform:scale(var(--map-zoom,1));}
+  .map-zoom-controls{
+    position:fixed;
+    right:max(14px, env(safe-area-inset-right));
+    bottom:max(14px, env(safe-area-inset-bottom));
+    z-index:18;
+    display:inline-flex;
+    align-items:center;
+    gap:2px;
+    padding:4px;
+    border-radius:var(--radius-pill);
+    background:var(--surface);
+    backdrop-filter:blur(12px) saturate(1.3);
+    -webkit-backdrop-filter:blur(12px) saturate(1.3);
+    border:1px solid var(--line);
+    box-shadow:var(--shadow-2);
+  }
+  .map-zoom-controls[hidden]{display:none;}
+  .map-zoom-btn{
+    border:0;
+    background:transparent;
+    color:var(--text);
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-weight:700;
+    min-width:32px;
+    height:32px;
+    padding:0 8px;
+    border-radius:var(--radius-pill);
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    transition:background var(--t-fast), color var(--t-fast);
+  }
+  .map-zoom-btn:hover{background:var(--hover);color:var(--accent);}
+  .map-zoom-btn:disabled{opacity:.4;cursor:default;}
+  .map-zoom-reset{min-width:48px;font-size:11px;letter-spacing:.03em;color:var(--muted);}
   .note.dragging{z-index:6;box-shadow:var(--shadow-2);}
   .note.dragging,.note.dragging *{cursor:grabbing;}
   .note-grip{display:none;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:none;color:var(--muted);border-radius:50%;cursor:grab;touch-action:none;opacity:.5;flex:none;}
@@ -1137,8 +1186,18 @@
     <span><svg viewBox="0 0 24 24"><use href="#i-spark"/></svg></span>
     <span><svg viewBox="0 0 24 24"><use href="#i-paw"/></svg></span>
   </div>
-  <main id="notes"></main>
-  <svg id="links" aria-hidden="true" focusable="false"></svg>
+  <div class="map-stage" id="map-stage">
+    <div class="map-canvas" id="map-canvas">
+      <main id="notes"></main>
+      <svg id="links" aria-hidden="true" focusable="false"></svg>
+    </div>
+  </div>
+  <div class="map-zoom-controls" id="map-zoom-controls" role="group" aria-label="Controles de zoom del mapa" hidden>
+    <button type="button" class="map-zoom-btn" id="map-zoom-out" aria-label="Alejar mapa" title="Alejar">−</button>
+    <button type="button" class="map-zoom-btn map-zoom-reset" id="map-zoom-reset" aria-label="Restablecer zoom al 100%" title="Restablecer 100%">100%</button>
+    <button type="button" class="map-zoom-btn" id="map-zoom-in" aria-label="Acercar mapa" title="Acercar">+</button>
+    <button type="button" class="map-zoom-btn" id="map-zoom-fit" aria-label="Encuadrar mapa en pantalla" title="Encuadrar"><svg class="i" aria-hidden="true" focusable="false" style="width:15px;height:15px"><use href="#i-expand"/></svg></button>
+  </div>
 </div>
 <footer class="support" aria-labelledby="support-title">
   <div class="footer-top">
@@ -2582,15 +2641,18 @@
     if (!linksDirty) return;
     linksDirty = false;
     const svg = document.getElementById("links");
-    const board = document.querySelector(".board");
-    if (!svg || !board) return;
-    const boardRect = board.getBoundingClientRect();
+    const canvas = document.getElementById("map-canvas") || document.querySelector(".board");
+    if (!svg || !canvas) return;
+    const scale = viewMode === "map" ? mapZoom : 1;
+    const canvasRect = canvas.getBoundingClientRect();
     const rectMap = new Map();
-    board.querySelectorAll(".note").forEach(sec => {
+    canvas.querySelectorAll(".note").forEach(sec => {
       const r = sec.getBoundingClientRect();
       rectMap.set(sec.dataset.id, {
-        left: r.left - boardRect.left, top: r.top - boardRect.top,
-        width: r.width, height: r.height
+        left: (r.left - canvasRect.left) / scale,
+        top: (r.top - canvasRect.top) / scale,
+        width: r.width / scale,
+        height: r.height / scale
       });
     });
     const { edges } = connectionModel();
@@ -2685,6 +2747,37 @@
   // ---------- Vista: cuadrícula / mapa ----------
   let drag = null;
   let itemDrag = null;
+  let mapZoom = 1;
+  const MAP_ZOOM_MIN = 0.35;
+  const MAP_ZOOM_MAX = 1.75;
+  const MAP_ZOOM_STEP = 0.15;
+
+  function clampMapZoom(z) {
+    return Math.min(MAP_ZOOM_MAX, Math.max(MAP_ZOOM_MIN, Math.round(z * 100) / 100));
+  }
+
+  function setMapZoom(nextZoom, focalPoint) {
+    const prev = mapZoom;
+    const clamped = clampMapZoom(nextZoom);
+    const board = document.querySelector(".board");
+    if (clamped === prev) return;
+    let fx = 0, fy = 0, vx = 0, vy = 0;
+    if (board && viewMode === "map") {
+      const br = board.getBoundingClientRect();
+      vx = focalPoint ? (focalPoint.x - br.left) : (board.clientWidth / 2);
+      vy = focalPoint ? (focalPoint.y - br.top) : (board.clientHeight / 2);
+      fx = (board.scrollLeft + vx) / prev;
+      fy = (board.scrollTop + vy) / prev;
+    }
+    mapZoom = clamped;
+    layoutCanvas();
+    if (board && viewMode === "map") {
+      board.scrollLeft = Math.max(0, fx * mapZoom - vx);
+      board.scrollTop = Math.max(0, fy * mapZoom - vy);
+    }
+    scheduleLinks();
+    updateMapControls();
+  }
 
   function updateStats() {
     const { edges } = connectionModel();
@@ -2714,10 +2807,14 @@
   function layoutCanvas() {
     const main = document.getElementById("notes");
     const board = document.querySelector(".board");
+    const stage = document.getElementById("map-stage");
+    const canvas = document.getElementById("map-canvas");
     if (!main || !board) return;
     if (viewMode !== "map") {
       main.style.removeProperty("--canvas-w"); main.style.removeProperty("--canvas-h");
       board.style.width = ""; board.style.height = ""; board.classList.remove("map");
+      if (stage) { stage.style.width = ""; stage.style.height = ""; }
+      if (canvas) { canvas.style.width = ""; canvas.style.height = ""; canvas.style.removeProperty("--map-zoom"); }
       return;
     }
     let maxR = 0, maxB = 0;
@@ -2727,11 +2824,21 @@
       maxR = Math.max(maxR, n.pos.x + sec.offsetWidth);
       maxB = Math.max(maxB, n.pos.y + sec.offsetHeight);
     });
-    const w = Math.max(document.documentElement.clientWidth, maxR + 40);
-    const h = Math.max(window.innerHeight - board.offsetTop, maxB + 40);
+    const w = Math.max(board.clientWidth || document.documentElement.clientWidth, maxR + 40);
+    const h = Math.max(board.clientHeight || (window.innerHeight - board.offsetTop), maxB + 40);
     main.style.setProperty("--canvas-w", w + "px");
     main.style.setProperty("--canvas-h", h + "px");
-    board.style.width = w + "px"; board.style.height = h + "px";
+    if (canvas) {
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      canvas.style.setProperty("--map-zoom", String(mapZoom));
+    }
+    if (stage) {
+      stage.style.width = Math.ceil(w * mapZoom) + "px";
+      stage.style.height = Math.ceil(h * mapZoom) + "px";
+    }
+    board.style.width = "";
+    board.style.height = "";
     board.classList.add("map");
   }
 
@@ -2821,6 +2928,16 @@
   }
   function updateMapControls() {
     const arrange = document.getElementById("arrange-map"), undo = document.getElementById("undo-map");
+    const zoomBox = document.getElementById("map-zoom-controls");
+    const zoomOut = document.getElementById("map-zoom-out");
+    const zoomIn = document.getElementById("map-zoom-in");
+    const zoomReset = document.getElementById("map-zoom-reset");
+    const zoomFit = document.getElementById("map-zoom-fit");
+    if (zoomBox) zoomBox.hidden = viewMode !== "map";
+    if (zoomReset) zoomReset.textContent = Math.round(mapZoom * 100) + "%";
+    if (zoomOut) zoomOut.disabled = mapZoom <= MAP_ZOOM_MIN;
+    if (zoomIn) zoomIn.disabled = mapZoom >= MAP_ZOOM_MAX;
+    if (zoomFit) zoomFit.disabled = !notes.length;
     if (!arrange || !undo) return;
     arrange.hidden = undo.hidden = viewMode !== "map";
     const busy = !!(drag || itemDrag || query.trim());
@@ -2828,12 +2945,39 @@
     arrange.title = tr("arrangeHint");
     undo.disabled = busy || !layoutUndo;
   }
+
+  function fitMapToViewport() {
+    if (viewMode !== "map") return;
+    const board = document.querySelector(".board");
+    const cards = [...document.querySelectorAll("#notes .note")];
+    if (!board || !cards.length) { setMapZoom(1); return; }
+    let minX = Infinity, minY = Infinity, maxX = 0, maxY = 0;
+    cards.forEach(sec => {
+      const n = notes.find(x => x.id === sec.dataset.id);
+      if (!n || !n.pos) return;
+      minX = Math.min(minX, n.pos.x);
+      minY = Math.min(minY, n.pos.y);
+      maxX = Math.max(maxX, n.pos.x + sec.offsetWidth);
+      maxY = Math.max(maxY, n.pos.y + sec.offsetHeight);
+    });
+    if (!isFinite(minX)) { setMapZoom(1); return; }
+    const pad = 32;
+    const gw = Math.max(1, maxX - minX + pad * 2);
+    const gh = Math.max(1, maxY - minY + pad * 2);
+    const fit = Math.min(1, board.clientWidth / gw, board.clientHeight / gh);
+    mapZoom = clampMapZoom(fit);
+    layoutCanvas();
+    board.scrollLeft = Math.max(0, (minX - pad) * mapZoom);
+    board.scrollTop = Math.max(0, (minY - pad) * mapZoom);
+    scheduleLinks();
+    updateMapControls();
+  }
   function arrangeMap() {
     if (viewMode !== "map" || drag || itemDrag || query.trim() || !notes.length) return;
     openPopId = null; render(); growItems();
     const before = notes.map(n => ({id:n.id,pos:n.pos ? {...n.pos} : null}));
     const sizes = new Map([...document.querySelectorAll(".note")].map(sec => [sec.dataset.id,{w:sec.offsetWidth,h:sec.offsetHeight}]));
-    const limit = Math.max(300, document.documentElement.clientWidth - 48);
+    const limit = Math.max(680, document.documentElement.clientWidth - 48);
     let y = 24;
     for (const group of mapGroups()) {
       let x=24, rowHeight=0;
@@ -2898,7 +3042,7 @@
   }
   function onDragMove(e) {
     if (!drag || e.pointerId !== drag.pid) return;
-    const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+    const dx = (e.clientX - drag.sx) / mapZoom, dy = (e.clientY - drag.sy) / mapZoom;
     if (!drag.moved && Math.hypot(dx, dy) > 3) drag.moved = true;
     moveNote(drag.sec, drag.note, drag.ox + dx, drag.oy + dy);
   }
@@ -2930,8 +3074,9 @@
   function onItemGripDown(e, note, item, row) {
     if (drag || itemDrag || (e.isPrimary === false && !!e.pointerType) || e.button !== 0) return;
     e.preventDefault(); e.stopPropagation();
-    try { row.setPointerCapture(e.pointerId); } catch (err) {}
-    itemDrag = { note, item, row, pid: e.pointerId, sy: e.clientY, moved: false, isDone: item.done };
+    const captureEl = row.closest(".note") || row;
+    try { captureEl.setPointerCapture(e.pointerId); } catch (err) {}
+    itemDrag = { note, item, row, captureEl, pid: e.pointerId, sy: e.clientY, moved: false, isDone: item.done };
     row.classList.add("dragging");
     detachItemDragListeners();
     document.addEventListener("pointermove", onItemDragMove);
@@ -2986,7 +3131,10 @@
     if (row && row.isConnected) row.classList.remove("dragging");
     if (moved) { commitItemOrder(note); touch(note); save(); announce(tr("itemMoved")); }
     const ended = itemDrag; itemDrag = null;
-    try { if (ended.row.hasPointerCapture(ended.pid)) ended.row.releasePointerCapture(ended.pid); } catch (_) {}
+    try {
+      const cap = ended.captureEl || ended.row;
+      if (cap && cap.hasPointerCapture(ended.pid)) cap.releasePointerCapture(ended.pid);
+    } catch (_) {}
     updateMapControls();
   }
 
@@ -4149,6 +4297,40 @@
   document.getElementById("view-calendar").addEventListener("click", () => setView("calendar", true));
   document.getElementById("arrange-map").addEventListener("click", arrangeMap);
   document.getElementById("undo-map").addEventListener("click", undoMapArrangement);
+  document.getElementById("map-zoom-out")?.addEventListener("click", () => setMapZoom(mapZoom - MAP_ZOOM_STEP));
+  document.getElementById("map-zoom-in")?.addEventListener("click", () => setMapZoom(mapZoom + MAP_ZOOM_STEP));
+  document.getElementById("map-zoom-reset")?.addEventListener("click", () => setMapZoom(1));
+  document.getElementById("map-zoom-fit")?.addEventListener("click", fitMapToViewport);
+
+  const mapBoardEl = document.querySelector(".board");
+  if (mapBoardEl) {
+    mapBoardEl.addEventListener("wheel", e => {
+      if (viewMode !== "map" || !(e.ctrlKey || e.metaKey)) return;
+      e.preventDefault();
+      const dir = e.deltaY < 0 ? 1 : -1;
+      setMapZoom(mapZoom + dir * MAP_ZOOM_STEP, { x: e.clientX, y: e.clientY });
+    }, { passive: false });
+
+    let pinchStartDist = 0, pinchStartZoom = 1;
+    mapBoardEl.addEventListener("touchstart", e => {
+      if (viewMode !== "map" || e.touches.length !== 2) return;
+      finishActiveDrags();
+      const [a, b] = e.touches;
+      pinchStartDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+      pinchStartZoom = mapZoom;
+    }, { passive: true });
+    mapBoardEl.addEventListener("touchmove", e => {
+      if (viewMode !== "map" || e.touches.length !== 2 || !pinchStartDist) return;
+      e.preventDefault();
+      const [a, b] = e.touches;
+      const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+      const mid = { x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 };
+      setMapZoom(pinchStartZoom * (dist / pinchStartDist), mid);
+    }, { passive: false });
+    mapBoardEl.addEventListener("touchend", e => {
+      if (e.touches.length < 2) pinchStartDist = 0;
+    }, { passive: true });
+  }
 
   const searchInput = document.getElementById("search");
   searchInput.addEventListener("input", () => { query = searchInput.value; render(); });

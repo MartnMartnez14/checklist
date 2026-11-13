@@ -6,7 +6,7 @@
 // 2. Recursos estáticos (assets): Cache-first con actualización en segundo plano vía fetch.
 // 3. Purga administrativa: al activarse una nueva versión (v22), se eliminan automáticamente cachés obsoletas.
 
-const CACHE = "checklist-v22";
+const CACHE = "checklist-v23";
 const ASSETS = [
   "./",
   "./index.html",
